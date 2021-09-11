@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9.0</LangVersion>
+		<AssemblyName>Coding4fun.DataTableGenerator.Common</AssemblyName>
+		<RootNamespace>Coding4fun.DataTableGenerator.Common</RootNamespace>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+</Project>
