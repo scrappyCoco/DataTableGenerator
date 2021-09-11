@@ -15,7 +15,6 @@ namespace SourceGeneratorTest
         [SetUp]
         public void Setup()
         {
-            
         }
 
         [Test]
@@ -45,7 +44,7 @@ namespace MyExample
 
     public partial class PersonSqlMapping
     {
-        public PersonSqlMapping()
+        static PersonSqlMapping()
         {
             new DataTableBuilder<Person>(""#PERSON"")
                 .AddColumn(""AGE"", ""SMALLINT"", p => p.Age)
@@ -68,9 +67,9 @@ namespace MyExample
 
             Assert.NotNull(newFile);
 
-            var generatedText = newFile.GetText().ToString().Trim();
-            
-            string expectedOutput = @"
+            var generatedText = newFile.GetText().ToString().Replace("\r\n", "\n").Trim();
+
+            var expectedOutput = @"
 using Coding4fun.DataTableGenerator.Common;
 using System.Collections.Generic;
 using System.Data;
@@ -84,6 +83,22 @@ namespace MyExample
         public DataTable JOB_HISTORY;
         public DataTable SKILL;
         
+
+        public PersonSqlMapping()
+        {
+            PERSON = new DataTable();
+            PERSON.Columns.Add(""AGE"", typeof(short));
+            PERSON.Columns.Add(""FIRST_NAME"", typeof(string));
+            PERSON.Columns.Add(""LAST_NAME"", typeof(string));
+            PERSON.Columns.Add(""COUNTRY_CODE"", typeof(string));
+            
+            JOB_HISTORY = new DataTable();
+            JOB_HISTORY.Columns.Add(""COMPANY_NAME"", typeof(string));
+            
+            SKILL = new DataTable();
+            SKILL.Columns.Add(""VALUE"", typeof(string));
+            
+        }
 
         public string GetSqlTableDefinition() => @""
 CREATE TABLE #PERSON (
@@ -102,17 +117,9 @@ CREATE TABLE #SKILL (
 
         public void FillDataTables(IEnumerable<Person> items)
         {
-            DataTable PERSON = new DataTable();
-            PERSON.Columns.Add(""AGE"", typeof(short));
-            PERSON.Columns.Add(""FIRST_NAME"", typeof(string));
-            PERSON.Columns.Add(""LAST_NAME"", typeof(string));
-            PERSON.Columns.Add(""COUNTRY_CODE"", typeof(string));
-            
-            DataTable JOB_HISTORY = new DataTable();
-            JOB_HISTORY.Columns.Add(""COMPANY_NAME"", typeof(string));
-            
-            DataTable SKILL = new DataTable();
-            SKILL.Columns.Add(""VALUE"", typeof(string));
+            PERSON.Clear();
+            JOB_HISTORY.Clear();
+            SKILL.Clear();
             
 
             foreach (var item in items)
@@ -149,11 +156,11 @@ CREATE TABLE #SKILL (
         
     }
 }
-".Trim();
+".Replace("\r\n", "\n").Trim();
 
             Assert.AreEqual(expectedOutput, generatedText);
         }
-        
+
         // Thanks for example: https://github.com/TessenR/NotifyPropertyChangedDemo
         private static Compilation CreateCompilation(string source)
             => CSharpCompilation.Create("compilation",
@@ -168,9 +175,11 @@ CREATE TABLE #SKILL (
         private static GeneratorDriver CreateDriver(params ISourceGenerator[] generators)
             => CSharpGeneratorDriver.Create(generators);
 
-        private static Compilation RunGenerators(Compilation compilation, out ImmutableArray<Diagnostic> diagnostics, params ISourceGenerator[] generators)
+        private static Compilation RunGenerators(Compilation compilation, out ImmutableArray<Diagnostic> diagnostics,
+            params ISourceGenerator[] generators)
         {
-            CreateDriver(generators).RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out diagnostics);
+            CreateDriver(generators)
+                .RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out diagnostics);
             return newCompilation;
         }
     }

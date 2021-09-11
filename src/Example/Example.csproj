@@ -5,12 +5,17 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<RootNamespace>Coding4fun.DataTableGenerator.Example</RootNamespace>
 		<AssemblyName>Coding4fun.DataTableGenerator.Example</AssemblyName>
+		<DisableImplicitComponentsAnalyzers>true</DisableImplicitComponentsAnalyzers>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<WarningsAsErrors>;NU1605;CS8034;</WarningsAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Common\Common.csproj" />
-	  <ProjectReference Include="..\Entity\Entity.csproj" />
-	  <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Common\Common.csproj"/>
+		<ProjectReference Include="..\Entity\Entity.csproj"/>
+		<ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
 	</ItemGroup>
 
 </Project>

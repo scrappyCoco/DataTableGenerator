@@ -16,7 +16,7 @@ namespace Coding4fun.DataTableGenerator.Common
         public string SqlTableName { get; }
         public string? VarName { get; set; }
         public string? EnumerableName { get; set; }
-        
+
         public List<ColumnDescription> Columns { get; }
         public List<TableDescription> SubTables { get; }
 

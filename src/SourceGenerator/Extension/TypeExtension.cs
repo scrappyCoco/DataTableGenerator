@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace SourceGenerator.Extension
+namespace Coding4fun.DataTableGenerator.SourceGenerator.Extension
 {
     public static class TypeExtension
     {

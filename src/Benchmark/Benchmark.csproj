@@ -3,18 +3,19 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
-		<AssemblyName>Coding4fun.DataTableGenerator.Benchmark</AssemblyName>
+		<AssemblyName>Benchmark</AssemblyName>
 		<RootNamespace>Coding4fun.DataTableGenerator.Benchmark</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
-	  <PackageReference Include="CsvHelper" Version="27.1.1" />
+		<PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
+		<PackageReference Include="CsvHelper" Version="27.1.1" />
+		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Common\Common.csproj" />
-	  <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>

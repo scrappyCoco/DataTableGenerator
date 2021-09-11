@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Coding4fun.DataTableGenerator.Common.Extension
 {
@@ -10,13 +11,11 @@ namespace Coding4fun.DataTableGenerator.Common.Extension
         internal static string[] GetDataTableNames(this TableDescription tableDescription)
         {
             List<string> tableNames = new() { tableDescription.SqlTableName.Replace("#", "") };
-            foreach (var subTable in tableDescription.SubTables)
-            {
-                tableNames.AddRange(GetDataTableNames(subTable));
-            }
+            foreach (var subTable in tableDescription.SubTables) tableNames.AddRange(GetDataTableNames(subTable));
+
             return tableNames.ToArray();
         }
-        
+
         internal static string GetSqlTableDefinitions(this TableDescription tableDescription)
         {
             StringBuilder sqlStringBuilder = new();
@@ -47,7 +46,7 @@ namespace Coding4fun.DataTableGenerator.Common.Extension
                 AppendSqlTableDefinition(sqlStringBuilder, subTableDescription);
             }
         }
-        
+
         internal static string GetSharpDataTableDefinitions(this TableDescription tableDescription)
         {
             StringBuilder tableBuilder = new();
@@ -64,15 +63,13 @@ namespace Coding4fun.DataTableGenerator.Common.Extension
                     $"Table must contain at least one column. Let's try to add with method {nameof(DataTableBuilder<int>.AddColumn)}");
 
             var tableName = tableDescription.SqlTableName.Replace("#", "");
-            tableBuilder.AppendFormat("DataTable {0} = new DataTable();", tableName).AppendLine();
+            tableBuilder.AppendFormat("{0} = new DataTable();", tableName).AppendLine();
             foreach (var column in tableDescription.Columns)
-            {
                 tableBuilder.AppendFormat("{0}.Columns.Add(\"{1}\", typeof({2}));",
                     tableName,
                     column.SqlColumnName,
                     MapSqlTypeToSharp(column.SqlType)
                 ).AppendLine();
-            }
 
             foreach (var subTable in tableDescription.SubTables)
             {
@@ -91,38 +88,36 @@ namespace Coding4fun.DataTableGenerator.Common.Extension
         private static void AppendMethodDefinition(StringBuilder stringBuilder, TableDescription tableDescription)
         {
             string tableName = tableDescription.SqlTableName.Replace("#", "");
-            
+
             stringBuilder
-                .AppendFormat(/**/"public void Add{0}({1} {2})", tableName, tableDescription.ClassName, tableDescription.VarName)
-                .AppendLine(/*  */"{")
-                .AppendFormat(/**/"    {0}.Rows.Add(", tableDescription.SqlTableName.Replace("#", ""))
+                .AppendFormat( /**/"public void Add{0}({1} {2})", tableName, tableDescription.ClassName,
+                    tableDescription.VarName)
+                .AppendLine( /*  */"{")
+                .AppendFormat( /**/"    {0}.Rows.Add(", tableDescription.SqlTableName.Replace("#", ""))
                 .AppendLine();
 
-            for (int columnNumber = 0; columnNumber < tableDescription.Columns.Count; columnNumber++)
+            for (var columnNumber = 0; columnNumber < tableDescription.Columns.Count; columnNumber++)
             {
                 var column = tableDescription.Columns[columnNumber];
                 stringBuilder.Append("        ").Append(column.ValueBody);
-                if (columnNumber + 1 < tableDescription.Columns.Count)
-                {
-                    stringBuilder.AppendLine(",");
-                }
+                if (columnNumber + 1 < tableDescription.Columns.Count) stringBuilder.AppendLine(",");
             }
 
             stringBuilder.AppendLine(");");
-            
+
             foreach (var subTable in tableDescription.SubTables)
             {
                 if (subTable.EnumerableName == null) throw new InvalidOperationException();
                 tableName = subTable.SqlTableName.Replace("#", "");
                 stringBuilder
-                    .AppendFormat(/**/"    foreach (var subItem in {0})", subTable.EnumerableName).AppendLine()
-                    .AppendLine(/*  */"    {")
-                    .AppendFormat(/**/"        Add{0}(subItem);", tableName).AppendLine()
-                    .AppendLine(/*  */"    }");
+                    .AppendFormat( /**/"    foreach (var subItem in {0})", subTable.EnumerableName).AppendLine()
+                    .AppendLine( /*  */"    {")
+                    .AppendFormat( /**/"        Add{0}(subItem);", tableName).AppendLine()
+                    .AppendLine( /*  */"    }");
             }
-            
+
             stringBuilder.AppendLine("}");
-            
+
             foreach (var subTable in tableDescription.SubTables)
             {
                 stringBuilder.AppendLine();
@@ -130,21 +125,49 @@ namespace Coding4fun.DataTableGenerator.Common.Extension
             }
         }
 
-        private static string MapSqlTypeToSharp(string sqlType)
+        private static readonly Regex SqlTypeRegex =
+            new("(?<sqlType>^[a-z-A-Z_]+)", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static string MapSqlTypeToSharp(string sqlFullType)
         {
-            switch (sqlType.ToUpperInvariant())
-            {
-                case "SMALLINT": return "short";
-                default:
-                {
-                    if (sqlType.StartsWith("VARCHAR")) return "string";
-                    if (sqlType.StartsWith("CHAR")) return "string";
-                    string type = "";
-                    return type;
-                }
-            }
+            // NUMERIC(15,2) => NUMERIC.
+            string? sqlTypeName = SqlTypeRegex.Match(sqlFullType).Groups["sqlType"].Value?.ToUpperInvariant();
+            if (sqlTypeName == null) throw new InvalidOperationException($"Unable to get sql type from {sqlFullType}");
 
-            throw new InvalidOperationException("");
+            return sqlTypeName switch
+            {
+                // @formatter:off
+                "VARBINARY"        => "byte[]",
+                "IMAGE"            => "byte[]",
+                "FILESTREAM"       => "byte[]",
+                "ROWVERSION"       => "byte[]",
+                "VARCHAR"          => "string",
+                "CHAR"             => "string",
+                "NVARCHAR"         => "string",
+                "NCHAR"            => "string",
+                "TEXT"             => "string",
+                "NTEXT"            => "string",
+                "XML"              => "string",
+                "UNIQUEIDENTIFIER" => "System.Guid",
+                "SMALLMONEY"       => "decimal",
+                "MONEY"            => "decimal",
+                "NUMERIC"          => "decimal",
+                "DECIMAL"          => "decimal",
+                "BIT"              => "bool",
+                "TINYINT"          => "byte",
+                "SMALLINT"         => "short",
+                "INT"              => "int",
+                "BIGINT"           => "bigint",
+                "FLOAT"            => "double",
+                "REAL"             => "System.Single",
+                "DATE"             => "System.DateTime",
+                "SMALLDATETIME"    => "System.DateTime",
+                "DATETIMEOFFSET"   => "System.DateTimeOffset",
+                "DATETIME"         => "System.DateTime",
+                "DATETIME2"        => "System.DateTime",
+                "TIME"             => "System.TimeSpan",
+                "SQL_VARIANT"      => "object",
+                _                  => throw new InvalidOperationException($"Unable to map {sqlFullType} to C# type.")
+            };
         }
     }
 }

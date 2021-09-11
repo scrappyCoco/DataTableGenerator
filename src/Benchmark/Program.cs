@@ -1,47 +1,59 @@
-﻿using System.Globalization;
+﻿using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using Coding4fun.DataTableGenerator.Benchmark;
 using CsvHelper;
+using CsvHelper.Configuration;
+using JetBrains.Annotations;
 
-namespace Coding4fun.DataTableGenerator.BenchmarkDotNet
+namespace Coding4fun.DataTableGenerator.Benchmark
 {
-    [SimpleJob(RuntimeMoniker.Net50 | RuntimeMoniker.Mono)]
-    [RPlotExporter, RankColumn]
+    [SimpleJob(RuntimeMoniker.Net50, targetCount: 20)]
+    [RankColumn]
     public class DataBuilderBenchmark
     {
-        private CaseStat[] records;
+        private CaseStat[] _records;
+        private SqlMappingWithExpression _sqlMappingWithExpression;
+        private CaseStatSqlMapping _caseStatSqlMapping;
 
-        [Params(1000, 10000)]
-        public int N;
+        [Params(1000, 10000)] [UsedImplicitly] public int N = 1000;
 
         [GlobalSetup]
         public void Setup()
         {
             // Download it from https://github.com/owid/covid-19-data/blob/master/public/data/owid-covid-data.csv
-            using var reader = new StreamReader("/Users/artemkorsunov/Downloads/owid-covid-data.csv");
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-            records = csv.GetRecords<CaseStat>().Take(N).ToArray();
+            using var reader = new StreamReader(@"C:\Users\korsh\Downloads\owid-covid-data.csv.txt");
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                Delimiter = ","
+            });
+            _records = csv.GetRecords<CaseStat>().Take(N).ToArray();
+
+            _sqlMappingWithExpression = SqlMappingWithExpression.Create();
+            _caseStatSqlMapping = new CaseStatSqlMapping();
         }
 
         [Benchmark]
-        public void Sha256()
+        public DataTable Generated()
         {
-            foreach (var caseStat in records)
-            {
-                new CaseStatSqlMapping().AddSTAT(caseStat);
-            }
+            _caseStatSqlMapping.FillDataTables(_records);
+            return _caseStatSqlMapping.STAT;
+        }
+
+        [Benchmark]
+        public DataTable Expression()
+        {
+            _sqlMappingWithExpression.AddRows(_records);
+            return _sqlMappingWithExpression.DataTable;
         }
     }
 
-    public class Program
+    public static class Program
     {
-        public static void Main(string[] args)
-        {
-            var summary = BenchmarkRunner.Run<DataBuilderBenchmark>();
-        }
+        public static void Main() => BenchmarkRunner.Run<DataBuilderBenchmark>();
     }
 }

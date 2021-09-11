@@ -1,6 +1,4 @@
-using System;
-
-namespace SourceGenerator.Extension
+namespace Coding4fun.DataTableGenerator.SourceGenerator.Extension
 {
     public static class StringExtension
     {

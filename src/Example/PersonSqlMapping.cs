@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Coding4fun.DataTableGenerator.Common;
 using Coding4fun.DataTableGenerator.Entity;
 
@@ -5,7 +6,8 @@ namespace Coding4fun.DataTableGenerator.Example
 {
     public partial class PersonSqlMapping
     {
-        public PersonSqlMapping()
+        [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+        static PersonSqlMapping()
         {
             new DataTableBuilder<Person>("#PERSON")
                 .AddColumn("AGE", "SMALLINT", p => p.Age)

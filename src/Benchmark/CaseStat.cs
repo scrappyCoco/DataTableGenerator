@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Coding4fun.DataTableGenerator.Benchmark
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class CaseStat
     {
         public string iso_code { get; set; }
