@@ -129,3 +129,24 @@ CREATE TABLE #SKILL (
     }
 }
 ```
+
+Also enough to use expression like in LINQ, but the performance of this method is a little bit slower.
+```c#
+        public SqlMappingWithExpression AddColumn(string columnName, string columnType, Expression<Func<CaseStat, object>> getCellExpression)
+        {
+            var func = getCellExpression.Compile();
+            DataTable.Columns.Add(columnName, typeof(string));
+            _cellGetters.Add(func);
+            return this;
+        }
+```
+
+
+|          Method |       Number of rows |       Mean |      Error |     StdDev | Rank |
+|---------------- |--------------------- |-----------:|-----------:|-----------:|-----:|
+|  Generated Code |                1 000 |   3.012 ms |  0.0195 ms |  0.0208 ms |    1 |
+|      Expression |                1 000 |   4.392 ms |  0.0704 ms |  0.0811 ms |    2 |
+|  Generated Code |               10 000 |  47.011 ms |  0.6708 ms |  0.7456 ms |    3 |
+|      Expression |               10 000 |  61.714 ms |  0.8679 ms |  0.9995 ms |    4 |
+|  Generated Code |              100 000 | 519.296 ms | 10.5864 ms | 11.7667 ms |    5 |
+|      Expression |              100 000 | 629.166 ms |  2.6385 ms |  2.5914 ms |    6 |

@@ -19,7 +19,7 @@ namespace Coding4fun.DataTableGenerator.Benchmark
         private SqlMappingWithExpression _sqlMappingWithExpression;
         private CaseStatSqlMapping _caseStatSqlMapping;
 
-        [Params(1000, 10000)] [UsedImplicitly] public int N = 1000;
+        [Params(1000, 10_000, 100_000)] [UsedImplicitly] public int N;
 
         [GlobalSetup]
         public void Setup()
