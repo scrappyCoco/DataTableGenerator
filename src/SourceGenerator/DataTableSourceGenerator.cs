@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Antlr4.StringTemplate;
 using Coding4fun.DataTableGenerator.Common;
-using Coding4fun.DataTableGenerator.Common.Extension;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -26,45 +26,21 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
  
             try
             {
-                List<string> usingDirectives = new();
-                usingDirectives.AddRange(contextSyntaxReceiver.UsingDirectives);
-                usingDirectives.AddRange(new[]
+                List<string> usingNamespaces = new();
+                usingNamespaces.AddRange(contextSyntaxReceiver.UsingDirectives);
+                usingNamespaces.AddRange(new[]
                 {
-                    "using System.Collections.Generic;",
-                    "using System.Data;"
+                    "System.Collections.Generic",
+                    "System.Data"
                 });
 
-                string[] dataTableNames = contextSyntaxReceiver.TableDescription.GetDataTableNames()
-                    .Select(dtName => "public DataTable " + dtName + ";\n".AddSpacesAfterLn(8))
-                    .ToArray();
+                var templateGroupDirectory = new TemplateGroupDirectory("/Users/artemkorsunov/RiderProjects/DataTableGenerator/src/SourceGenerator/CodeTemplate");
+                var classTemplate = templateGroupDirectory.GetInstanceOf("ClassDefinition");
+                classTemplate.Add("usingNamespaces", usingNamespaces.Distinct().ToArray());
+                classTemplate.Add("class", contextSyntaxReceiver);
+                string sharpCode = classTemplate.Render();
 
-                string template = $@"{string.Join(Environment.NewLine, new HashSet<string>(usingDirectives.OrderBy(it => it)))}
-
-namespace {contextSyntaxReceiver.Namespace}
-{{
-    public partial class {contextSyntaxReceiver.SqlMappingClassName}
-    {{
-        {string.Join("", dataTableNames)}
-
-        public string GetSqlTableDefinition() => @""
-{contextSyntaxReceiver.TableDescription.GetSqlTableDefinitions()}
-"";
-
-        public void FillDataTables(IEnumerable<{contextSyntaxReceiver.TableDescription.ClassName}> items)
-        {{
-            {contextSyntaxReceiver.TableDescription.GetSharpDataTableDefinitions().AddSpacesAfterLn(12)}
-
-            foreach (var item in items)
-            {{
-                Add{contextSyntaxReceiver.TableDescription.SqlTableName.Replace("#", "")}(item);
-            }}
-        }}
-
-        {contextSyntaxReceiver.TableDescription.GetMethodDefinitions().AddSpacesAfterLn(8)}
-    }}
-}}
-";
-                context.AddSource($"{contextSyntaxReceiver.SqlMappingClassName ?? "NotFound"}.Generated.cs", template);
+                context.AddSource($"{contextSyntaxReceiver.SqlMappingClassName ?? "NotFound"}.Generated.cs", sharpCode);
             }
             catch (Exception exception)
             {
@@ -130,6 +106,7 @@ namespace {contextSyntaxReceiver.Namespace}
                     var firstTypeArgument = genericNameSyntax.TypeArgumentList.Arguments.FirstOrDefault();
                     if (firstTypeArgument == null) return;
 
+                    
                     TableDescription = new TableDescription(tableName, firstTypeArgument.ToString());
 
                     // ..
@@ -149,7 +126,7 @@ namespace {contextSyntaxReceiver.Namespace}
                         .First()
                         .ChildNodes()
                         .IsInstanceOf<UsingDirectiveSyntax>()
-                        .Select(u => u.ToString())
+                        .Select(u => u.Name.ToString())
                         .ToArray();
 
                     SqlMappingClassName = sqlMappingConstructor.Identifier.Text;
@@ -160,7 +137,7 @@ namespace {contextSyntaxReceiver.Namespace}
 
                     if (namespaceDeclarationSyntax == null)
                         throw new InvalidOperationException("Unable to find namespace");
-                    Namespace = namespaceDeclarationSyntax.Name.GetText().ToString();
+                    Namespace = namespaceDeclarationSyntax.Name.GetText().ToString().Trim();
                 }
                 catch (Exception exception)
                 {
@@ -305,7 +282,7 @@ namespace {contextSyntaxReceiver.Namespace}
                     }
                 }
 
-                ColumnDescription columnDescription = new(columnName, columnType, null, varName);
+                ColumnDescription columnDescription = new(columnName, columnType, varName, varName);
                 
                 TableDescription subTableDescription = new(subTableName, genericNameText)
                 {

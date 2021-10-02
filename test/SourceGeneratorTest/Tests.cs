@@ -76,80 +76,74 @@ using System.Collections.Generic;
 using System.Data;
 
 namespace MyExample
-
 {
     public partial class PersonSqlMapping
     {
-        public DataTable PERSON;
-        public DataTable JOB_HISTORY;
-        public DataTable SKILL;
-        
+        public DataTable PersonDataTable { get; } = new DataTable();
+        public DataTable JobHistoryDataTable { get; } = new DataTable();
+        public DataTable SkillDataTable { get; } = new DataTable();
 
         public string GetSqlTableDefinition() => @""
-CREATE TABLE #PERSON (
+CREATE TABLE #PERSON
+(
     AGE SMALLINT,
     FIRST_NAME VARCHAR(50),
     LAST_NAME VARCHAR(50),
     COUNTRY_CODE CHAR(2)
 );
-CREATE TABLE #JOB_HISTORY (
+
+CREATE TABLE #JOB_HISTORY
+(
     COMPANY_NAME VARCHAR(100)
 );
-CREATE TABLE #SKILL (
+
+CREATE TABLE #SKILL
+(
     VALUE VARCHAR(100)
 );
 "";
 
         public void FillDataTables(IEnumerable<Person> items)
         {
-            DataTable PERSON = new DataTable();
-            PERSON.Columns.Add(""AGE"", typeof(short));
-            PERSON.Columns.Add(""FIRST_NAME"", typeof(string));
-            PERSON.Columns.Add(""LAST_NAME"", typeof(string));
-            PERSON.Columns.Add(""COUNTRY_CODE"", typeof(string));
-            
-            DataTable JOB_HISTORY = new DataTable();
-            JOB_HISTORY.Columns.Add(""COMPANY_NAME"", typeof(string));
-            
-            DataTable SKILL = new DataTable();
-            SKILL.Columns.Add(""VALUE"", typeof(string));
-            
-
             foreach (var item in items)
             {
-                AddPERSON(item);
+                AddPerson(item);
+                foreach (var j in p.Jobs)
+                {
+                    AddJobHistory(j);
+                }
+                foreach (var p in p.Skills)
+                {
+                    AddSkill(p);
+                }
             }
         }
 
-        public void AddPERSON(Person p){
-            PERSON.Rows.Add(
+        public void AddPerson(Person p)
+        {
+            PersonDataTable.Rows.Add(
                 p.Age,
                 p.FirstName,
                 p.LastName,
-                p.CountryCode);
-            foreach (var subItem in p.Jobs)
-            {
-                AddJOB_HISTORY(subItem);
-            }
-            foreach (var subItem in p.Skills)
-            {
-                AddSKILL(subItem);
-            }
+                p.CountryCode
+            );
         }
-        
-        public void AddJOB_HISTORY(Job j){
-            JOB_HISTORY.Rows.Add(
-                j.CompanyName);
+
+        public void AddJobHistory(Job j)
+        {
+            JobHistoryDataTable.Rows.Add(
+                j.CompanyName
+            );
         }
-        
-        public void AddSKILL(string p){
-            SKILL.Rows.Add(
-                );
+
+        public void AddSkill(string p)
+        {
+            SkillDataTable.Rows.Add(
+                p
+            );
         }
-        
     }
-}
-".Trim();
+}".Trim();
 
             Assert.AreEqual(expectedOutput, generatedText);
         }

@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Coding4fun.PainlessUtils;
 
 namespace Coding4fun.DataTableGenerator.Common
 {
     public class DataTableBuilder<T>
     {
         private readonly TableDescription _tableDescription;
-
-        public DataTableBuilder(string tableName)
+        
+        public DataTableBuilder(string? tableName = null)
         {
             if (string.IsNullOrWhiteSpace(tableName)) throw new ArgumentException("Invalid table name");
-            _tableDescription = new TableDescription(tableName, typeof(T).Name);
+            string className = typeof(T).Name;
+            _tableDescription = new TableDescription(tableName, className);
         }
 
         public DataTableBuilder<T> AddColumn<TItem>(

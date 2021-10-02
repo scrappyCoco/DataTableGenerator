@@ -1,11 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<AssemblyName>Coding4fun.DataTableGenerator.Common</AssemblyName>
 		<RootNamespace>Coding4fun.DataTableGenerator.Common</RootNamespace>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Coding4fun.PainlessUtils" Version="1.0.2" />
+	</ItemGroup>
 
 </Project>

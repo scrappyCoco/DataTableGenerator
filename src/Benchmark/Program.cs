@@ -32,7 +32,7 @@ namespace Coding4fun.DataTableGenerator.BenchmarkDotNet
         {
             foreach (var caseStat in records)
             {
-                new CaseStatSqlMapping().AddSTAT(caseStat);
+                //new CaseStatSqlMapping().AddSTAT(caseStat);
             }
         }
     }
