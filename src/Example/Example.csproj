@@ -5,12 +5,17 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<RootNamespace>Coding4fun.DataTableGenerator.Example</RootNamespace>
 		<AssemblyName>Coding4fun.DataTableGenerator.Example</AssemblyName>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Common\Common.csproj" />
-	  <ProjectReference Include="..\Entity\Entity.csproj" />
 	  <ProjectReference Include="..\SourceGenerator\SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
 	</ItemGroup>
 
 </Project>

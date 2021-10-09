@@ -1,11 +1,6 @@
-using System.Collections.Immutable;
-using System.Data;
 using System.IO;
 using System.Linq;
-using Coding4fun.DataTableGenerator.Common;
 using Coding4fun.DataTableGenerator.SourceGenerator;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 
 namespace SourceGeneratorTest
@@ -28,42 +23,59 @@ namespace MyExample
 {
     public class Person
     {
+        public Guid Id { get; set; }
         public short Age { get; set; }
+        [MaxLength(50)]
         public string FirstName { get; set; }
+        [MaxLength(50)]
         public string LastName { get; set; }
+        [MinLength(2)]
+        [MaxLength(2)]
         public string CountryCode { get; set; }
         public List<Job> Jobs { get; set; }
-        public List<string> Skills { get; set; }
     }
 
     public class Job
     {
+        public Guid PersonId { get; set; }
+        public int Number { get; set; }
         public string CompanyName { get; set; }
         public string Address { get; set; }
     }
 
-
     public partial class PersonSqlMapping
     {
-        public PersonSqlMapping()
+        [SqlMappingDeclaration]  
+        private void Initialize()
         {
-            new DataTableBuilder<Person>(""#PERSON"")
-                .AddColumn(""AGE"", ""SMALLINT"", p => p.Age)
-                .AddColumn(""FIRST_NAME"", ""VARCHAR(50)"", p => p.FirstName)
-                .AddColumn(""LAST_NAME"", ""VARCHAR(50)"", p => p.LastName)
-                .AddColumn(""COUNTRY_CODE"", ""CHAR(2)"", p => p.CountryCode)
-                .AddSubTable<Job>(""#JOB_HISTORY"", p => p.Jobs, jobBuilder => jobBuilder
-                    .AddColumn(""COMPANY_NAME"", ""VARCHAR(100)"", j => j.CompanyName)
-                    .AddColumn(""ADDRESS"", ""VARCHAR(200)"", j => j.Address)
-                ).AddBasicSubTable<string>(""#SKILL"", ""VALUE"", ""VARCHAR(100)"", p => p.Skills);
+            new TableBuilder<Person>(NamingConvention.SnakeCase)
+                .AddPreExecutionAction(person =>
+                {
+                    Console.WriteLine(person.LastName + "" "" + person.FirstName);
+                })
+                .SetName(""#MY_PERSON"")
+                .AddColumn(person => person.Id)
+                .AddColumn(person => person.Age)
+                .AddColumn(person => person.FirstName)
+                .AddColumn(person => person.LastName)
+                .AddColumn(person => person.CountryCode, columnName:""COUNTRY"")
+                .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
+                    .AddPreExecutionAction((job, person) =>
+                    {
+                        job.PersonId = person.Id;
+                    })
+                    .AddColumn(job => job.PersonId)
+                    .AddColumn(job => job.CompanyName, ""VARCHAR(100)"")
+                    .AddColumn(job => job.Address, ""VARCHAR(200)"")
+                );
         }
     }
 }
 ";
-            var comp = CreateCompilation(userSource);
-            var newComp = RunGenerators(comp, out _, new DataTableSourceGenerator());
+            var compilation = CompilationUtil.CreateCompilation(userSource);
+            var newCompilation = CompilationUtil.RunGenerators(compilation, out _, new DataTableSourceGenerator());
 
-            var newFile = newComp.SyntaxTrees
+            var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
 
             Assert.NotNull(newFile);
@@ -80,92 +92,63 @@ namespace MyExample
     public partial class PersonSqlMapping
     {
         public DataTable PersonDataTable { get; } = new DataTable();
-        public DataTable JobHistoryDataTable { get; } = new DataTable();
-        public DataTable SkillDataTable { get; } = new DataTable();
+        public DataTable JobDataTable { get; } = new DataTable();
 
         public string GetSqlTableDefinition() => @""
-CREATE TABLE #PERSON
+CREATE TABLE #MY_PERSON
 (
-    AGE SMALLINT,
-    FIRST_NAME VARCHAR(50),
-    LAST_NAME VARCHAR(50),
-    COUNTRY_CODE CHAR(2)
+    id UNIQUEIDENTIFIER,
+    age SMALLINT,
+    first_name NVARCHAR(50),
+    last_name NVARCHAR(50),
+    country NCHAR(2)
 );
 
-CREATE TABLE #JOB_HISTORY
+CREATE TABLE #job
 (
-    COMPANY_NAME VARCHAR(100)
-);
-
-CREATE TABLE #SKILL
-(
-    VALUE VARCHAR(100)
+    person_id UNIQUEIDENTIFIER,
+    company_name VARCHAR(100),
+    address VARCHAR(200)
 );
 "";
 
         public void FillDataTables(IEnumerable<Person> items)
         {
-            foreach (var item in items)
+            foreach (var person in items)
             {
-                AddPerson(item);
-                foreach (var j in p.Jobs)
+                Console.WriteLine(person.LastName + "" "" + person.FirstName);
+                AddPerson(person);
+                foreach (var job in person.Jobs)
                 {
-                    AddJobHistory(j);
-                }
-                foreach (var p in p.Skills)
-                {
-                    AddSkill(p);
+                    job.PersonId = person.Id;
+                    AddJob(job);
                 }
             }
         }
 
-        public void AddPerson(Person p)
+        public void AddPerson(Person person)
         {
             PersonDataTable.Rows.Add(
-                p.Age,
-                p.FirstName,
-                p.LastName,
-                p.CountryCode
+                person.Id,
+                person.Age,
+                person.FirstName,
+                person.LastName,
+                person.CountryCode
             );
         }
 
-        public void AddJobHistory(Job j)
+        public void AddJob(Job job)
         {
-            JobHistoryDataTable.Rows.Add(
-                j.CompanyName
-            );
-        }
-
-        public void AddSkill(string p)
-        {
-            SkillDataTable.Rows.Add(
-                p
+            JobDataTable.Rows.Add(
+                job.PersonId,
+                job.CompanyName,
+                job.Address
             );
         }
     }
 }".Trim();
 
             Assert.AreEqual(expectedOutput, generatedText);
-        }
-        
-        // Thanks for example: https://github.com/TessenR/NotifyPropertyChangedDemo
-        private static Compilation CreateCompilation(string source)
-            => CSharpCompilation.Create("compilation",
-                new[] { CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp9)) },
-                new[]
-                {
-                    MetadataReference.CreateFromFile(typeof(DataTable).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(DataTableBuilder<int>).Assembly.Location)
-                },
-                new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-
-        private static GeneratorDriver CreateDriver(params ISourceGenerator[] generators)
-            => CSharpGeneratorDriver.Create(generators);
-
-        private static Compilation RunGenerators(Compilation compilation, out ImmutableArray<Diagnostic> diagnostics, params ISourceGenerator[] generators)
-        {
-            CreateDriver(generators).RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out diagnostics);
-            return newCompilation;
         }
     }
 }

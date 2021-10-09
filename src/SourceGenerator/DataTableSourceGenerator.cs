@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using Antlr4.StringTemplate;
 using Coding4fun.DataTableGenerator.Common;
+using Coding4fun.DataTableGenerator.SourceGenerator.Extension;
+using Coding4fun.PainlessUtils;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using SourceGenerator.Extension;
 
 namespace Coding4fun.DataTableGenerator.SourceGenerator
@@ -13,324 +17,462 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
     [Generator]
     public class DataTableSourceGenerator : ISourceGenerator
     {
+        private readonly string _tableBuilderName = typeof(TableBuilder<int>).GetNameWithoutGeneric();
+        private NamingConvention _namingConvention = NamingConvention.ScreamingSnakeCase;
+
         /// <inheritdoc />
         public void Initialize(GeneratorInitializationContext context)
         {
-            context.RegisterForSyntaxNotifications(() => new MySyntaxReceiver());
         }
 
         /// <inheritdoc />
         public void Execute(GeneratorExecutionContext context)
         {
-            if (context.SyntaxReceiver is not MySyntaxReceiver contextSyntaxReceiver) return;
- 
-            try
-            {
-                List<string> usingNamespaces = new();
-                usingNamespaces.AddRange(contextSyntaxReceiver.UsingDirectives);
-                usingNamespaces.AddRange(new[]
-                {
-                    "System.Collections.Generic",
-                    "System.Data"
-                });
-
-                var templateGroupDirectory = new TemplateGroupDirectory("/Users/artemkorsunov/RiderProjects/DataTableGenerator/src/SourceGenerator/CodeTemplate");
-                var classTemplate = templateGroupDirectory.GetInstanceOf("ClassDefinition");
-                classTemplate.Add("usingNamespaces", usingNamespaces.Distinct().ToArray());
-                classTemplate.Add("class", contextSyntaxReceiver);
-                string sharpCode = classTemplate.Render();
-
-                context.AddSource($"{contextSyntaxReceiver.SqlMappingClassName ?? "NotFound"}.Generated.cs", sharpCode);
-            }
-            catch (Exception exception)
-            {
-                var diagnosticDescriptor = new DiagnosticDescriptor("c4f.id", "Error", "Message", "Generator", DiagnosticSeverity.Error, true);
-                var diagnostic = Diagnostic.Create(diagnosticDescriptor, Location.None);
-                context.ReportDiagnostic(diagnostic);
-            }
-        }
-
-        private class MySyntaxReceiver : ISyntaxReceiver
-        {
-            private static readonly string DataTableBuilderName = typeof(DataTableBuilder<int>).GetNameWithoutGeneric();
-            public string? Namespace { get; private set; }
-            public string? SqlMappingClassName { get; private set; }
-            public SourceText? SourceText { get; private set; }
-
-            public TableDescription TableDescription { get; private set; }
-
-            public string[] UsingDirectives { get; private set; }
-
-            /// <inheritdoc />
-            public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
+            foreach (SyntaxTree syntaxTree in context.Compilation.SyntaxTrees)
             {
                 try
                 {
-                    // public partial class PersonSqlMapping
-                    // {
-                    //     public PersonSqlMapping() { ... }
-                    //     ^                      ^
-
-                    if (syntaxNode is not ConstructorDeclarationSyntax sqlMappingConstructor ||
-                        !sqlMappingConstructor.Identifier.Text.EndsWith("SqlMapping")
-                        || sqlMappingConstructor.Body == null)
-                    {
-                        return;
-                    }
-
-                    // new DataTableBuilder<Person>("#PERSON")...
-                    // ^                                     ^
-                    ObjectCreationExpressionSyntax? dtBuilderCreationSyntax = sqlMappingConstructor
+                    SyntaxNode rootNode = syntaxTree.GetRoot();
+                    MethodDeclarationSyntax[] methodDeclarations = rootNode
                         .DescendantNodes()
-                        .IsInstanceOf<ObjectCreationExpressionSyntax>()
-                        .FirstOrDefault();
-
-                    // new DataTableBuilder<Person>("#PERSON")...
-                    //     ^              ^
-                    if (dtBuilderCreationSyntax == null ||
-                        dtBuilderCreationSyntax.Type is not GenericNameSyntax genericNameSyntax ||
-                        genericNameSyntax.Identifier.Text != DataTableBuilderName)
-                    {
-                        return;
-                    }
-
-                    // new DataTableBuilder<Person>("#PERSON")...
-                    //                              ^       ^
-                    ArgumentSyntax? firstArgument = dtBuilderCreationSyntax.ArgumentList?.Arguments.FirstOrDefault();
-                    string? tableName = (firstArgument?.Expression as LiteralExpressionSyntax)?.Token.ValueText;
-
-                    if (tableName == null) return;
-
-                    // new DataTableBuilder<Person>("#PERSON")...
-                    //                     ^      ^
-                    var firstTypeArgument = genericNameSyntax.TypeArgumentList.Arguments.FirstOrDefault();
-                    if (firstTypeArgument == null) return;
-
-                    
-                    TableDescription = new TableDescription(tableName, firstTypeArgument.ToString());
-
-                    // ..
-                    //   .AddColumn(...)
-                    //   .AddColumn(...)
-                    //   .AddSubTable(...)
-                    // ...
-                    var invocationExpressions = dtBuilderCreationSyntax
-                        .Ancestors()
-                        .Where(node => node is InvocationExpressionSyntax)
-                        .Cast<InvocationExpressionSyntax>();
-
-
-                    ParseInvocationExpressions(invocationExpressions, TableDescription);
-
-                    UsingDirectives = syntaxNode.Ancestors().IsInstanceOf<CompilationUnitSyntax>()
-                        .First()
-                        .ChildNodes()
-                        .IsInstanceOf<UsingDirectiveSyntax>()
-                        .Select(u => u.Name.ToString())
+                        .IsInstanceOf<MethodDeclarationSyntax>()
                         .ToArray();
 
-                    SqlMappingClassName = sqlMappingConstructor.Identifier.Text;
-                    SourceText = sqlMappingConstructor.Body.GetText();
-                    NamespaceDeclarationSyntax? namespaceDeclarationSyntax = syntaxNode.Ancestors()
-                        .IsInstanceOf<NamespaceDeclarationSyntax>()
-                        .FirstOrDefault();
+                    foreach (MethodDeclarationSyntax methodDeclaration in methodDeclarations)
+                    {
+                        // [SqlMappingDeclaration]
+                        //  ^                   ^
+                        // private void Initialize()
+                        // {
+                        //    ...
+                        // }
 
-                    if (namespaceDeclarationSyntax == null)
-                        throw new InvalidOperationException("Unable to find namespace");
-                    Namespace = namespaceDeclarationSyntax.Name.GetText().ToString().Trim();
+                        bool isSqlMappingDefinition = methodDeclaration.AttributeLists
+                            .SelectMany(attributeList => attributeList.Attributes)
+                            .Any(attribute => attribute.Name.ToString() == SqlMappingDeclarationAttribute.Name);
+
+                        if (!isSqlMappingDefinition) continue;
+
+                        // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
+                        //     ^              ^
+                        GenericNameSyntax? genericName = methodDeclaration
+                            .DescendantNodes()
+                            .IsInstanceOf<ObjectCreationExpressionSyntax>()
+                            .Select(objectCreationExpression => objectCreationExpression.Type)
+                            .IsInstanceOf<GenericNameSyntax>()
+                            .FirstOrDefault(genericName => genericName.Identifier.Text == _tableBuilderName);
+
+                        if (genericName == null)
+                        {
+                            Throw($"Unable to find definition of {_tableBuilderName}<TItem>.", methodDeclaration);
+                        }
+                        
+                        // new DataTableBuilder<Person>()...
+                        //                     ^      ^
+                        TypeSyntax? genericType = genericName!.TypeArgumentList.Arguments.FirstOrDefault();
+                        if (genericType == null)
+                        {
+                            Throw($"Unable to find generic type of {_tableBuilderName}.", methodDeclaration);
+                        }
+
+                        // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
+                        //                              ^                                 ^
+                        string? namingConventionValue = genericName.Ancestors()
+                                                            .IsInstanceOf<ObjectCreationExpressionSyntax>()
+                                                            .First()
+                                                            .ArgumentList?.Arguments.FirstOrDefault()?.GetLastToken()
+                                                            .Text
+                                                        ?? NamingConvention.ScreamingSnakeCase.ToString();
+
+                        _namingConvention = namingConventionValue.ParseEnum<NamingConvention>();
+                        
+                        string sqlTableName = GetSqlTableName(genericName.ToString());
+                        TableDescription tableDescription =
+                            new(genericType!.ToString(), genericType.ToString(), sqlTableName);
+
+                        // ..
+                        //   .AddColumn(...)
+                        //   .AddColumn(...)
+                        //   .AddSubTable(...)
+                        // ...
+                        var invocationExpressions = genericName
+                            .Ancestors()
+                            .IsInstanceOf<InvocationExpressionSyntax>()
+                            .ToArray();
+
+                        var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
+                        ITypeSymbol? genericTypeSymbol = ModelExtensions.GetTypeInfo(semanticModel, genericType).Type;
+                        if (genericTypeSymbol == null)
+                        {
+                            Throw("Unable to get type info", genericType);
+                        }
+
+                        ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol!);
+                        
+                        var usingDirectives = rootNode.DescendantNodes()
+                            .IsInstanceOf<UsingDirectiveSyntax>()
+                            .Select(u => u.Name.ToString())
+                            .ToArray();
+                        
+                        // public partial class PersonSqlMapping
+                        //                      ^              ^
+                        
+                        ClassDeclarationSyntax classDeclaration =
+                            genericType.Ancestors().IsInstanceOf<ClassDeclarationSyntax>().First()!;
+                        
+                        string sqlMappingClassName = classDeclaration.Identifier.Text;
+                        NamespaceDeclarationSyntax? namespaceDeclaration = genericName.Ancestors()
+                            .IsInstanceOf<NamespaceDeclarationSyntax>()
+                            .FirstOrDefault();
+
+                        if (namespaceDeclaration == null)
+                        {
+                            Throw("Unable to find namespace");
+                        }
+
+                        string @namespace = namespaceDeclaration!.Name.GetText().ToString().Trim();
+                        
+                        List<string> usingNamespaces = new();
+                        usingNamespaces.AddRange(usingDirectives);
+                        usingNamespaces.AddRange(new[]
+                        {
+                            "System.Collections.Generic",
+                            "System.Data"
+                        });
+
+                        using Stream? templatesStream =
+                            Assembly.GetExecutingAssembly()
+                                .GetManifestResourceStream(
+                                    "Coding4fun.DataTableGenerator.SourceGenerator.CodeTemplates.stg");
+
+                        if (templatesStream == null)
+                        {
+                            Throw("Unable to find resource with string template.");
+                        }
+
+                        TemplateGroupString templateGroup = new(new StreamReader(templatesStream!).ReadToEnd());
+                        var classTemplate = templateGroup.GetInstanceOf("ClassDefinition");
+                        classTemplate.Add("usingNamespaces", usingNamespaces.Distinct().ToArray());
+                        classTemplate.Add("cNamespace", @namespace);
+                        classTemplate.Add("tableDescription", tableDescription);
+                        classTemplate.Add("sqlMappingClassName", sqlMappingClassName);
+                        string sharpCode = classTemplate.Render();
+            
+                        context.AddSource($"{sqlMappingClassName}.Generated.cs", sharpCode);
+                    }
                 }
                 catch (Exception exception)
                 {
+                    var diagnosticDescriptor = new DiagnosticDescriptor("Coding4fun.DataTools", "Error", exception.Message,
+                        "DataTableGenerator", DiagnosticSeverity.Error, true);
                     
+                    Location codeLocation = exception is SourceGeneratorException sourceGeneratorException
+                        ? sourceGeneratorException.Location
+                        : Location.None;
+
+                    var diagnostic = Diagnostic.Create(diagnosticDescriptor, codeLocation);
+                    context.ReportDiagnostic(diagnostic);
                 }
             }
+        }
 
-            private static ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression)
+        private string ChangeSqlCase(string entityName)
+        {
+            string sqlTableName = _namingConvention switch
             {
-                string? columnName = null;
-                string? columnType = null;
-                string? varName = null;
-                string? expressionBody = null;
+                NamingConvention.CamelCase => entityName.ChangeCase(CaseRules.ToCamelCase)!,
+                NamingConvention.PascalCase => entityName.ChangeCase(CaseRules.ToTitleCase)!,
+                NamingConvention.KebabCase => entityName.ChangeCase(CaseRules.ToLowerCase, "-")!,
+                NamingConvention.SnakeCase => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
+                NamingConvention.ScreamingSnakeCase => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!,
+                _ => throw new ArgumentOutOfRangeException($"Unable to map {_namingConvention}.")
+            };
 
-                //
-                // ...AddColumn("AGE", "SMALLINT", p => p.Age)
-                //
-                for (var argNumber = 0; argNumber < invocationExpression.ArgumentList.Arguments.Count; argNumber++)
+            return sqlTableName;
+        }
+
+        private string GetSqlTableName(string entityName) => "#" + ChangeSqlCase(entityName);
+
+        private ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression,
+            ITypeSymbol genericType)
+        {
+            string? propertyName = null;
+            string? columnName = null;
+            string? columnType = null;
+            string? varName = null;
+            string? expressionBody = null;
+
+            //
+            // ...AddColumn(person => person.CountryCode, "CHAR(2)", "COUNTRY_CODE")
+            //
+            for (int argNumber = 0; argNumber < invocationExpression.ArgumentList.Arguments.Count; argNumber++)
+            {
+                ArgumentSyntax argument = invocationExpression.ArgumentList.Arguments[argNumber];
+                string? parameterName = argument.NameColon?.Name.Identifier.Text;
+
+                if (argNumber == 0)
                 {
-                    ArgumentSyntax argumentListArgument = invocationExpression.ArgumentList.Arguments[argNumber];
-                    switch (argNumber)
+                    // person => person.CountryCode
+                    if (argument.Expression is SimpleLambdaExpressionSyntax simpleLambdaExpression)
                     {
-                        case 0:
-                            columnName = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                            break;
-                        case 1:
-                            columnType = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                            break;
-                        case 2:
+                        varName = simpleLambdaExpression.Parameter.ToString();
+                        if (simpleLambdaExpression.ExpressionBody == null)
                         {
-                            var lambdaExpressionSyntax =
-                                argumentListArgument.Expression as SimpleLambdaExpressionSyntax;
-                            varName = lambdaExpressionSyntax?.Parameter.ToString();
-                            expressionBody = lambdaExpressionSyntax?.ExpressionBody?.ToString();
-                            break;
+                            Throw("Unable to get expression body", simpleLambdaExpression);
                         }
+
+                        expressionBody = simpleLambdaExpression.ExpressionBody!.ToString();
+                        propertyName = columnName = simpleLambdaExpression.ExpressionBody.GetLastToken().ToString();
+                    }
+                    else
+                    {
+                        // (person) => person.CountryCode
+                        var parenthesizedLambdaExpression =
+                            argument.Expression as ParenthesizedLambdaExpressionSyntax;
+
+                        if (parenthesizedLambdaExpression?.ExpressionBody == null)
+                        {
+                            Throw("Unable to get expression body", parenthesizedLambdaExpression);
+                        }
+
+                        varName = parenthesizedLambdaExpression!.ParameterList.Parameters.First().Identifier.Text;
+                        expressionBody = parenthesizedLambdaExpression.ExpressionBody!.ToString();
+                        propertyName = columnName =
+                            parenthesizedLambdaExpression.ExpressionBody.GetLastToken().ToString();
                     }
                 }
-
-                if (columnName == null || columnType == null || expressionBody == null || varName == null)
+                else if (parameterName == "sqlType" || parameterName == null && argNumber == 1)
                 {
-                    throw new InvalidOperationException($"Unable to parse: {invocationExpression}");
+                    columnType = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
                 }
-
-                ColumnDescription columnDescription = new(columnName, columnType, expressionBody, varName);
-
-                return columnDescription;
+                else if (parameterName == "columnName" || parameterName == null && argNumber == 2)
+                {
+                    columnName = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
+                }
             }
 
-            private static TableDescription ParseAddSubTable(InvocationExpressionSyntax invocationExpression)
+            if (expressionBody == null || varName == null || columnName == null || propertyName == null)
             {
-                string? subTableName = null;
-                string? expressionBody = null;
-                string? varName = null;
-
-                //
-                // .AddSubTable<Job>("#JOB_HISTORY", p => p.Jobs, jobBuilder => jobBuilder
-                //              .AddColumn("COMPANY_NAME", "VARCHAR(100)", j => j.CompanyName)
-                //              .AddColumn("ADDRESS", "VARCHAR(200)", j => j.Address)
-                //          )
-                //
-
-                var memberAccessExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
-                var genericName = memberAccessExpression?.Name as GenericNameSyntax;
-                string? genericNameText = genericName?.TypeArgumentList.Arguments.FirstOrDefault()?.ToString();
-
-                for (var argNumber = 0; argNumber < invocationExpression.ArgumentList.Arguments.Count; argNumber++)
-                {
-                    ArgumentSyntax argumentListArgument = invocationExpression.ArgumentList.Arguments[argNumber];
-                    if (argNumber == 0)
-                    {
-                        subTableName = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                    }
-                    else if (argNumber == 1)
-                    {
-                        var lambdaExpressionSyntax = argumentListArgument.Expression as SimpleLambdaExpressionSyntax;
-                        expressionBody = lambdaExpressionSyntax?.ExpressionBody?.ToString();
-                    }
-                    else if (argNumber == 2)
-                    {
-                        var lambdaExpressionSyntax = argumentListArgument.Expression as SimpleLambdaExpressionSyntax;
-                        varName = lambdaExpressionSyntax?.Parameter.ToString();
-                        var expressionBody1 = lambdaExpressionSyntax?.ExpressionBody;
-                    }
-                }
-
-                if (genericNameText == null)
-                {
-                    throw new InvalidOperationException($"Unable to find generic name in: {invocationExpression}");
-                }
-
-                if (subTableName == null)
-                {
-                    throw new InvalidOperationException($"Unable to find sub-table name in: {invocationExpression}");
-                }
-
-                TableDescription subTableDescription = new(subTableName, genericNameText)
-                {
-                    EnumerableName = expressionBody,
-                    VarName = varName
-                };
-
-                return subTableDescription;
+                Throw($"Unable to parse: {invocationExpression}", invocationExpression);
             }
 
-            private static TableDescription ParseAddBasicSubTable(InvocationExpressionSyntax invocationExpression)
+            if (columnType == null)
             {
-                string? subTableName = null;
-                string? expressionBody = null;
-                string? varName = null;
-                string? columnName = null;
-                string? columnType = null;
-                
-                //
-                // .AddBasicSubTable<string>("#SKILL", "SKILL", "VARCHAR(100)", p => p.Skills)
-                // 
-                
-                var memberAccessExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
-                var genericName = memberAccessExpression?.Name as GenericNameSyntax;
-                string? genericNameText = genericName?.TypeArgumentList.Arguments.FirstOrDefault()?.ToString();
-
-                for (var argNumber = 0; argNumber < invocationExpression.ArgumentList.Arguments.Count; argNumber++)
-                {
-                    ArgumentSyntax argumentListArgument = invocationExpression.ArgumentList.Arguments[argNumber];
-                    if (argNumber == 0)
-                    {
-                        subTableName = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                    }
-                    else if (argNumber == 1)
-                    {
-                        columnName = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                    }
-                    else if (argNumber == 2)
-                    {
-                        columnType = ((LiteralExpressionSyntax)argumentListArgument.Expression).Token.ValueText;
-                    }
-                    else if (argNumber == 3)
-                    {
-                        var lambdaExpressionSyntax = argumentListArgument.Expression as SimpleLambdaExpressionSyntax;
-                        varName = lambdaExpressionSyntax?.Parameter.ToString();
-                        expressionBody = lambdaExpressionSyntax?.ExpressionBody?.ToString();
-                    }
-                }
-
-                ColumnDescription columnDescription = new(columnName, columnType, varName, varName);
-                
-                TableDescription subTableDescription = new(subTableName, genericNameText)
-                {
-                    EnumerableName = expressionBody,
-                    VarName = varName,
-                    Columns = { columnDescription }
-                };
-
-                return subTableDescription;
+                IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName!)[0];
+                columnType = MapSharpType2Sql(propertySymbol);
             }
 
-            private static void ParseInvocationExpressions(
-                IEnumerable<InvocationExpressionSyntax> invocationExpressions,
-                TableDescription tableDescription)
+            columnName = ChangeSqlCase(columnName!);
+
+            ColumnDescription columnDescription = new(columnName, columnType, expressionBody!);
+
+            return columnDescription;
+        }
+
+        private string MapSharpType2Sql(IPropertySymbol propertySymbol)
+        {
+            if (propertySymbol.Type is IArrayTypeSymbol arrayTypeSymbol)
             {
-                foreach (var invocationExpression in invocationExpressions)
+                if (!"byte".Equals(arrayTypeSymbol.ElementType.Name, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (invocationExpression.Expression is not MemberAccessExpressionSyntax
-                        memberAccessExpressionSyntax) continue;
+                    Throw($"Invalid type: {arrayTypeSymbol}");
+                }
 
-                    string methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
+                return "VARBINARY(MAX)";
+            }
 
-                    if (methodName == nameof(DataTableBuilder<int>.AddColumn))
+            if ("string".Equals(propertySymbol.Type.Name, StringComparison.InvariantCultureIgnoreCase))
+            {
+                AttributeData[] attributes = propertySymbol.GetAttributes().ToArray();
+                AttributeData? maxLengthAttribute =
+                    attributes.FirstOrDefault(a => a.AttributeClass?.Name == "MaxLength");
+                AttributeData? minLengthAttribute =
+                    attributes.FirstOrDefault(a => a.AttributeClass?.Name == "MinLength");
+
+                if (maxLengthAttribute != null)
+                {
+                    int? min = null;
+
+                    int? max = ParseIntAttribute(maxLengthAttribute);
+                    if (minLengthAttribute != null)
                     {
-                        var columnDescription = ParseAddColumn(invocationExpression);
-                        tableDescription.VarName = columnDescription.VarName;
-                        tableDescription.Columns.Add(columnDescription);
+                        min = ParseIntAttribute(minLengthAttribute);
                     }
-                    else if (methodName == nameof(DataTableBuilder<int>.AddSubTable))
-                    {
-                        var subTableDescription = ParseAddSubTable(invocationExpression);
-                        tableDescription.SubTables.Add(subTableDescription);
 
-                        var simpleLambdaExpression =
-                            invocationExpression.ArgumentList.Arguments[2].Expression as SimpleLambdaExpressionSyntax;
-                        
-                        var subTableInvocationExpressions = simpleLambdaExpression.ExpressionBody
-                            .DescendantNodes()
-                            .Where(node => node is InvocationExpressionSyntax)
-                            .Cast<InvocationExpressionSyntax>();
+                    return min == max ? $"NCHAR({max})" : $"NVARCHAR({max})";
+                }
+            }
+            
+            return propertySymbol.Type.Name.ToLowerInvariant() switch
+            {
+                "guid"           => "UNIQUEIDENTIFIER",
+                "byte"           => "BINARY",
+                "short"          => "SMALLINT",
+                "int16"          => "SMALLINT",
+                "int"            => "INTEGER",
+                "int32"          => "INTEGER",
+                "long"           => "BIGINT",
+                "int64"          => "BIGINT",
+                "bool"           => "BIT",
+                "datetime"       => "DATETIME",
+                "datetimeoffset" => "DATETIMEOFFSET",
+                "timespan"       => "TIME",
+                "decimal"        => "DECIMAL(15,2)",
+                "double"         => "FLOAT",
+                "single"         => "REAL",
+                _                => "NVARCHAR(MAX)"
+            };
+        }
 
-                        ParseInvocationExpressions(subTableInvocationExpressions, subTableDescription);
-                    }
-                    else if (methodName == nameof(DataTableBuilder<int>.AddBasicSubTable))
+        private int ParseIntAttribute(AttributeData attributeData)
+        {
+            SyntaxNode attributeNode = attributeData.ApplicationSyntaxReference!.GetSyntax();
+            string? attributeText = attributeNode.Cast<AttributeSyntax>()
+                .ArgumentList?.Arguments.First().Expression.Cast<LiteralExpressionSyntax>()
+                .Token.Text;
+
+            if (attributeText == null)
+            {
+                Throw("Unable to parse int value from attribute", attributeNode);
+            }
+
+            return int.Parse(attributeText!);
+        }
+
+        private TableDescription ParseAddSubTable(InvocationExpressionSyntax invocationExpression,
+            ITypeSymbol genericType)
+        {
+            string? expressionBodyText = null;
+
+            //
+            // .AddSubTable<Job>(p => p.Jobs, jobBuilder => jobBuilder
+            //              .AddColumn(j => j.CompanyName, "VARCHAR(100)", "COMPANY_NAME")
+            //              .AddColumn(j => j.Address, "VARCHAR(200)", "ADDRESS"),
+            //              new Assignment<Person, Job>(p => p.Id, j => j.PersonId)
+            //          )
+            //
+            
+            string? genericNameText = null;
+            ITypeSymbol? subTableGenericType = null;
+
+            for (int argNumber = 0; argNumber < invocationExpression.ArgumentList.Arguments.Count; argNumber++)
+            {
+                ArgumentSyntax argument = invocationExpression.ArgumentList.Arguments[argNumber];
+                if (argNumber == 0)
+                {
+                    var lambdaExpressionSyntax = argument.Expression as SimpleLambdaExpressionSyntax;
+                    ExpressionSyntax? expressionBody = lambdaExpressionSyntax?.ExpressionBody;
+                    expressionBodyText = expressionBody?.ToString();
+
+                    if (expressionBody == null)
                     {
-                        var basicSubTable = ParseAddBasicSubTable(invocationExpression);
-                        tableDescription.SubTables.Add(basicSubTable);
+                        Throw("Unable to get body of lambda expression.", argument);
                     }
+
+                    // if generic type is implicit: .AddSubTable(person => person.Jobs, ...)
+                    // then we must get it from the type information.
+                    MemberAccessExpressionSyntax? enumerableMemberAccessExpression = expressionBody!
+                        .DescendantNodesAndSelf()
+                        .IsInstanceOf<MemberAccessExpressionSyntax>()
+                        .Last();
+
+                    string enumerableName = enumerableMemberAccessExpression.GetLastToken().Text;
+                    INamedTypeSymbol enumerableType = (INamedTypeSymbol)((IPropertySymbol)genericType.GetMembers(enumerableName)[0]).Type;
+                    subTableGenericType = enumerableType.TypeArguments[0];
+
+                    genericNameText = subTableGenericType.Name;
+                }
+            }
+
+            if (genericNameText == null || subTableGenericType == null)
+            {
+                Throw("Unable to get generic name.", invocationExpression);
+            }
+
+            string sqlTableName = GetSqlTableName(genericNameText!);
+
+            TableDescription subTableDescription = new(genericNameText!, genericNameText!, sqlTableName)
+            {
+                EnumerableName = expressionBodyText,
+                GenericType = subTableGenericType!
+            };
+
+            return subTableDescription;
+        }
+
+        [ContractAnnotation("=> halt")]
+        private static void Throw(string message, SyntaxNode? node = null) =>
+            throw new SourceGeneratorException(message, node?.GetLocation() ?? Location.None);
+
+        private void ParseInvocationExpressions(IEnumerable<InvocationExpressionSyntax> invocationExpressions,
+            TableDescription tableDescription,
+            ITypeSymbol genericType)
+        {
+            foreach (var invocationExpression in invocationExpressions)
+            {
+                if (invocationExpression.Expression is not MemberAccessExpressionSyntax
+                    memberAccessExpressionSyntax) continue;
+
+                string methodName = memberAccessExpressionSyntax.Name.Identifier.Text;
+
+                if (methodName == nameof(TableBuilder<int>.AddPreExecutionAction))
+                {
+                    //
+                    // .SetPrimaryKey(person => Console.WriteLine(person.LastName + " " + person.FirstName))
+                    //                          ^                                                         ^
+
+                    var lambdaExpression =
+                        invocationExpression.ArgumentList.Arguments.FirstOrDefault()?.Expression as
+                            LambdaExpressionSyntax;
+                    
+                    if (lambdaExpression == null)
+                    {
+                        Throw("Unable to get expression",
+                            invocationExpression.ArgumentList);
+                    }
+                    
+                    tableDescription.PreExecutionActions = lambdaExpression!.Block?.Statements
+                                                               .Select(statement => statement.ToString())
+                                                               .ToArray()
+                                                           ?? (lambdaExpression.ExpressionBody == null
+                                                               ? null
+                                                               : new[]
+                                                               {
+                                                                   lambdaExpression.ExpressionBody + ";"
+                                                               })
+                                                           ?? Array.Empty<string>();
+                }
+                else if (methodName == nameof(TableBuilder<int>.SetName))
+                {
+                    tableDescription.SqlTableName =
+                        ((LiteralExpressionSyntax)invocationExpression.ArgumentList.Arguments[0].Expression)
+                        .Token
+                        .ValueText;
+                }
+
+                if (methodName == nameof(TableBuilder<int>.AddColumn))
+                {
+                    var columnDescription = ParseAddColumn(invocationExpression, genericType);
+                    tableDescription.Columns.Add(columnDescription);
+                }
+                else if (methodName == nameof(TableBuilder<int>.AddSubTable))
+                {
+                    TableDescription subTableDescription = ParseAddSubTable(invocationExpression, genericType);
+
+                    tableDescription.SubTables.Add(subTableDescription);
+                    subTableDescription.ParentTable = tableDescription;
+
+                    var simpleLambdaExpression = (SimpleLambdaExpressionSyntax)
+                        invocationExpression.ArgumentList.Arguments[1].Expression;
+
+                    var subTableInvocationExpressions = simpleLambdaExpression.ExpressionBody!
+                        .DescendantNodesAndSelf()
+                        .Where(node => node is InvocationExpressionSyntax)
+                        .Cast<InvocationExpressionSyntax>()
+                        .Reverse();
+
+                    ParseInvocationExpressions(subTableInvocationExpressions, subTableDescription,
+                        subTableDescription.GenericType);
                 }
             }
         }
