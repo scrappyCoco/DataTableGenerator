@@ -35,7 +35,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                     SyntaxNode rootNode = syntaxTree.GetRoot();
                     MethodDeclarationSyntax[] methodDeclarations = rootNode
                         .DescendantNodes()
-                        .IsInstanceOf<MethodDeclarationSyntax>()
+                        .OfType<MethodDeclarationSyntax>()
                         .ToArray();
 
                     foreach (MethodDeclarationSyntax methodDeclaration in methodDeclarations)
@@ -57,9 +57,9 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         //     ^              ^
                         GenericNameSyntax? genericName = methodDeclaration
                             .DescendantNodes()
-                            .IsInstanceOf<ObjectCreationExpressionSyntax>()
+                            .OfType<ObjectCreationExpressionSyntax>()
                             .Select(objectCreationExpression => objectCreationExpression.Type)
-                            .IsInstanceOf<GenericNameSyntax>()
+                            .OfType<GenericNameSyntax>()
                             .FirstOrDefault(genericName => genericName.Identifier.Text == _tableBuilderName);
 
                         if (genericName == null)
@@ -78,7 +78,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
                         //                              ^                                 ^
                         string? namingConventionValue = genericName.Ancestors()
-                                                            .IsInstanceOf<ObjectCreationExpressionSyntax>()
+                                                            .OfType<ObjectCreationExpressionSyntax>()
                                                             .First()
                                                             .ArgumentList?.Arguments.FirstOrDefault()?.GetLastToken()
                                                             .Text
@@ -97,7 +97,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         // ...
                         var invocationExpressions = genericName
                             .Ancestors()
-                            .IsInstanceOf<InvocationExpressionSyntax>()
+                            .OfType<InvocationExpressionSyntax>()
                             .ToArray();
 
                         var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
@@ -110,7 +110,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol!);
                         
                         var usingDirectives = rootNode.DescendantNodes()
-                            .IsInstanceOf<UsingDirectiveSyntax>()
+                            .OfType<UsingDirectiveSyntax>()
                             .Select(u => u.Name.ToString())
                             .ToArray();
                         
@@ -118,11 +118,11 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         //                      ^              ^
                         
                         ClassDeclarationSyntax classDeclaration =
-                            genericType.Ancestors().IsInstanceOf<ClassDeclarationSyntax>().First()!;
+                            genericType.Ancestors().OfType<ClassDeclarationSyntax>().First()!;
                         
                         string sqlMappingClassName = classDeclaration.Identifier.Text;
                         NamespaceDeclarationSyntax? namespaceDeclaration = genericName.Ancestors()
-                            .IsInstanceOf<NamespaceDeclarationSyntax>()
+                            .OfType<NamespaceDeclarationSyntax>()
                             .FirstOrDefault();
 
                         if (namespaceDeclaration == null)
@@ -373,7 +373,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                     // then we must get it from the type information.
                     MemberAccessExpressionSyntax? enumerableMemberAccessExpression = expressionBody!
                         .DescendantNodesAndSelf()
-                        .IsInstanceOf<MemberAccessExpressionSyntax>()
+                        .OfType<MemberAccessExpressionSyntax>()
                         .Last();
 
                     string enumerableName = enumerableMemberAccessExpression.GetLastToken().Text;

@@ -6,6 +6,21 @@
 		<LangVersion>9.0</LangVersion>
 		<AssemblyName>Coding4fun.DataTableGenerator.SourceGenerator</AssemblyName>
 		<RootNamespace>Coding4fun.DataTableGenerator.SourceGenerator</RootNamespace>
+
+		<Company>Coding4fun</Company>
+		<Authors>Korshunov Artem</Authors>
+		<Title>Source Generator</Title>
+		<Description>Source Generator description</Description>
+		<Copyright>Copyright ©2021 Coding4fun</Copyright>
+		<Version>1.0.1</Version>
+
+		<PackageId>Coding4fun.DataTools</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/scrappyCoco/DataTools</PackageProjectUrl>
+		<PackageTags>analyzers data-tool</PackageTags>
+		<PackageReleaseNotes>First release</PackageReleaseNotes>
+		<Configuration>Release</Configuration>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -14,6 +29,7 @@
 		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.11.0" />
 		<PackageReference Include="StringTemplate4" Version="4.0.8" PrivateAssets="all" GeneratePathProperty="true" />
 	</ItemGroup>
 
