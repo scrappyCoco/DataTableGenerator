@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<AssemblyName>Coding4fun.DataTools.Analyzers</AssemblyName>
+		<RootNamespace>Coding4fun.DataTools.Analyzers</RootNamespace>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<DevelopmentDependency>true</DevelopmentDependency>
+
+		<Company>Coding4fun</Company>
+		<Authors>Korshunov Artem</Authors>
+		<Title>Data Tools</Title>
+		<Description>Data tools for data engineers.</Description>
+		<Copyright>Copyright ©2021 Coding4fun</Copyright>
+		<Version>1.0.12</Version>
+
+		<PackageId>Coding4fun.DataTools.Analyzers</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/scrappyCoco/DataTools</PackageProjectUrl>
+		<PackageTags>data-tool</PackageTags>
+		<PackageReleaseNotes>First release</PackageReleaseNotes>
+		<Configuration>Release</Configuration>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Antlr3.Runtime" Version="3.5.1" PrivateAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="Coding4fun.PainlessUtils" Version="1.0.3" PrivateAssets="all" GeneratePathProperty="true" />
+		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.2" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="3.11.0" />
+		<PackageReference Include="StringTemplate4" Version="4.0.8" PrivateAssets="all" GeneratePathProperty="true" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="CodeTemplates.stg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Common\Common.csproj" OutputItemType="Analyzer" />
+	</ItemGroup>
+
+<!--	<PropertyGroup>-->
+<!--		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>-->
+<!--	</PropertyGroup>-->
+
+<!--	<Target Name="GetDependencyTargetPaths">-->
+<!--		<ItemGroup>-->
+<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGStringTemplate4)\lib\netstandard1.3\Antlr4.StringTemplate.dll" IncludeRuntimeDependency="false" />-->
+<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGAntlr3_Runtime)\lib\netstandard1.1\Antlr3.Runtime.dll" IncludeRuntimeDependency="false" />-->
+<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGCoding4fun_PainlessUtils)\lib\netstandard2.0\Coding4fun.PainlessUtils.dll" IncludeRuntimeDependency="false" />-->
+<!--&lt;!&ndash;			<TargetPathWithTargetPlatformMoniker Include="$(PKGCoding4fun_DataTools_Common)\lib\netstandard2.0\Coding4fun.DataTools.Common.dll" IncludeRuntimeDependency="false" />&ndash;&gt;-->
+<!--		</ItemGroup>-->
+<!--	</Target>-->
+
+	<ItemGroup>
+		<None Pack="true" PackagePath="" Update="Tools\*.ps1" CopyToOutputDirectory="Always" />
+		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(OutputPath)\$(AssemblyName).dll" />
+		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(PKGStringTemplate4)\lib\netstandard1.3\Antlr4.StringTemplate.dll" />
+		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(PKGAntlr3_Runtime)\lib\netstandard1.1\Antlr3.Runtime.dll" />
+		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(PKGCoding4fun_PainlessUtils)\lib\netstandard2.0\Coding4fun.PainlessUtils.dll" />
+		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(OutputPath)\Coding4fun.DataTools.Common.dll" />
+	</ItemGroup>
+</Project>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Coding4fun.PainlessUtils;
 using Microsoft.CodeAnalysis;
 
-namespace Coding4fun.DataTableGenerator.Common
+namespace Coding4fun.DataTools.Common
 {
     internal class TableDescription
     {

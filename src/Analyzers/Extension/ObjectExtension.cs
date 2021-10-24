@@ -1,4 +1,4 @@
-namespace Coding4fun.DataTableGenerator.SourceGenerator.Extension
+namespace Coding4fun.DataTools.Analyzers.Extension
 {
     public static class ObjectExtension
     {

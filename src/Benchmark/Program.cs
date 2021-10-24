@@ -4,10 +4,9 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using Coding4fun.DataTableGenerator.Benchmark;
 using CsvHelper;
 
-namespace Coding4fun.DataTableGenerator.BenchmarkDotNet
+namespace Coding4fun.DataTableGenerator.Benchmark
 {
     [SimpleJob(RuntimeMoniker.Net50 | RuntimeMoniker.Mono)]
     [RPlotExporter, RankColumn]

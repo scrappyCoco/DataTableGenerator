@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Coding4fun.DataTableGenerator.SourceGenerator;
+using Coding4fun.DataTools.Analyzers;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 

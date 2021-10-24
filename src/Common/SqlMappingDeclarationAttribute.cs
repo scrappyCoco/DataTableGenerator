@@ -1,8 +1,9 @@
 using System;
+using JetBrains.Annotations;
 
-namespace Coding4fun.DataTableGenerator.Common
+namespace Coding4fun.DataTools.Common
 {
-    [AttributeUsage(AttributeTargets.Method)]
+    [PublicAPI]
     public class SqlMappingDeclarationAttribute: Attribute
     {
         public static readonly string Name = nameof(SqlMappingDeclarationAttribute).Replace(nameof(Attribute), "");

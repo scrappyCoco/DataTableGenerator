@@ -15,8 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\src\Common\Common.csproj" />
-	  <ProjectReference Include="..\..\src\SourceGenerator\SourceGenerator.csproj" />
+	  <ProjectReference Include="..\..\src\Analyzers\Analyzers.csproj" />
 	</ItemGroup>
 
 </Project>

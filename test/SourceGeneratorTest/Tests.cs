@@ -1,6 +1,6 @@
 using System.IO;
 using System.Linq;
-using Coding4fun.DataTableGenerator.SourceGenerator;
+using Coding4fun.DataTools.Analyzers;
 using NUnit.Framework;
 
 namespace SourceGeneratorTest
@@ -32,7 +32,7 @@ namespace MyExample
         [MinLength(2)]
         [MaxLength(2)]
         public string CountryCode { get; set; }
-        public List<Job> Jobs { get; set; }
+        public Job[] Jobs { get; set; }
     }
 
     public class Job

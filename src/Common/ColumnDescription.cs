@@ -1,4 +1,4 @@
-namespace Coding4fun.DataTableGenerator.Common
+namespace Coding4fun.DataTools.Common
 {
     internal class ColumnDescription
     {

@@ -1,8 +1,11 @@
-namespace Coding4fun.DataTableGenerator.Common
+using JetBrains.Annotations;
+
+namespace Coding4fun.DataTools.Common
 {
     /// <summary>
     /// Naming convention kinds.
     /// </summary>
+    [PublicAPI]
     public enum NamingConvention
     {
         /// <summary>

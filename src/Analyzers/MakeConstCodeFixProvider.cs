@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Formatting;
 using Microsoft.CodeAnalysis.Simplification;
 
-namespace Coding4fun.DataTableGenerator.SourceGenerator
+namespace Coding4fun.DataTools.Analyzers
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeConstCodeFixProvider)), Shared]
     public class MakeConstCodeFixProvider : CodeFixProvider

@@ -1,7 +1,5 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using Coding4fun.DataTableGenerator.Common;
+using Coding4fun.DataTools.Common;
 using JetBrains.Annotations;
 
 namespace Coding4fun.DataTableGenerator.Example
@@ -9,20 +7,16 @@ namespace Coding4fun.DataTableGenerator.Example
     public partial class PersonSqlMapping
     {
         [SqlMappingDeclaration]
-        //[SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
         [UsedImplicitly]
         private void Initialize()
         {
             // Notes:
-            // 1. Keep same names for parameter in lambda expressions for the same type.
+            //    Keep same names for parameter in lambda expressions for the same type.
             //    For our example it's `person`.
             //    If you write for the first column: person => person.Id.
             //    At the second column it should be same: person => person.Age.
             //    It will be not valid for second and others columns: p => p.Age.
-            // 2. Write always generic name. For C# in some scenarios generic name is redundant,
-            //    but there it's required.
-            //    Example: .AddSubTable<Job>(person => person.Jobs ...
-            //                         ^   ^
+
             
             new TableBuilder<Person>()
                 // It's possible to add some action, that will be added before

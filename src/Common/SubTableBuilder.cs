@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using JetBrains.Annotations;
 
-namespace Coding4fun.DataTableGenerator.Common
+namespace Coding4fun.DataTools.Common
 {
+    [PublicAPI]
     public class SubTableBuilder<TItem, TParentItem>
     {
         public SubTableBuilder<TItem, TParentItem> AddColumn(

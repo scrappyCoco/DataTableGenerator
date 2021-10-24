@@ -1,12 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{FD235D9D-9316-42EB-A232-7215627C174B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2ED1B8E6-08B0-47B9-95B9-88B260B88230}"
+	ProjectSection(SolutionItems) = preProject
+		src\DataTools.nuspec = src\DataTools.nuspec
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{E5C4F5F8-083F-43B2-AA67-CE9CBB5DEFFD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceGenerator", "src\SourceGenerator\SourceGenerator.csproj", "{9E1C77C6-1127-4C3F-A0B5-1911FA829624}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "src\Common\Common.csproj", "{FD235D9D-9316-42EB-A232-7215627C174B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analyzers", "src\Analyzers\Analyzers.csproj", "{9E1C77C6-1127-4C3F-A0B5-1911FA829624}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "src\Example\Example.csproj", "{6A5234F8-1E2A-4781-9E6F-8728883BAAFC}"
 EndProject

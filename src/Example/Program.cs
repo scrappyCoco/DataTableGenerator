@@ -9,7 +9,7 @@ namespace Coding4fun.DataTableGenerator.Example
             int i = 0;
             Console.WriteLine(i);
             var personSqlMapping = new PersonSqlMapping();
-            //Console.WriteLine(personSqlMapping.GetSqlTableDefinition());
+            Console.WriteLine(personSqlMapping.GetSqlTableDefinition());
         }
     }
 }

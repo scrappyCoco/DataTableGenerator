@@ -1,11 +1,10 @@
 using System.Collections.Immutable;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Coding4fun.DataTableGenerator.SourceGenerator
+namespace Coding4fun.DataTools.Analyzers
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MakeConstAnalyzer : DiagnosticAnalyzer

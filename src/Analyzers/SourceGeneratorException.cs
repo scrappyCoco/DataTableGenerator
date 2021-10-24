@@ -1,7 +1,7 @@
 using System;
 using Microsoft.CodeAnalysis;
 
-namespace Coding4fun.DataTableGenerator.SourceGenerator
+namespace Coding4fun.DataTools.Analyzers
 {
     public class SourceGeneratorException: Exception
     {

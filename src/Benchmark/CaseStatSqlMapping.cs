@@ -1,4 +1,3 @@
-using Coding4fun.DataTableGenerator.Common;
 
 namespace Coding4fun.DataTableGenerator.Benchmark
 {

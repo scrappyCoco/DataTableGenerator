@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Coding4fun.DataTools</id>
+		<version>1.0.12</version>
+		<authors>Korshunov Artem</authors>
+		<owners>Korshunov Artem</owners>
+		<projectUrl>https://github.com/scrappyCoco/DataTools</projectUrl>
+		<license type="expression">MIT</license>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<releaseNotes>First release</releaseNotes>
+		<description>Core utility functions for web applications</description>
+		<copyright>Copyright ©2021 Coding4fun</copyright>
+		<tags>data-tool</tags>
+
+		<dependencies>
+			<dependency id="Coding4fun.DataTools.Common" version="1.0.12" />
+			<dependency id="Coding4fun.DataTools.Analyzers" version="1.0.12" />
+		</dependencies>
+	</metadata>
+</package>

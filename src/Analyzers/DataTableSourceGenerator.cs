@@ -4,15 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Antlr4.StringTemplate;
-using Coding4fun.DataTableGenerator.Common;
-using Coding4fun.DataTableGenerator.SourceGenerator.Extension;
+using Coding4fun.DataTools.Analyzers.Extension;
+using Coding4fun.DataTools.Common;
 using Coding4fun.PainlessUtils;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceGenerator.Extension;
 
-namespace Coding4fun.DataTableGenerator.SourceGenerator
+namespace Coding4fun.DataTools.Analyzers
 {
     [Generator]
     public class DataTableSourceGenerator : ISourceGenerator
@@ -143,7 +142,7 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         using Stream? templatesStream =
                             Assembly.GetExecutingAssembly()
                                 .GetManifestResourceStream(
-                                    "Coding4fun.DataTableGenerator.SourceGenerator.CodeTemplates.stg");
+                                    "Coding4fun.DataTools.Analyzers.CodeTemplates.stg");
 
                         if (templatesStream == null)
                         {
@@ -377,8 +376,23 @@ namespace Coding4fun.DataTableGenerator.SourceGenerator
                         .Last();
 
                     string enumerableName = enumerableMemberAccessExpression.GetLastToken().Text;
-                    INamedTypeSymbol enumerableType = (INamedTypeSymbol)((IPropertySymbol)genericType.GetMembers(enumerableName)[0]).Type;
-                    subTableGenericType = enumerableType.TypeArguments[0];
+                    IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(enumerableName)[0];
+                    ITypeSymbol enumerableType;
+                    if (propertySymbol.Type is INamedTypeSymbol namedTypeSymbol)
+                    {
+                        enumerableType = namedTypeSymbol.TypeArguments[0];
+                    }
+                    else if (propertySymbol.Type is IArrayTypeSymbol arrayTypeSymbol)
+                    {
+                        enumerableType = (INamedTypeSymbol)arrayTypeSymbol.ElementType;
+                    }
+                    else
+                    {
+                        Throw("Unable to get type of enumerable.");
+                        throw new InvalidOperationException();
+                    }
+                    
+                    subTableGenericType = enumerableType;
 
                     genericNameText = subTableGenericType.Name;
                 }
