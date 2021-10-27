@@ -8,6 +8,7 @@ namespace Coding4fun.DataTools.Common
     [PublicAPI]
     public class TableBuilder<TItem>
     {
+        public const string Name = nameof(TableBuilder<TItem>);
         public TableBuilder(NamingConvention namingConvention = NamingConvention.ScreamingSnakeCase)
         {
         }
