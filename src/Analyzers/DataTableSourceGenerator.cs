@@ -100,7 +100,7 @@ namespace Coding4fun.DataTools.Analyzers
                             .ToArray();
 
                         var semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-                        ITypeSymbol? genericTypeSymbol = ModelExtensions.GetTypeInfo(semanticModel, genericType).Type;
+                        ITypeSymbol? genericTypeSymbol = semanticModel.GetTypeInfo(genericType).Type;
                         if (genericTypeSymbol == null)
                         {
                             Throw("Unable to get type info", genericType);
@@ -142,7 +142,7 @@ namespace Coding4fun.DataTools.Analyzers
                         using Stream? templatesStream =
                             GetType().Assembly
                                 .GetManifestResourceStream(
-                                    "Coding4fun.DataTools.Analyzers.CodeTemplates.stg");
+                                    "Coding4fun.DataTools.Analyzers.TargetCodeTemplates.stg");
 
                         if (templatesStream == null)
                         {

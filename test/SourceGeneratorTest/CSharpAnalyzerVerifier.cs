@@ -12,7 +12,7 @@ namespace SourceGeneratorTest
     public static class CSharpAnalyzerVerifier<TAnalyzer>
         where TAnalyzer : DiagnosticAnalyzer, new()
     {
-        public class Test : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
+        private class Test : CSharpAnalyzerTest<TAnalyzer, NUnitVerifier>
         {
             public Test()
             {
@@ -45,7 +45,7 @@ namespace SourceGeneratorTest
         {
             var test = new Test
             {
-                TestCode = source,
+                TestCode = source
             };
 
             test.ExpectedDiagnostics.AddRange(expected);

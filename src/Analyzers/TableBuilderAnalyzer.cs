@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Data.Common;
 using Coding4fun.DataTools.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -35,8 +34,10 @@ namespace Coding4fun.DataTools.Analyzers
 
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreationExpressionSyntax.Parent?.Kind() != SyntaxKind.SimpleMemberAccessExpression)
+            var objectCreationExpression = (ObjectCreationExpressionSyntax)context.Node;
+            if (objectCreationExpression.Type is not GenericNameSyntax { Identifier: { Text: TableBuilder<int>.Name } }) return;
+
+            if (objectCreationExpression.Parent?.Kind() != SyntaxKind.SimpleMemberAccessExpression)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
             }
