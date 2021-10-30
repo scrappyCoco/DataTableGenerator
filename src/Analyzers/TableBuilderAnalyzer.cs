@@ -36,6 +36,10 @@ namespace Coding4fun.DataTools.Analyzers
         private void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)context.Node;
+            if (objectCreationExpressionSyntax.Parent?.Kind() != SyntaxKind.SimpleMemberAccessExpression)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Rule, context.Node.GetLocation()));
+            }
         }
     }
 }

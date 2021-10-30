@@ -1,6 +1,8 @@
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Coding4fun.DataTools.Analyzers;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace SourceGeneratorTest
@@ -73,7 +75,7 @@ namespace MyExample
 }
 ";
             var compilation = CompilationUtil.CreateCompilation(userSource);
-            var newCompilation = CompilationUtil.RunGenerators(compilation, out _, new DataTableSourceGenerator());
+            var newCompilation = CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> diagnostics, new DataTableSourceGenerator());
 
             var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));

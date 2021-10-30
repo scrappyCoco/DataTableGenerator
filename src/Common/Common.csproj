@@ -13,7 +13,6 @@
 		<Title>Data Tools</Title>
 		<Description>Data tools for data engineers.</Description>
 		<Copyright>Copyright ©2021 Coding4fun</Copyright>
-		<Version>1.0.12</Version>
 
 		<PackageId>Coding4fun.DataTools.Common</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

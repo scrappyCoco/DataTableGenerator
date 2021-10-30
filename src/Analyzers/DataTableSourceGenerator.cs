@@ -140,7 +140,7 @@ namespace Coding4fun.DataTools.Analyzers
                         });
 
                         using Stream? templatesStream =
-                            Assembly.GetExecutingAssembly()
+                            GetType().Assembly
                                 .GetManifestResourceStream(
                                     "Coding4fun.DataTools.Analyzers.CodeTemplates.stg");
 

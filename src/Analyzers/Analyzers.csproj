@@ -14,7 +14,6 @@
 		<Title>Data Tools</Title>
 		<Description>Data tools for data engineers.</Description>
 		<Copyright>Copyright ©2021 Coding4fun</Copyright>
-		<Version>1.0.12</Version>
 
 		<PackageId>Coding4fun.DataTools.Analyzers</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -43,18 +42,17 @@
 	  <ProjectReference Include="..\Common\Common.csproj" OutputItemType="Analyzer" />
 	</ItemGroup>
 
-<!--	<PropertyGroup>-->
-<!--		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>-->
-<!--	</PropertyGroup>-->
+	<PropertyGroup>
+		<GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+	</PropertyGroup>
 
-<!--	<Target Name="GetDependencyTargetPaths">-->
-<!--		<ItemGroup>-->
-<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGStringTemplate4)\lib\netstandard1.3\Antlr4.StringTemplate.dll" IncludeRuntimeDependency="false" />-->
-<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGAntlr3_Runtime)\lib\netstandard1.1\Antlr3.Runtime.dll" IncludeRuntimeDependency="false" />-->
-<!--			<TargetPathWithTargetPlatformMoniker Include="$(PKGCoding4fun_PainlessUtils)\lib\netstandard2.0\Coding4fun.PainlessUtils.dll" IncludeRuntimeDependency="false" />-->
-<!--&lt;!&ndash;			<TargetPathWithTargetPlatformMoniker Include="$(PKGCoding4fun_DataTools_Common)\lib\netstandard2.0\Coding4fun.DataTools.Common.dll" IncludeRuntimeDependency="false" />&ndash;&gt;-->
-<!--		</ItemGroup>-->
-<!--	</Target>-->
+	<Target Name="GetDependencyTargetPaths">
+		<ItemGroup>
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGStringTemplate4)\lib\netstandard1.3\Antlr4.StringTemplate.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGAntlr3_Runtime)\lib\netstandard1.1\Antlr3.Runtime.dll" IncludeRuntimeDependency="false" />
+			<TargetPathWithTargetPlatformMoniker Include="$(PKGCoding4fun_PainlessUtils)\lib\netstandard2.0\Coding4fun.PainlessUtils.dll" IncludeRuntimeDependency="false" />
+		</ItemGroup>
+	</Target>
 
 	<ItemGroup>
 		<None Pack="true" PackagePath="" Update="Tools\*.ps1" CopyToOutputDirectory="Always" />

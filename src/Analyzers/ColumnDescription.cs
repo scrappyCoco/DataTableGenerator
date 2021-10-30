@@ -1,4 +1,4 @@
-namespace Coding4fun.DataTools.Common
+namespace Coding4fun.DataTools.Analyzers
 {
     internal class ColumnDescription
     {
