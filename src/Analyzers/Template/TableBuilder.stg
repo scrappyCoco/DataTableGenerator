@@ -1,0 +1,12 @@
+RootTableBuilder(table, leadingTrivia, trailingTrivia) ::=
+"<leadingTrivia>new TableBuilder\<<table.ClassName>>()
+<TableBuilder(table)>
+;
+<trailingTrivia>"
+
+TableBuilder(table) ::=
+"<table.Columns:{column|.AddColumn(<table.VarName> => <table.VarName>.<column.ValueBody>)<\n>}>
+<table.SubTables:{subTable|<AddSubTable(subTable, table)><\n>}>"
+
+AddSubTable(childTable, parentTable) ::=
+".AddSubTable(<parentTable.VarName> => <parentTable.VarName>.<childTable.ClassName>, <childTable.VarName>Builder => <childTable.VarName>Builder<TableBuilder(childTable)>)"

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Antlr4.StringTemplate;
 using Coding4fun.DataTools.Analyzers.Extension;
 using Coding4fun.DataTools.Common;
@@ -87,7 +86,7 @@ namespace Coding4fun.DataTools.Analyzers
                         
                         string sqlTableName = GetSqlTableName(genericName.ToString());
                         TableDescription tableDescription =
-                            new(genericType!.ToString(), genericType.ToString(), sqlTableName);
+                            new(genericType!.ToString(), sqlTableName);
 
                         // ..
                         //   .AddColumn(...)
@@ -138,19 +137,8 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Collections.Generic",
                             "System.Data"
                         });
-
-                        using Stream? templatesStream =
-                            GetType().Assembly
-                                .GetManifestResourceStream(
-                                    "Coding4fun.DataTools.Analyzers.TargetCodeTemplates.stg");
-
-                        if (templatesStream == null)
-                        {
-                            Throw("Unable to find resource with string template.");
-                        }
-
-                        TemplateGroupString templateGroup = new(new StreamReader(templatesStream!).ReadToEnd());
-                        var classTemplate = templateGroup.GetInstanceOf("ClassDefinition");
+                        
+                        Template classTemplate = TemplateManager.GetDataTableTemplate();
                         classTemplate.Add("usingNamespaces", usingNamespaces.Distinct().ToArray());
                         classTemplate.Add("cNamespace", @namespace);
                         classTemplate.Add("tableDescription", tableDescription);
@@ -263,7 +251,7 @@ namespace Coding4fun.DataTools.Analyzers
 
             columnName = ChangeSqlCase(columnName!);
 
-            ColumnDescription columnDescription = new(columnName, columnType, expressionBody!);
+            ColumnDescription columnDescription = new(columnType, expressionBody!, columnName);
 
             return columnDescription;
         }
@@ -405,7 +393,7 @@ namespace Coding4fun.DataTools.Analyzers
 
             string sqlTableName = GetSqlTableName(genericNameText!);
 
-            TableDescription subTableDescription = new(genericNameText!, genericNameText!, sqlTableName)
+            TableDescription subTableDescription = new(genericNameText!, sqlTableName)
             {
                 EnumerableName = expressionBodyText,
                 GenericType = subTableGenericType!

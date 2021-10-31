@@ -7,22 +7,21 @@ namespace Coding4fun.DataTools.Analyzers
 {
     internal class TableDescription
     {
-        public TableDescription(string className, string entityName, string sqlTableName)
+        public TableDescription(string className, string? sqlTableName = null)
         {
             SqlTableName = sqlTableName;
-            VarName = entityName.ChangeCase(CaseRules.ToCamelCase);
-            EntityName = entityName.ChangeCase(CaseRules.ToTitleCase)!;
+            VarName = className.ChangeCase(CaseRules.ToCamelCase);
+            EntityName = className.ChangeCase(CaseRules.ToTitleCase)!;
             ClassName = className;
-            DataTableName = entityName.ChangeCase(CaseRules.ToTitleCase, "") + "DataTable";
+            DataTableName = className.ChangeCase(CaseRules.ToTitleCase, "") + "DataTable";
             Columns = new List<ColumnDescription>();
             SubTables = new List<TableDescription>();
         }
         
-        internal ITypeSymbol? GenericType { get; set; }
-
+        public ITypeSymbol? GenericType { get; set; }
         public string EntityName { get; internal set; }
         public string? ClassName { get; }
-        public string SqlTableName { get; internal set; }
+        public string? SqlTableName { get; internal set; }
         public string DataTableName { get; }
         public string? VarName { get; set; }
         public string? EnumerableName { get; set; }

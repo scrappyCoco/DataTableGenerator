@@ -35,8 +35,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="TargetCodeTemplates.stg" />
-	  <EmbeddedResource Include="SqlMappingTemplate.stg" />
+	  <EmbeddedResource Include="Template\TableBuilder.stg" />
+	  <EmbeddedResource Include="Template\DataTable.stg" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -2,15 +2,15 @@ namespace Coding4fun.DataTools.Analyzers
 {
     internal class ColumnDescription
     {
-        public ColumnDescription(string sqlColumnName, string sqlType, string valueBody)
+        public ColumnDescription(string valueBody, string? sqlColumnName = null, string? sqlType = null)
         {
             SqlColumnName = sqlColumnName;
             SqlType = sqlType;
             ValueBody = valueBody;
         }
 
-        public string SqlColumnName { get; }
-        public string SqlType { get; }
+        public string? SqlColumnName { get; }
+        public string? SqlType { get; }
         public string ValueBody { get; }
 
         /// <inheritdoc />
