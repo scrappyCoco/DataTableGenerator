@@ -20,11 +20,5 @@ namespace Coding4fun.DataTools.Common
         public SubTableBuilder<TItem, TParentItem> AddSubTable<TSubItem>(
             Expression<Func<TItem, IEnumerable<TSubItem>>> enumerableGetter,
             Action<SubTableBuilder<TSubItem, TItem>> subTableConsumer) => this;
-
-        public SubTableBuilder<TItem, TParentItem> AddBasicSubTable<TSubItem>(
-            string subTableName,
-            string sqlColumnName,
-            string sqlType,
-            Expression<Func<TItem, IEnumerable<TSubItem>>> enumerableGetter) => this;
     }
 }

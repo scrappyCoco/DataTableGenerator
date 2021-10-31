@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Coding4fun.DataTools" Version="1.0.24" />
+		<PackageReference Include="Coding4fun.DataTools" Version="1.0.29" />
 		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
 	</ItemGroup>
 

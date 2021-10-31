@@ -16,8 +16,9 @@ namespace Coding4fun.DataTableGenerator.Example
             //    If you write for the first column: person => person.Id.
             //    At the second column it should be same: person => person.Age.
             //    It will be not valid for second and others columns: p => p.Age.
+            new TableBuilder<Person>();
 
-            
+
             new TableBuilder<Person>()
                 // It's possible to add some action, that will be added before
                 // adding to DataTable.

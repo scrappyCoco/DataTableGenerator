@@ -1,19 +1,17 @@
-﻿using System;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using Antlr4.StringTemplate;
 using Coding4fun.DataTools.Analyzers.Extension;
-using Coding4fun.PainlessUtils;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Simplification;
+using Formatter = Microsoft.CodeAnalysis.Formatting.Formatter;
 
 namespace Coding4fun.DataTools.Analyzers
 {
@@ -55,7 +53,6 @@ namespace Coding4fun.DataTools.Analyzers
 
             var genericName = (GenericNameSyntax)objectCreationExpression.Type;
             IdentifierNameSyntax typeSyntax = (IdentifierNameSyntax)genericName.TypeArgumentList.Arguments.First();
-            string typeName = typeSyntax.Identifier.Text;
             TypeInfo genericTypeInfo = semanticModel.GetTypeInfo(typeSyntax, cancellationToken);
 
             var tableDescription = ParseTable(genericTypeInfo.Type);
@@ -63,16 +60,17 @@ namespace Coding4fun.DataTools.Analyzers
             StatementSyntax oldStatement = objectCreationExpression.Ancestors().OfType<StatementSyntax>().First();
             SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
             SyntaxTriviaList trailingTrivia = oldStatement.GetTrailingTrivia();
+            var whitespaceTrivia = leadingTrivia.Where(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia).LastOrDefault();
 
             Template template = TemplateManager.GetTableBuilderTemplate();
             template.Add("table", tableDescription);
-            template.Add("leadingTrivia", leadingTrivia);
-            template.Add("trailingTrivia", trailingTrivia);
-
 
             string code = template.Render();
+            code = TableBuilderFormatter.Format(code, leadingTrivia.ToString(), trailingTrivia.ToString(),
+                whitespaceTrivia.ToString());
 
             StatementSyntax newStatement = SyntaxFactory.ParseStatement(code);
+            
             SyntaxNode? oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
             SyntaxNode newRoot = oldRoot.ReplaceNode(oldStatement, newStatement);
 
@@ -98,7 +96,9 @@ namespace Coding4fun.DataTools.Analyzers
                 }
                 else if (objectKind == ObjectKind.Enumerable)
                 {
-                    tableDescription.SubTables.Add(ParseTable(enumerableType));
+                    TableDescription subTable = ParseTable(enumerableType);
+                    subTable.EnumerableName = property.Name;
+                    tableDescription.SubTables.Add(subTable);
                 }
                 // TODO: ObjectKind.Object
             }
