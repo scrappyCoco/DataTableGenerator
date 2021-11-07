@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace Coding4fun.DataTools.Common
+namespace Coding4fun.DataTools.Analyzers
 {
     [PublicAPI]
     public class SqlMappingDeclarationAttribute: Attribute

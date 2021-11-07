@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Coding4fun.DataTools.Common.StringUtil
+namespace Coding4fun.DataTools.Analyzers.StringUtil
 {
     public static class StringExtensions
     {

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Coding4fun.DataTools.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Coding4fun.DataTools.Common.StringUtil
+namespace Coding4fun.DataTools.Analyzers.StringUtil
 {
     /// <summary>
     /// Naming convention kinds.

@@ -19,7 +19,7 @@ namespace SourceGeneratorTest
         public void Test()
         {
             const string userSource = @"
-using Coding4fun.DataTableGenerator.Common;
+using Coding4fun.DataTools.Analyzers;
 
 namespace MyExample
 {
@@ -85,7 +85,7 @@ namespace MyExample
             var generatedText = newFile.GetText().ToString().Trim();
             
             string expectedOutput = @"
-using Coding4fun.DataTableGenerator.Common;
+using Coding4fun.DataTools.Analyzers;
 using System.Collections.Generic;
 using System.Data;
 

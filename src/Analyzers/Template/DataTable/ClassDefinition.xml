@@ -2,7 +2,7 @@
 <!-- @formatter:off
      --><root><!--
      --><usingNamespaces>
-<!-- --><usingNamespace /><!-- 
+<!-- -->using <usingNamespace />;<!-- 
      --></usingNamespaces>
 <!-- -->
 <!-- -->namespace <namespace />

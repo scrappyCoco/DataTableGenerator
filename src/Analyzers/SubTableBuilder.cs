@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 
-namespace Coding4fun.DataTools.Common
+namespace Coding4fun.DataTools.Analyzers
 {
     [PublicAPI]
     public class SubTableBuilder<TItem, TParentItem>

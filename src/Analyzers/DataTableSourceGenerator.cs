@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Coding4fun.DataTools.Analyzers.Extension;
+using Coding4fun.DataTools.Analyzers.StringUtil;
 using Coding4fun.DataTools.Analyzers.Template.DataTable;
-using Coding4fun.DataTools.Common;
-using Coding4fun.DataTools.Common.StringUtil;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
+using NamingConvention = Coding4fun.DataTools.Analyzers.StringUtil.NamingConvention;
 
 namespace Coding4fun.DataTools.Analyzers
 {

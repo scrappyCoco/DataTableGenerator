@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Coding4fun.DataTools.Common.StringUtil;
+using Coding4fun.DataTools.Analyzers.StringUtil;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
+using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
 
 namespace Coding4fun.DataTools.Analyzers
 {

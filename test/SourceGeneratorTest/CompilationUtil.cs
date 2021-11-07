@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.Data;
 using Coding4fun.DataTools;
 using Coding4fun.DataTools.Analyzers;
-using Coding4fun.DataTools.Common;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
