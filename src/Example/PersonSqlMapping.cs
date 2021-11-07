@@ -1,13 +1,13 @@
 using System;
-using Coding4fun.DataTools.Common;
 using JetBrains.Annotations;
+using Coding4fun.DataTools.Common;
 
 namespace Coding4fun.DataTableGenerator.Example
 {
     public partial class PersonSqlMapping
     {
         [SqlMappingDeclaration]
-        [UsedImplicitly]
+        // [UsedImplicitly]
         private void Initialize()
         {
             // Notes:

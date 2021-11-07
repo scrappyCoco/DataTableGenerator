@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><root><!--
+     --><usingNamespaces>
+<!-- --><usingNamespace /><!-- 
+     --></usingNamespaces>
+<!-- -->
+<!-- -->namespace <namespace />
+<!-- -->{
+<!-- -->    public partial class <sqlMappingClassName />
+<!-- -->    {
+<!--          --><class><dataTableDefinition /></class><!--
+     -->
+<!-- -->        public string GetSqlTableDefinition() => @"
+<!-- --><class><sqlTableDefinition /></class>";
+<!-- -->
+<!-- -->        public void FillDataTables(IEnumerable&lt;<className />&gt; items)
+<!-- -->        {<!--
+             --><class>
+<!--             --><invokeMethod /><!--
+             --></class><!--    
+     -->        }
+<!--        
+             --><class>
+<!--             --><methodDefinition /><!--
+             --></class><!--    
+     -->    }
+<!-- -->}
+<!-- --></root>

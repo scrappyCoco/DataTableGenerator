@@ -10,7 +10,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Coding4fun.DataTools" Version="1.0.29" />
+		<PackageReference Include="Coding4fun.DataTools" Version="1.0.41" />
+		<PackageReference Include="Coding4fun.DataTools.Common" Version="1.0.41">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
 	</ItemGroup>
 

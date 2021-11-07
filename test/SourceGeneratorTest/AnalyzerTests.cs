@@ -207,11 +207,11 @@ class Program
                 .AddColumn(job => job.PersonId)
                 .AddColumn(job => job.CompanyName)
                 .AddColumn(job => job.Address)
-                )
+            )
             .AddSubTable(person => person.SkillValues, skillBuilder => skillBuilder
                 .AddColumn(skill => skill.PersonId)
                 .AddColumn(skill => skill.Tag)
-                );
+            );
     }
 }
 ");

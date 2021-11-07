@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using Coding4fun.DataTools.Common.StringUtil;
 using JetBrains.Annotations;
 
 namespace Coding4fun.DataTools.Common

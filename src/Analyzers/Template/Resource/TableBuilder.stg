@@ -7,5 +7,5 @@ TableBuilder(table) ::="
 <table.Columns:{column|.AddColumn(<table.VarName> => <table.VarName>.<column.ValueBody>)}; separator=\"\n\">
 <table.SubTables:{subTable|<AddSubTable(subTable, table)>}; separator=\"\n\">"
 
-AddSubTable(childTable, parentTable) ::=
+AddSubTable(childTable, parentTable) ::=a
 ".AddSubTable(<parentTable.VarName> => <parentTable.VarName>.<childTable.EnumerableName>, <childTable.VarName>Builder => <childTable.VarName>Builder<\n><TableBuilder(childTable)>)"

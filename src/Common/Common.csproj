@@ -1,30 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
-		<LangVersion>9.0</LangVersion>
-		<Nullable>enable</Nullable>
-		<AssemblyName>Coding4fun.DataTools.Common</AssemblyName>
-		<RootNamespace>Coding4fun.DataTools.Common</RootNamespace>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-		
-		<Company>Coding4fun</Company>
-		<Authors>Korshunov Artem</Authors>
-		<Title>Data Tools</Title>
-		<Description>Data tools for data engineers.</Description>
-		<Copyright>Copyright ©2021 Coding4fun</Copyright>
 
-		<PackageId>Coding4fun.DataTools.Common</PackageId>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageProjectUrl>https://github.com/scrappyCoco/DataTools</PackageProjectUrl>
-		<PackageTags>data-tool</PackageTags>
-		<PackageReleaseNotes>First release</PackageReleaseNotes>
-		<Configuration>Release</Configuration>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Coding4fun.PainlessUtils" Version="1.0.3" />
-		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Common</AssemblyName>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+
+    <Company>Coding4fun</Company>
+    <Authors>Korshunov Artem</Authors>
+    <Title>Data Tools</Title>
+    <Description>Data tools for data engineers.</Description>
+    <Copyright>Copyright ©2021 Coding4fun</Copyright>
+
+    <PackageId>Coding4fun.DataTools.Common</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/scrappyCoco/DataTools</PackageProjectUrl>
+    <PackageTags>data-tool</PackageTags>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Configuration>Release</Configuration>
+    <RootNamespace>Coding4fun.DataTools.Common</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" PrivateAssets="all" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+
 </Project>

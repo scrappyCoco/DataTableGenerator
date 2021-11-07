@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><class><!--
+     --><offset />foreach (var <varName /> in <items />)
+<!-- --><offset />{
+<!-- --><offset />    <preExecutionActions />
+<!-- --><offset />    Add<entityName />(<varName />);
+<!--               --><subTables><invokeMethod /></subTables><!--
+     --><offset />}
+<!-- --></class>

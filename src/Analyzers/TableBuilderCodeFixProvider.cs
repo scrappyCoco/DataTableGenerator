@@ -1,17 +1,15 @@
 ﻿using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
-using Antlr4.StringTemplate;
 using Coding4fun.DataTools.Analyzers.Extension;
+using Coding4fun.DataTools.Analyzers.Template.TableBuilder;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Formatter = Microsoft.CodeAnalysis.Formatting.Formatter;
 
 namespace Coding4fun.DataTools.Analyzers
 {
@@ -19,24 +17,30 @@ namespace Coding4fun.DataTools.Analyzers
     public class TableBuilderCodeFixProvider : CodeFixProvider
     {
         /// <inheritdoc />
+        public override FixAllProvider? GetFixAllProvider() => null;
+
+        /// <inheritdoc />
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
-
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
-            var diagnostic = context.Diagnostics.First();
+            SyntaxNode? root = await context.Document
+                .GetSyntaxRootAsync(context.CancellationToken)
+                .ConfigureAwait(false);
+            
+            Diagnostic diagnostic = context.Diagnostics.First();
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
             // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf()
-                .OfType<ObjectCreationExpressionSyntax>().First();
+            ObjectCreationExpressionSyntax declaration = root!.FindToken(diagnosticSpan.Start).Parent!
+                .AncestorsAndSelf()
+                .OfType<ObjectCreationExpressionSyntax>()
+                .First();
 
             // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: "Make constant",
-                    createChangedDocument: c => MakeConstAsync(context.Document, declaration, c),
-                    equivalenceKey: "Make constant"),
+                    title: "Create SQL mapping",
+                    createChangedDocument: c => AddSqlMappingAsync(context.Document, declaration, c),
+                    equivalenceKey: "Create SQL mapping"),
                 diagnostic);
         }
 
@@ -44,7 +48,7 @@ namespace Coding4fun.DataTools.Analyzers
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
             ImmutableArray.Create(TableBuilderAnalyzer.DiagnosticId);
 
-        private static async Task<Document> MakeConstAsync(Document document,
+        private static async Task<Document> AddSqlMappingAsync(Document document,
             ObjectCreationExpressionSyntax objectCreationExpression,
             CancellationToken cancellationToken)
         {
@@ -55,27 +59,21 @@ namespace Coding4fun.DataTools.Analyzers
             IdentifierNameSyntax typeSyntax = (IdentifierNameSyntax)genericName.TypeArgumentList.Arguments.First();
             TypeInfo genericTypeInfo = semanticModel.GetTypeInfo(typeSyntax, cancellationToken);
 
-            var tableDescription = ParseTable(genericTypeInfo.Type);
+            var tableDescription = ParseTable(genericTypeInfo.Type!);
 
             StatementSyntax oldStatement = objectCreationExpression.Ancestors().OfType<StatementSyntax>().First();
             SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
-            SyntaxTriviaList trailingTrivia = oldStatement.GetTrailingTrivia();
-            var whitespaceTrivia = leadingTrivia.Where(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia).LastOrDefault();
+            var whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
 
-            Template template = TemplateManager.GetTableBuilderTemplate();
-            template.Add("table", tableDescription);
-
-            string code = template.Render();
-            code = TableBuilderFormatter.Format(code, leadingTrivia.ToString(), trailingTrivia.ToString(),
-                whitespaceTrivia.ToString());
+            string code = RootResolver.GenerateDataBuilder(tableDescription, whitespaceTrivia.ToString());
 
             StatementSyntax newStatement = SyntaxFactory.ParseStatement(code);
             
             SyntaxNode? oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-            SyntaxNode newRoot = oldRoot.ReplaceNode(oldStatement, newStatement);
+            SyntaxNode newRoot = oldRoot!.ReplaceNode(oldStatement, newStatement);
 
             // Return document with transformed tree.
-            return document.WithSyntaxRoot(newRoot!);
+            return document.WithSyntaxRoot(newRoot);
         }
 
         private static TableDescription ParseTable(ITypeSymbol type)
@@ -96,9 +94,10 @@ namespace Coding4fun.DataTools.Analyzers
                 }
                 else if (objectKind == ObjectKind.Enumerable)
                 {
-                    TableDescription subTable = ParseTable(enumerableType);
+                    TableDescription subTable = ParseTable(enumerableType!);
                     subTable.EnumerableName = property.Name;
                     tableDescription.SubTables.Add(subTable);
+                    subTable.ParentTable = tableDescription;
                 }
                 // TODO: ObjectKind.Object
             }
@@ -124,7 +123,7 @@ namespace Coding4fun.DataTools.Analyzers
                     i.Name == "IEnumerable" && i.ContainingNamespace.ToString() == "System.Collections")
                 && type is INamedTypeSymbol namedType)
             {
-                ITypeSymbol? genericTypeParameter = namedType.TypeArguments.FirstOrDefault();
+                ITypeSymbol genericTypeParameter = namedType.TypeArguments.First();
                 enumerableType = genericTypeParameter;
                 if ("byte".EqualsIgnoreCase(genericTypeParameter.Name)) return ObjectKind.Scalar;
                 if (IsScalarType(genericTypeParameter)) return ObjectKind.Ignore;

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Coding4fun.PainlessUtils;
+using Coding4fun.DataTools.Common.StringUtil;
+using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 
 namespace Coding4fun.DataTools.Analyzers
 {
+    [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     internal class TableDescription
     {
         public TableDescription(string className, string? sqlTableName = null)

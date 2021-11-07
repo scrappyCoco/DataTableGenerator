@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><class><!--
+     -->        public void Add<entityName />(<className/> <varName />)
+<!-- -->        {
+<!-- -->            <dataTableName />.Rows.Add(<!--
+                 --><columns>
+<!-- -->                <valueBody /><comma /><!--
+                 --></columns>
+<!-- -->            );
+<!-- -->        }
+<!--         --><subTables>
+<!--             --><methodDefinition /><!--
+             --></subTables><!--
+             --></class>

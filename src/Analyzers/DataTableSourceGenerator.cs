@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Antlr4.StringTemplate;
 using Coding4fun.DataTools.Analyzers.Extension;
+using Coding4fun.DataTools.Analyzers.Template.DataTable;
 using Coding4fun.DataTools.Common;
-using Coding4fun.PainlessUtils;
+using Coding4fun.DataTools.Common.StringUtil;
 using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -138,12 +137,7 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Data"
                         });
                         
-                        Template classTemplate = TemplateManager.GetDataTableTemplate();
-                        classTemplate.Add("usingNamespaces", usingNamespaces.Distinct().ToArray());
-                        classTemplate.Add("cNamespace", @namespace);
-                        classTemplate.Add("tableDescription", tableDescription);
-                        classTemplate.Add("sqlMappingClassName", sqlMappingClassName);
-                        string sharpCode = classTemplate.Render();
+                        string sharpCode = ClassDefinitionResolver.GenerateDataTable(tableDescription, usingNamespaces, @namespace, sqlMappingClassName);
             
                         context.AddSource($"{sqlMappingClassName}.Generated.cs", sharpCode);
                     }
@@ -251,7 +245,7 @@ namespace Coding4fun.DataTools.Analyzers
 
             columnName = ChangeSqlCase(columnName!);
 
-            ColumnDescription columnDescription = new(columnType, expressionBody!, columnName);
+            ColumnDescription columnDescription = new(expressionBody!, columnName, columnType);
 
             return columnDescription;
         }
@@ -473,8 +467,10 @@ namespace Coding4fun.DataTools.Analyzers
                         .Cast<InvocationExpressionSyntax>()
                         .Reverse();
 
+                    if (subTableDescription.GenericType == null) Throw("Unable to get generic type of sub table.");
+                    
                     ParseInvocationExpressions(subTableInvocationExpressions, subTableDescription,
-                        subTableDescription.GenericType);
+                        subTableDescription.GenericType!);
                 }
             }
         }
