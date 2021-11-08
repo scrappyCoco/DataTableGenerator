@@ -12,6 +12,7 @@ namespace Coding4fun.DataTools.Analyzers
         public string? SqlColumnName { get; }
         public string? SqlType { get; }
         public string ValueBody { get; }
+        public string? SharpType { get; set; }
 
         /// <inheritdoc />
         public override string ToString() => $"{nameof(SqlColumnName)}={SqlColumnName}," +

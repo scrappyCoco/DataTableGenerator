@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
-     --><root><!--
+===== --><root><!--
      --><usingNamespaces>
 <!-- -->using <usingNamespace />;<!-- 
      --></usingNamespaces>
@@ -11,6 +11,11 @@
 <!-- -->    {
 <!--          --><class><dataTableDefinition /></class><!--
      -->
+<!-- -->        public <sqlMappingClassName />()
+<!-- -->        {<!--
+                --><class><columnMapping /></class><!--
+     -->        }
+  
 <!-- -->        public string GetSqlTableDefinition() => @"
 <!-- --><class><sqlTableDefinition /></class>";
 <!-- -->
@@ -20,6 +25,11 @@
 <!--             --><invokeMethod /><!--
              --></class><!--    
      -->        }
+<!-- -->
+<!-- -->        public async Task BulkCopyAsync(SqlConnection targetConnection)
+<!-- -->        {
+<!--            --><class><bulkCopy /></class>
+<!-- -->        }
 <!--        
              --><class>
 <!--             --><methodDefinition /><!--

@@ -50,6 +50,10 @@
 	  <None Remove="Template\Resource\DataTableInvokeMethod.xml" />
 	  <None Remove="Template\Resource\DataTableMethodDefinition.xml" />
 	  <None Remove="Template\Resource\DataTableSqlDefinition.xml" />
+	  <None Remove="Template\DataTable\BulkCopy.xml" />
+	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
+	  <None Remove="Template\DataTable\ColumnMapping.xml" />
+	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
 	</ItemGroup>
   
 	<ItemGroup>

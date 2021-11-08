@@ -1,0 +1,18 @@
+﻿[{
+  "Id": "47E05748-EFD9-413C-A90E-A762E55BFA15",
+  "Age": 16,
+  "FirstName": "Andrew",
+  "LastName": "K.",
+  "CountryCode": "US",
+  "Jobs": [
+    {
+      "CompanyName": "YooMoney",
+      "Address": "St. Petersburg, Piskarevsky prospect, 2k2Shch"
+    }
+  ],
+  "Skills": [
+    "C#",
+    "TSQL",
+    "SSAS"
+  ]
+}]

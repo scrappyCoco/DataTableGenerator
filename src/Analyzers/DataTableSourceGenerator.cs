@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Coding4fun.DataTools.Analyzers.Extension;
 using Coding4fun.DataTools.Analyzers.StringUtil;
@@ -135,7 +136,9 @@ namespace Coding4fun.DataTools.Analyzers
                         usingNamespaces.AddRange(new[]
                         {
                             "System.Collections.Generic",
-                            "System.Data"
+                            "System.Data",
+                            "System.Data.SqlClient",
+                            "System.Threading.Tasks"
                         });
                         
                         string sharpCode = ClassDefinitionResolver.GenerateDataTable(tableDescription, usingNamespaces, @namespace, sqlMappingClassName);
@@ -183,6 +186,7 @@ namespace Coding4fun.DataTools.Analyzers
             string? columnType = null;
             string? varName = null;
             string? expressionBody = null;
+            string? sharpType = null;
 
             //
             // ...AddColumn(person => person.CountryCode, "CHAR(2)", "COUNTRY_CODE")
@@ -237,16 +241,17 @@ namespace Coding4fun.DataTools.Analyzers
             {
                 Throw($"Unable to parse: {invocationExpression}", invocationExpression);
             }
-
-            if (columnType == null)
-            {
-                IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName!)[0];
-                columnType = MapSharpType2Sql(propertySymbol);
-            }
+            
+            IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName!)[0];
+            columnType ??= MapSharpType2Sql(propertySymbol);
+            sharpType = propertySymbol.Type.ToString();
 
             columnName = ChangeSqlCase(columnName!);
 
-            ColumnDescription columnDescription = new(expressionBody!, columnName, columnType);
+            ColumnDescription columnDescription = new(expressionBody!, columnName, columnType)
+            {
+                SharpType = sharpType
+            };
 
             return columnDescription;
         }

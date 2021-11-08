@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><class><!--
+     -->            using (SqlBulkCopy <varName />SqlBulkCopy = new SqlBulkCopy(targetConnection))
+<!-- -->            {
+<!-- -->                <varName />SqlBulkCopy.DestinationTableName = "<sqlTableName />";
+<!-- -->                await <varName />SqlBulkCopy.WriteToServerAsync(<dataTableName />);
+<!-- -->            }<!--
+     --><subTables>
+<!-- --><bulkCopy /></subTables><!--
+     --></class>

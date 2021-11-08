@@ -64,6 +64,18 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
                 return true;
             }
 
+            if (currentTemplate.Name == "bulkCopy")
+            {
+                newResolver = new BulkCopyResolver();
+                return true;
+            }
+            
+            if (currentTemplate.Name == "columnMapping")
+            {
+                newResolver = new ColumnMappingResolver(_sqlMappingClassName);
+                return true;
+            }
+
             newResolver = null;
             return false;
         }
