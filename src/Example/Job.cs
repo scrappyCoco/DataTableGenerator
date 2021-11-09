@@ -1,7 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace Coding4fun.DataTableGenerator.Example
+namespace Coding4fun.DataTools.Example
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class Job

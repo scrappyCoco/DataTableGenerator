@@ -1,11 +1,10 @@
 using System.Collections.Immutable;
 using System.Data;
-using Coding4fun.DataTools;
 using Coding4fun.DataTools.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest.Infrastructure
 {
     internal static class CompilationUtil
     {

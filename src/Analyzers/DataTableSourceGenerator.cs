@@ -5,7 +5,6 @@ using System.Linq;
 using Coding4fun.DataTools.Analyzers.Extension;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using Coding4fun.DataTools.Analyzers.Template.DataTable;
-using JetBrains.Annotations;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
@@ -68,7 +67,7 @@ namespace Coding4fun.DataTools.Analyzers
                         
                         // new DataTableBuilder<Person>()...
                         //                     ^      ^
-                        TypeSyntax? genericType = genericName!.TypeArgumentList.Arguments.FirstOrDefault();
+                        TypeSyntax? genericType = genericName.TypeArgumentList.Arguments.FirstOrDefault();
                         if (genericType == null)
                         {
                             Throw($"Unable to find generic type of {_tableBuilderName}.", methodDeclaration);
@@ -87,7 +86,7 @@ namespace Coding4fun.DataTools.Analyzers
                         
                         string sqlTableName = GetSqlTableName(genericName.ToString());
                         TableDescription tableDescription =
-                            new(genericType!.ToString(), sqlTableName);
+                            new(genericType.ToString(), sqlTableName);
 
                         // ..
                         //   .AddColumn(...)
@@ -106,7 +105,7 @@ namespace Coding4fun.DataTools.Analyzers
                             Throw("Unable to get type info", genericType);
                         }
 
-                        ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol!);
+                        ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol);
                         
                         var usingDirectives = rootNode.DescendantNodes()
                             .OfType<UsingDirectiveSyntax>()
@@ -129,7 +128,7 @@ namespace Coding4fun.DataTools.Analyzers
                             Throw("Unable to find namespace");
                         }
 
-                        string @namespace = namespaceDeclaration!.Name.GetText().ToString().Trim();
+                        string @namespace = namespaceDeclaration.Name.GetText().ToString().Trim();
                         
                         List<string> usingNamespaces = new();
                         usingNamespaces.AddRange(usingDirectives);
@@ -186,7 +185,6 @@ namespace Coding4fun.DataTools.Analyzers
             string? columnType = null;
             string? varName = null;
             string? expressionBody = null;
-            string? sharpType = null;
 
             //
             // ...AddColumn(person => person.CountryCode, "CHAR(2)", "COUNTRY_CODE")
@@ -221,7 +219,7 @@ namespace Coding4fun.DataTools.Analyzers
                             Throw("Unable to get expression body", parenthesizedLambdaExpression);
                         }
 
-                        varName = parenthesizedLambdaExpression!.ParameterList.Parameters.First().Identifier.Text;
+                        varName = parenthesizedLambdaExpression.ParameterList.Parameters.First().Identifier.Text;
                         expressionBody = parenthesizedLambdaExpression.ExpressionBody!.ToString();
                         propertyName = columnName =
                             parenthesizedLambdaExpression.ExpressionBody.GetLastToken().ToString();
@@ -242,13 +240,13 @@ namespace Coding4fun.DataTools.Analyzers
                 Throw($"Unable to parse: {invocationExpression}", invocationExpression);
             }
             
-            IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName!)[0];
+            IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName)[0];
             columnType ??= MapSharpType2Sql(propertySymbol);
-            sharpType = propertySymbol.Type.ToString();
+            string? sharpType = propertySymbol.Type.ToString();
 
-            columnName = ChangeSqlCase(columnName!);
+            columnName = ChangeSqlCase(columnName);
 
-            ColumnDescription columnDescription = new(expressionBody!, columnName, columnType)
+            ColumnDescription columnDescription = new(expressionBody, columnName, columnType)
             {
                 SharpType = sharpType
             };
@@ -323,7 +321,7 @@ namespace Coding4fun.DataTools.Analyzers
                 Throw("Unable to parse int value from attribute", attributeNode);
             }
 
-            return int.Parse(attributeText!);
+            return int.Parse(attributeText);
         }
 
         private TableDescription ParseAddSubTable(InvocationExpressionSyntax invocationExpression,
@@ -358,7 +356,7 @@ namespace Coding4fun.DataTools.Analyzers
 
                     // if generic type is implicit: .AddSubTable(person => person.Jobs, ...)
                     // then we must get it from the type information.
-                    MemberAccessExpressionSyntax? enumerableMemberAccessExpression = expressionBody!
+                    MemberAccessExpressionSyntax? enumerableMemberAccessExpression = expressionBody
                         .DescendantNodesAndSelf()
                         .OfType<MemberAccessExpressionSyntax>()
                         .Last();
@@ -391,18 +389,18 @@ namespace Coding4fun.DataTools.Analyzers
                 Throw("Unable to get generic name.", invocationExpression);
             }
 
-            string sqlTableName = GetSqlTableName(genericNameText!);
+            string sqlTableName = GetSqlTableName(genericNameText);
 
-            TableDescription subTableDescription = new(genericNameText!, sqlTableName)
+            TableDescription subTableDescription = new(genericNameText, sqlTableName)
             {
                 EnumerableName = expressionBodyText,
-                GenericType = subTableGenericType!
+                GenericType = subTableGenericType
             };
 
             return subTableDescription;
         }
 
-        [ContractAnnotation("=> halt")]
+        [DoesNotReturn]
         private static void Throw(string message, SyntaxNode? node = null) =>
             throw new SourceGeneratorException(message, node?.GetLocation() ?? Location.None);
 
@@ -433,7 +431,7 @@ namespace Coding4fun.DataTools.Analyzers
                             invocationExpression.ArgumentList);
                     }
                     
-                    tableDescription.PreExecutionActions = lambdaExpression!.Block?.Statements
+                    tableDescription.PreExecutionActions = lambdaExpression.Block?.Statements
                                                                .Select(statement => statement.ToString())
                                                                .ToArray()
                                                            ?? (lambdaExpression.ExpressionBody == null

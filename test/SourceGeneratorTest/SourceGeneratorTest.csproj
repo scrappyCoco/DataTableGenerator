@@ -4,6 +4,10 @@
 		<TargetFramework>net5.0</TargetFramework>
 
 		<IsPackable>false</IsPackable>
+
+		<AssemblyName>Coding4fun.DataTools.SourceGeneratorTest</AssemblyName>
+
+		<RootNamespace>Coding4fun.DataTools.SourceGeneratorTest</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -20,6 +24,25 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\Analyzers\Analyzers.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="TestSource\EmptyList.cs" />
+	  <Content Include="TestSource\EmptyList.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestSource\BasicTableBuilder.cs" />
+	  <Content Include="TestSource\BasicTableBuilder.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestSource\CodeFix\Source.cs" />
+	  <Content Include="TestSource\CodeFix\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestSource\CodeFix\Target.cs" />
+	  <Content Include="TestSource\CodeFix\Target.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>

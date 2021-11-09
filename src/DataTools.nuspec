@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>Coding4fun.DataTools</id>
-		<version>1.0.54</version>
+		<version>1.0.57</version>
 		<authors>Korshunov Artem</authors>
 		<owners>Korshunov Artem</owners>
 		<projectUrl>https://github.com/scrappyCoco/DataTools</projectUrl>
@@ -15,7 +15,7 @@
 		
 		<dependencies>
 			<!-- <dependency id="Coding4fun.DataTools.Common" version="1.0.48" /> -->
-			<dependency id="Coding4fun.DataTools.Analyzers" version="1.0.54" />
+			<dependency id="Coding4fun.DataTools.Analyzers" version="1.0.57" />
 		</dependencies>
 	</metadata>
 	<files>

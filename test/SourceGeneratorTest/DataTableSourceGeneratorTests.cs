@@ -2,12 +2,13 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Coding4fun.DataTools.Analyzers;
+using Coding4fun.DataTools.SourceGeneratorTest.Infrastructure;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest
 {
-    public class Tests
+    public class DataTableSourceGeneratorTests
     {
         [SetUp]
         public void Setup()

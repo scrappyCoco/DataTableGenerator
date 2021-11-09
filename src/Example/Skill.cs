@@ -1,7 +1,6 @@
 using System;
-using JetBrains.Annotations;
 
-namespace Coding4fun.DataTableGenerator.Example
+namespace Coding4fun.DataTools.Example
 {
     public class Skill
     {

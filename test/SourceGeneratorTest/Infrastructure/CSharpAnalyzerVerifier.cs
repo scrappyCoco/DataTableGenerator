@@ -5,9 +5,8 @@ using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
-using NUnit.Framework.Internal;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest.Infrastructure
 {
     public static class CSharpAnalyzerVerifier<TAnalyzer>
         where TAnalyzer : DiagnosticAnalyzer, new()

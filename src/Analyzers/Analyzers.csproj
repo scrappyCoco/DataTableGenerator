@@ -34,7 +34,9 @@
 <!--  </ItemGroup>-->
 
 	<ItemGroup>
+	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
 	  <EmbeddedResource Include="Template\DataTable\ClassDefinition.xml" />
+	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
 	  <EmbeddedResource Include="Template\DataTable\Definition.xml" />
 	  <EmbeddedResource Include="Template\DataTable\InvokeMethod.xml" />
 	  <EmbeddedResource Include="Template\DataTable\MethodDefinition.xml" />
@@ -43,28 +45,19 @@
 	  <EmbeddedResource Include="Template\Resource\TableBuilder.stg" />
 	  <EmbeddedResource Include="Template\TableBuilder\Body.xml" />
 	  <EmbeddedResource Include="Template\TableBuilder\Root.xml" />
-	  <None Remove="Template\TableBuilderBody.xml" />
-	  <None Remove="Template\TableBuilderRoot.xml" />
+	  <None Remove="Template\DataTable\BulkCopy.xml" />
+	  <None Remove="Template\DataTable\ColumnMapping.xml" />
 	  <None Remove="Template\Resource\DataTableClassDefinition.xml" />
 	  <None Remove="Template\Resource\DataTableDefinition.xml" />
 	  <None Remove="Template\Resource\DataTableInvokeMethod.xml" />
 	  <None Remove="Template\Resource\DataTableMethodDefinition.xml" />
 	  <None Remove="Template\Resource\DataTableSqlDefinition.xml" />
-	  <None Remove="Template\DataTable\BulkCopy.xml" />
-	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
-	  <None Remove="Template\DataTable\ColumnMapping.xml" />
-	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
+	  <None Remove="Template\TableBuilderBody.xml" />
+	  <None Remove="Template\TableBuilderRoot.xml" />
 	</ItemGroup>
   
 	<ItemGroup>
 		<None Pack="true" PackagePath="" Update="Tools\*.ps1" CopyToOutputDirectory="Always" />
 		<None Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" Include="$(OutputPath)\$(AssemblyName).dll" />
-	</ItemGroup>
-  
-	<ItemGroup>
-	  <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
-	  <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
-	  <None Remove="AnalyzerReleases.Shipped.md" />
-	  <None Remove="AnalyzerReleases.Unshipped.md" />
 	</ItemGroup>
 </Project>

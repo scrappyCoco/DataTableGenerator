@@ -1,9 +1,10 @@
 using System.Collections.Immutable;
 using Coding4fun.DataTools.Analyzers;
+using Coding4fun.DataTools.SourceGeneratorTest.Infrastructure;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest
 {
     public class ErrorTests
     {

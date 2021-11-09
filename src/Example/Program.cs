@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Coding4fun.DataTableGenerator.Example
+namespace Coding4fun.DataTools.Example
 {
     static class Program
     {

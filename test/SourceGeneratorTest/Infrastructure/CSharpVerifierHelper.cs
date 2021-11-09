@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest.Infrastructure
 {
     internal static class CSharpVerifierHelper
     {

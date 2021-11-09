@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 
-namespace SourceGeneratorTest
+namespace Coding4fun.DataTools.SourceGeneratorTest.Infrastructure
 {
     public static class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
         where TAnalyzer : DiagnosticAnalyzer, new()
@@ -67,7 +67,7 @@ namespace SourceGeneratorTest
             var test = new Test
             {
                 TestCode = source,
-                FixedCode = fixedSource,
+                FixedCode = fixedSource
             };
 
             test.ExpectedDiagnostics.AddRange(expected);
