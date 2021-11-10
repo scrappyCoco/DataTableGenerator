@@ -21,6 +21,9 @@
 		<PackageReleaseNotes>First release</PackageReleaseNotes>
 		<Configuration>Release</Configuration>
 	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+	  <NoWarn>1701;1702;</NoWarn>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2021.2.0" PrivateAssets="all" />

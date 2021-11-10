@@ -9,15 +9,15 @@ namespace Coding4fun.DataTools.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class TableBuilderAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "TableBuilderAnalyzer";
+        public const string DiagnosticId = "C4FDT0001";
 
         private static readonly string Title = $"{TableBuilder<int>.Name} is empty";
         private static readonly string MessageFormat = "It should have some method calls";
         private static readonly string Description = "Add methods.";
-        private const string Category = "DataTools";
+        private const string Category = "Code";
 
         private static readonly DiagnosticDescriptor Rule = new(DiagnosticId, Title, MessageFormat, Category,
-            DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description);
+            DiagnosticSeverity.Info, isEnabledByDefault: true, description: Description);
 
 
         /// <inheritdoc />
