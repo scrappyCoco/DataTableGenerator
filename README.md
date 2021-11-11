@@ -1,17 +1,19 @@
 # Coding4fun.DataTools
 
-## DataTableGenerator
 
-Someone who have deal with C# DataTable knows, that it has many lines of code, located in different places.
+
+## DataTable source generator
+
+Someone who have deal with C# DataTable knows, that it has many lines of code, located in different places. It has some problems.
 
 For example:
 ```c#
-// 1. We must to declare tables.
+// 1. We must to declare tables. It's not difficult.
 DataTable personDataTable = new DataTable();
 DataTable jobDataTable = new DataTable();
 DataTable skillDataTable = new DataTable();
 
-// 2. We must to declare columns.
+// 2. We must to declare columns. Why we must to write types expclicitly? It could be got from Person type`
 personDataTable.Columns.Add("ID", typeof(Guid));
 personDataTable.Columns.Add("AGE", typeof(short));
 personDataTable.Columns.Add("FIRST_NAME", typeof(string));
@@ -27,6 +29,9 @@ skillDataTable.Columns.Add("PERSON_ID", typeof(Guid));
 skillDataTable.Columns.Add("TAG", typeof(string));
 
 // 3. We must to fill DataTables.
+// Same columns are involved.
+// In cases, where columns count is big it's difficult to map columns to it's values,
+// especially if column names are not equals to property names.
 IEnumerable<Person> persons = new Person[] { };// There some data source.
 foreach (var person in persons)
 {
@@ -59,6 +64,7 @@ foreach (var person in persons)
 }
 
 // 4. If we want write to temp tables, we must to define it.
+// Another one time we specify same columns.
 const string tempTableDefinition = @"
 CREATE TABLE #MY_PERSON
 (
@@ -106,6 +112,8 @@ using (SqlBulkCopy skillSqlBulkCopy = new SqlBulkCopy(targetConnection))
 
 await targetConnection.CloseAsync();
 ```
+
+Keep in mind, that this model is basic and only for example. In real world we have deal with more complex objects.
 
 As you can notice, there a lot boilerplate code. I think, that there could be presented model, that will generate all this code:
 ```c#
@@ -283,6 +291,8 @@ CREATE TABLE #SKILL
 }
 ```
 
+## TableBuilder analyzer and code fix
+
 Describing a model by hand is tedious, and there comes to the rescue analyzer, that will produce this mapping. At first, we need to create partial class with constructor invocation:
 ```c#
 public partial class PersonSqlMapping
@@ -321,3 +331,5 @@ await personSqlMapping.BulkCopyAsync(targetConnection);
 // TODO: do something with that tables.
 await targetConnection.CloseAsync();
 ```
+
+As result we have got very compat data model, where each column described in one place. It's easy to read and refactoring.
