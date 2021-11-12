@@ -46,6 +46,8 @@ public class Person
 
     // Enumerable of basic types should be mapped to complex types with defined relations.
     public IEnumerable<Skill> SkillValues => Skills.Select(skill => new Skill(Id, skill));
+    
+    public Contact Contact { get; set; }
 }
 
 public class Job
@@ -65,6 +67,12 @@ public class Skill
 
     public Guid PersonId { get; set; }
     public string Tag { get; set; }
+}
+
+public class Contact
+{
+    public string Phone { get; set; }
+    public string Email { get; set; }
 }
 
 class Program

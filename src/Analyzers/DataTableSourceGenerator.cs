@@ -404,6 +404,11 @@ namespace Coding4fun.DataTools.Analyzers
         private static void Throw(string message, SyntaxNode? node = null) =>
             throw new SourceGeneratorException(message, node?.GetLocation() ?? Location.None);
 
+        private void ParseInlineObject(InvocationExpressionSyntax invocationExpressionSyntax)
+        {
+            
+        }
+
         private void ParseInvocationExpressions(IEnumerable<InvocationExpressionSyntax> invocationExpressions,
             TableDescription tableDescription,
             ITypeSymbol genericType)
@@ -454,6 +459,10 @@ namespace Coding4fun.DataTools.Analyzers
                 {
                     var columnDescription = ParseAddColumn(invocationExpression, genericType);
                     tableDescription.Columns.Add(columnDescription);
+                }
+                if (methodName == nameof(TableBuilder<int>.InlineObject))
+                {
+                    ParseInlineObject(invocationExpression);
                 }
                 else if (methodName == nameof(TableBuilder<int>.AddSubTable))
                 {

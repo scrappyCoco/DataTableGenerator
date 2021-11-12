@@ -22,8 +22,5 @@ namespace Coding4fun.DataTools.Example
         public IEnumerable<Skill> SkillValues => Skills.Select(skill => new Skill(Id, skill));
 
         public Contact Contact { get; set; }
-
-        // Single object should be wrapped to IEnumerable inherited type.
-        public IEnumerable<Contact> Contacts => Contact == null ? Array.Empty<Contact>() : new[] { Contact };
     }
 }

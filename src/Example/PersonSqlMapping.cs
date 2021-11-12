@@ -16,7 +16,7 @@ namespace Coding4fun.DataTools.Example
             //    If you write for the first column: person => person.Id.
             //    At the second column it should be same: person => person.Age.
             //    It will be not valid for second and others columns: p => p.Age.
-            
+
             new TableBuilder<Person>()
                 // It's possible to add some action, that will be added before
                 // adding to DataTable.
@@ -54,6 +54,9 @@ namespace Coding4fun.DataTools.Example
                 ).AddSubTable<Skill>(person => person.SkillValues, skillBuilder => skillBuilder
                     .AddColumn(skill => skill.PersonId)
                     .AddColumn(skill => skill.Tag, "VARCHAR(100)")
+                ).InlineObject(person => person.Contact, contactBuilder => contactBuilder
+                    .AddColumn(contact => contact.Email)
+                    .AddColumn(contact => contact.Phone)
                 );
         }
     }

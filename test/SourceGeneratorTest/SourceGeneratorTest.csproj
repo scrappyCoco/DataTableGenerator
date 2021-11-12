@@ -43,6 +43,14 @@
 	  <Content Include="TestSource\CodeFix\Target.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Compile Remove="TestSource\SourceGenerator\Source.cs" />
+	  <Content Include="TestSource\SourceGenerator\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestSource\SourceGenerator\Target.cs" />
+	  <Content Include="TestSource\SourceGenerator\Target.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>

@@ -26,5 +26,9 @@ namespace Coding4fun.DataTools.Analyzers
         public TableBuilder<TItem> AddSubTable<TSubItem>(
             Expression<Func<TItem, IEnumerable<TSubItem>>> enumerableGetter,
             Action<SubTableBuilder<TSubItem, TItem>> subTableConsumer) => this;
+        
+        public TableBuilder<TItem> InlineObject<TSubItem>(
+            Expression<Func<TItem, TSubItem>> objectGetter,
+            Action<SubTableBuilder<TSubItem, TItem>> objectConsumer) => this; 
     }
 }
