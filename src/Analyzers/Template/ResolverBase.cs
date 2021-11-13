@@ -17,7 +17,8 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
             if (templatesStream == null)
             {
-                throw new SourceGeneratorException("Unable to find resource with string template.", Location.None);
+                // TODO: uncomment it.
+                //throw new SourceGeneratorException("Unable to find resource with string template.", Location.None);
             }
             
             CodeTemplate template = new XmlTemplateParser().ParseXml(templatesStream);

@@ -14,7 +14,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Analyzers", "src\Analyzers\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "src\Example\Example.csproj", "{6A5234F8-1E2A-4781-9E6F-8728883BAAFC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SourceGeneratorTest", "test\SourceGeneratorTest\SourceGeneratorTest.csproj", "{DC50DE9C-14D9-44B7-832A-94D70823088B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Test", "test\Test\Test.csproj", "{DC50DE9C-14D9-44B7-832A-94D70823088B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{70B988EF-D05C-4691-B64B-B2112514ED9C}"
 	ProjectSection(SolutionItems) = preProject

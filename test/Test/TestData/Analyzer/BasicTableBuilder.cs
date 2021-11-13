@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SourceGeneratorTest.TestSource
+﻿namespace Example
 {
     class TableBuilder<TItem> { }
     class Person { }
@@ -9,7 +7,7 @@ namespace SourceGeneratorTest.TestSource
     {
         static void Main()
         {
-            var list = new List<Person>();
+            [|new TableBuilder<Person>()|];
         }
     }
 }

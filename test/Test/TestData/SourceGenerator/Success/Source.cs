@@ -1,6 +1,11 @@
-﻿using Coding4fun.DataTools.Analyzers;
+﻿#nullable disable
 
-namespace MyExample
+using Coding4fun.DataTools.Analyzers;
+using Coding4fun.DataTools.Analyzers.StringUtil;
+using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
     public class Person
     {
@@ -14,6 +19,7 @@ namespace MyExample
         [MaxLength(2)]
         public string CountryCode { get; set; }
         public Job[] Jobs { get; set; }
+        public Contact Contact { get; set; }
     }
 
     public class Job
@@ -38,22 +44,22 @@ namespace MyExample
             new TableBuilder<Person>(NamingConvention.SnakeCase)
                 .AddPreExecutionAction(person =>
                 {
-                    Console.WriteLine(person.LastName + "" "" + person.FirstName);
+                    Console.WriteLine(person.LastName + " " + person.FirstName);
                 })
-                .SetName(""#MY_PERSON"")
+                .SetName("#MY_PERSON")
                 .AddColumn(person => person.Id)
                 .AddColumn(person => person.Age)
                 .AddColumn(person => person.FirstName)
                 .AddColumn(person => person.LastName)
-                .AddColumn(person => person.CountryCode, columnName:""COUNTRY"")
+                .AddColumn(person => person.CountryCode, columnName:"COUNTRY")
                 .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
                     .AddPreExecutionAction((job, person) =>
                     {
                         job.PersonId = person.Id;
                     })
                     .AddColumn(job => job.PersonId)
-                    .AddColumn(job => job.CompanyName, ""VARCHAR(100)"")
-                    .AddColumn(job => job.Address, ""VARCHAR(200)"")
+                    .AddColumn(job => job.CompanyName, "VARCHAR(100)")
+                    .AddColumn(job => job.Address, "VARCHAR(200)")
                 ).InlineObject(person => person.Contact, contactBuilder => contactBuilder
                     .AddColumn(contact => contact.Email)
                     .AddColumn(contact => contact.Phone)

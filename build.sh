@@ -9,8 +9,8 @@ mkdir -p build
 
 # dotnet build src/Common/Common.csproj -c Release -p:Version=$VERSION
 dotnet build src/Analyzers/Analyzers.csproj -c Release -p:Version=$VERSION
-nuget pack src/DataTools.nuspec
+# nuget pack src/DataTools.nuspec
 
 # mv src/Common/bin/Release/*.nupkg build/
 mv src/Analyzers/bin/Release/*.nupkg build/
-mv *.nupkg build/
+# mv *.nupkg build/

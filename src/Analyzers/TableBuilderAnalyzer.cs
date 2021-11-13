@@ -11,6 +11,7 @@ namespace Coding4fun.DataTools.Analyzers
     {
         public const string DiagnosticId = "C4FDT0001";
 
+        // TODO: rename descriptions.
         private static readonly string Title = $"{TableBuilder<int>.Name} is empty";
         private static readonly string MessageFormat = "It should have some method calls";
         private static readonly string Description = "Add methods.";

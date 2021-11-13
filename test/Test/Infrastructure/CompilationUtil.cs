@@ -4,7 +4,7 @@ using Coding4fun.DataTools.Analyzers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Coding4fun.DataTools.SourceGeneratorTest.Infrastructure
+namespace Coding4fun.DataTools.Test.Infrastructure
 {
     internal static class CompilationUtil
     {

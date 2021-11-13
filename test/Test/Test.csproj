@@ -1,0 +1,90 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+
+		<IsPackable>false</IsPackable>
+
+		<AssemblyName>Coding4fun.DataTools.Test</AssemblyName>
+
+		<RootNamespace>Coding4fun.DataTools.Test</RootNamespace>
+
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.Common" Version="3.11.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing.NUnit" Version="1.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.NUnit" Version="1.1.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Testing.Verifiers.NUnit" Version="1.1.0" />
+		<PackageReference Include="NUnit" Version="3.12.0" />
+		<PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Analyzers\Analyzers.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="TestData\SourceGenerator\EmptySqlMappingDeclaration\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\EmptySqlMappingDeclaration\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\DataTableBuilderWithoutGeneric\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\EmptyTableBuilder\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\NotResolvedType\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\NotResolvedType\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\WithoutNamespace\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\WithoutNamespace\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\NotResolvedProperty\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\NotResolvedProperty\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\ColumnWithoutLambdaBody\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\ColumnWithoutLambdaBody\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\SyntaxError\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\SyntaxError\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Remove="TestData\CodeFix\Source.cs" />
+	  <Content Include="TestData\Analyzer\BasicTableBuilder.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="TestData\Analyzer\EmptyList.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Include="TestData\CodeFix\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\CodeFix\Target.cs" />
+	  <Content Include="TestData\CodeFix\Target.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\Source.cs" />
+	  <Compile Remove="TestData\SourceGenerator\Target.cs" />
+	  <Content Include="TestData\SourceGenerator\Success\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\BasicTableBuilder.cs" />
+	  <Compile Remove="TestData\EmptyList.cs" />
+	  <Content Include="TestData\SourceGenerator\Success\Target.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>

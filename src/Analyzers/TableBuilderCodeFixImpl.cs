@@ -53,7 +53,8 @@ namespace Coding4fun.DataTools.Analyzers
 
             if (_usedTypes.Contains(typeFullName))
             {
-                throw new SourceGeneratorException($"{typeFullName} cyclic dependencies are not supported.", Location.None);
+                // TODO: uncomment it.
+                //throw new SourceGeneratorException($"{typeFullName} cyclic dependencies are not supported.", Location.None);
             }
             _usedTypes.Add(typeFullName);
 
