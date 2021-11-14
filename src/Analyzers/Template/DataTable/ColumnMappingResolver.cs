@@ -47,11 +47,6 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
                 var table = (ColumnDescription)contextObjects.Last();
                 return new object?[] { table.SharpType };
             }
-            
-            if (template.Name == "sqlMappingName")
-            {
-                return new object?[] { _sqlMappingName };
-            }
 
             return new object?[] { null };
         }

@@ -48,5 +48,8 @@ namespace Coding4fun.DataTools.Analyzers
         
         public static Message GetUnableToResolveProperty(string propertyName, string typeName) =>
             new("C4FDT0015", $"Unable to resolve {propertyName} in {typeName}.");
+        
+        public static Message GetCyclicDependenciesAreNotSupported(string typeFullName) =>
+            new("C4FDT0016", $"Cyclic dependencies are not supported: {typeFullName}.");
     }
 }

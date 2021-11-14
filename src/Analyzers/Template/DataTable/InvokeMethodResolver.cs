@@ -32,12 +32,6 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
                 return new object?[] { table.EntityName };
             }
 
-            if (template.Name == "varName")
-            {
-                var table = (TableDescription)contextObjects.Last();
-                return new object?[] { table.VarName };
-            }
-
             if (template.Name == "subTables")
             {
                 var table = (TableDescription)contextObjects.Last();

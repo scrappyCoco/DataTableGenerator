@@ -32,7 +32,7 @@ namespace Coding4fun.DataTools.Test.Infrastructure
         {
             string pathToFile = Path.Combine(_pathToTestData, methodName!, fileName);
             string code = await File.ReadAllTextAsync(pathToFile);
-            return code.Trim();
+            return code.Trim().Replace("\r", "");
         }
     }
 }

@@ -26,14 +26,16 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
         /// <inheritdoc />
         public override object?[] Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
         {
-            if (template.Name == "class") return new object?[] { _tableDescription };
-            if (template.Name == "usingNamespaces") return _usingNamespaces.Cast<object>().ToArray();
-            if (template.Name == "usingNamespace") return new[] { contextObjects.Last() };
-            if (template.Name == "namespace") return new object?[] { _ns };
-            if (template.Name == "sqlMappingClassName") return new object?[] { _sqlMappingClassName };
-            if (template.Name == "className") return new object?[] { _tableDescription.ClassName };
-            if (template.Name == "methodDefinition") return new object?[] { "TODO:methodDefinition" };
-            return new object?[] { null };
+            return template.Name switch
+            {
+                "class"               => new object?[] { _tableDescription },
+                "usingNamespaces"     => _usingNamespaces.Cast<object>().ToArray(),
+                "usingNamespace"      => new[] { contextObjects.Last() },
+                "namespace"           => new object?[] { _ns },
+                "sqlMappingClassName" => new object?[] { _sqlMappingClassName },
+                "className"           => new object?[] { _tableDescription.ClassName },
+                _                     => new object?[] { null }
+            };
         }
 
         /// <inheritdoc />

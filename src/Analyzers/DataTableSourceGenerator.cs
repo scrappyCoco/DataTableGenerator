@@ -489,7 +489,7 @@ namespace Coding4fun.DataTools.Analyzers
 
                 if (methodName == nameof(TableBuilder<int>.AddColumn))
                 {
-                    var columnDescription = ParseAddColumn(invocationExpression, genericType);
+                    ColumnDescription columnDescription = ParseAddColumn(invocationExpression, genericType);
                     tableDescription.Columns.Add(columnDescription);
                 }
                 if (methodName == nameof(TableBuilder<int>.InlineObject))

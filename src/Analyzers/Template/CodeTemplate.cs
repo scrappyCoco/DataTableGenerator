@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Coding4fun.DataTools.Analyzers.Template
@@ -23,6 +24,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
         public string? Name { get; }
         // ReSharper disable once UnusedAutoPropertyAccessor.Global
+        [ExcludeFromCodeCoverage]
         public CodeTemplate? Parent { get; set; }
         public CodeTemplate[] Children { get; internal set; }
         private string? Text { get; }
@@ -51,7 +53,10 @@ namespace Coding4fun.DataTools.Analyzers.Template
             object?[]? resolvedObjects = resolver.Resolve(this, contextObjects);
             if ((resolvedObjects?.Length ?? 0) == 0) return;
 
-            if (resolvedObjects!.Length == 1 && Children.Length == 0) sharpSb.Append(resolvedObjects[0]);
+            if (resolvedObjects!.Length == 1 && Children.Length == 0 && resolvedObjects[0] != null)
+            {
+                sharpSb.Append(resolvedObjects[0]);
+            }
             else
             {
                 foreach (object? rObject in resolvedObjects)
@@ -67,6 +72,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
         }
 
         /// <inheritdoc />
+        [ExcludeFromCodeCoverage]
         public override string ToString() => $"{Name ?? Text}";
     }
 

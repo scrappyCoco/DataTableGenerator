@@ -14,17 +14,16 @@ namespace Coding4fun.DataTools.Analyzers.Template
             return ParseXml(streamReader);
         }
 
-        public CodeTemplate ParseXml(TextReader streamReader)
+        private CodeTemplate ParseXml(TextReader streamReader)
         {
             using var xmlReader = XmlReader.Create(streamReader);
 
             while (xmlReader.Read())
             {
-                if (xmlReader.NodeType != XmlNodeType.Element) continue;
-                return ReadBlock(xmlReader);
+                if (xmlReader.NodeType == XmlNodeType.Element) break;
             }
 
-            throw new InvalidOperationException();
+            return ReadBlock(xmlReader);
         }
 
         private CodeTemplate ReadBlock(XmlReader xmlReader)
@@ -35,7 +34,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
             CodeTemplate template = new CodeTemplate(blockName, null, Array.Empty<CodeTemplate>());
             if (xmlReader.IsEmptyElement) return template;
 
-            while (xmlReader.Read())
+            for (bool goForward = true; goForward && (goForward = xmlReader.Read());)
             {
                 switch (xmlReader.NodeType)
                 {
@@ -52,11 +51,13 @@ namespace Coding4fun.DataTools.Analyzers.Template
                         {
                             child.Parent = template;
                         }
-                        return template;
+
+                        goForward = false;
+                        break;
                 }
             }
 
-            throw new InvalidOperationException();
+            return template;
         }
     }
 }

@@ -53,7 +53,7 @@ namespace Example
 
         // Enumerable of basic types should be mapped to complex types with defined relations.
         public IEnumerable<Skill> SkillValues => Skills.Select(skill => new Skill(Id, skill));
-    
+
         public Contact Contact { get; set; }
     }
 

@@ -21,8 +21,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.TableBuilder
             {
                 "table"     => new object[] { _tableDescription },
                 "className" => new object[] { _tableDescription.ClassName! },
-                "space"     => new object[] { _linePrefix },
-                _           => null
+                _           => new object[] { _linePrefix } // space
             };
         }
 

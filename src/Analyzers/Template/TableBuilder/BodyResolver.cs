@@ -11,11 +11,6 @@ namespace Coding4fun.DataTools.Analyzers.Template.TableBuilder
 
         public override object?[]? Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
         {
-            if (template.Name == "table")
-            {
-                return new object?[] { null };
-            }
-            
             if (template.Name == "columns")
             {
                 var tableDescription = (TableDescription)contextObjects.Last();
@@ -64,7 +59,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.TableBuilder
                 return new object?[] { _linePrefix + new string(' ', spaceCount) };
             }
 
-            return null;
+            return new object?[] { null };
         }
 
         /// <inheritdoc />

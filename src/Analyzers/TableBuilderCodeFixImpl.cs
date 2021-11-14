@@ -28,17 +28,18 @@ namespace Coding4fun.DataTools.Analyzers
             StatementSyntax oldStatement = objectCreationExpression.Ancestors().OfType<StatementSyntax>().First();
             
             StatementSyntax newStatement;
+            SyntaxTrivia? whitespaceTrivia = null;
             try
             {
                 SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
-                var whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
-                var tableDescription = ParseTable(genericTypeInfo.Type!);
+                whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
+                TableDescription tableDescription = ParseTable(genericTypeInfo.Type!);
                 string code = RootResolver.GenerateDataBuilder(tableDescription, whitespaceTrivia.ToString());
                 newStatement = SyntaxFactory.ParseStatement(code);
             }
             catch (Exception e)
             {
-                newStatement = SyntaxFactory.ParseStatement($"string errorMessage = \"{e.Message}\"");
+                newStatement = SyntaxFactory.ParseStatement($"{whitespaceTrivia}string errorMessage = \"{e.Message}\";\n");
             }
 
             SyntaxNode? oldRoot = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -49,24 +50,28 @@ namespace Coding4fun.DataTools.Analyzers
 
         private TableDescription ParseTable(ITypeSymbol type)
         {
-            string typeFullName = type.ToString();
-
-            if (_usedTypes.Contains(typeFullName))
+            void CheckUsedType(ITypeSymbol t)
             {
-                // TODO: uncomment it.
-                //throw new SourceGeneratorException($"{typeFullName} cyclic dependencies are not supported.", Location.None);
+                string typeFullName = t.ToString();
+                if (_usedTypes.Contains(typeFullName))
+                {
+                    throw new SourceGeneratorException(DataTableMessages.GetCyclicDependenciesAreNotSupported(typeFullName));
+                }
+                _usedTypes.Add(typeFullName);
             }
-            _usedTypes.Add(typeFullName);
+
+            CheckUsedType(type);
 
             TableDescription tableDescription = new(type.Name);
 
-            IPropertySymbol[] propertySymbols = type
+            List<IPropertySymbol> propertySymbols = type
                 .GetMembers()
                 .OfType<IPropertySymbol>()
-                .ToArray();
-            
-            foreach (IPropertySymbol property in propertySymbols)
+                .ToList();
+
+            for (int propertyNumber = 0; propertyNumber < propertySymbols.Count; propertyNumber++)
             {
+                IPropertySymbol property = propertySymbols[propertyNumber];
                 ObjectKind objectKind = GetObjectKind(property.Type, out ITypeSymbol? enumerableType);
                 if (objectKind == ObjectKind.Scalar)
                 {
@@ -78,6 +83,17 @@ namespace Coding4fun.DataTools.Analyzers
                     subTable.EnumerableName = property.Name;
                     tableDescription.SubTables.Add(subTable);
                     subTable.ParentTable = tableDescription;
+                }
+                else if (objectKind == ObjectKind.Object)
+                {
+                    CheckUsedType(property.Type);
+                    
+                    IPropertySymbol[] objectProperties = property.Type
+                        .GetMembers()
+                        .OfType<IPropertySymbol>()
+                        .ToArray();
+                    
+                    propertySymbols.AddRange(objectProperties);
                 }
             }
 

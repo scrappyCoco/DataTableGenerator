@@ -3,11 +3,12 @@ using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
 using NUnit.Framework;
 
-namespace Coding4fun.DataTools.Test
+namespace Coding4fun.DataTools.Test.Analyzer
 {
-    public class AnalyzerTests: TestBase
-    { [Test]
-        public async Task TestPositive()
+    public class Tests: TestBase
+    {
+        [Test]
+        public async Task BasicTableBuilder()
         {
             // new TableBuilder<Person>(); // must be triggered.
             string source = await LoadAsync();
@@ -15,19 +16,11 @@ namespace Coding4fun.DataTools.Test
         }
         
         [Test]
-        public async Task TestNegative()
+        public async Task EmptyList()
         {
             // List<Person>(); // must not be triggered.
             string source = await LoadAsync();
             await CSharpAnalyzerVerifier<TableBuilderAnalyzer>.VerifyAnalyzerAsync(source);
-        }
-
-        [Test]
-        public async Task TestCodeFix()
-        {
-            string source = await LoadAsync();
-            string target = await LoadAsync();
-            await CSharpCodeFixVerifier<TableBuilderAnalyzer, TableBuilderCodeFixProvider>.VerifyCodeFixAsync(source, target);
         }
     }
 }   

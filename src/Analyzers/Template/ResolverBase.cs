@@ -11,16 +11,10 @@ namespace Coding4fun.DataTools.Analyzers.Template
         {
             if (Cache.TryGetValue(resourcePath, out CodeTemplate codeTemplate)) return codeTemplate;
             
-            using Stream? templatesStream = typeof(ResolverBase)
+            using Stream templatesStream = typeof(ResolverBase)
                 .Assembly
-                .GetManifestResourceStream(resourcePath);
+                .GetManifestResourceStream(resourcePath)!;
 
-            if (templatesStream == null)
-            {
-                // TODO: uncomment it.
-                //throw new SourceGeneratorException("Unable to find resource with string template.", Location.None);
-            }
-            
             CodeTemplate template = new XmlTemplateParser().ParseXml(templatesStream);
             Cache.Add(resourcePath, template);
             return template;

@@ -8,7 +8,6 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
         /// <inheritdoc />
         public override object?[] Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
         {
-            if (template.Name == "classes") return new object?[] { null };
             if (template.Name == "dataTableName")
             {
                 var tableDescription = (TableDescription)contextObjects.Last();
