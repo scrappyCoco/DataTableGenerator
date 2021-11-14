@@ -31,15 +31,13 @@ namespace Coding4fun.DataTools.Analyzers
                 .OfType<ObjectCreationExpressionSyntax>()
                 .First();
 
-            TableBuilderCodeFixImpl tableBuilderCodeFixImpl = new();
-
             const string title = "Create SQL mapping for DataBuilder";
             
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title,
                     createChangedDocument: cancellationToken =>
-                        tableBuilderCodeFixImpl.AddSqlMappingAsync(context.Document, declaration, cancellationToken),
+                        new TableBuilderCodeFixImpl().AddSqlMappingAsync(context.Document, declaration, cancellationToken),
                     equivalenceKey: title),
                 diagnostic);
         }

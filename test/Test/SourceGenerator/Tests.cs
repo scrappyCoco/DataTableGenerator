@@ -1,10 +1,8 @@
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
-using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Coding4fun.DataTools.Test.SourceGenerator
@@ -22,15 +20,14 @@ namespace Coding4fun.DataTools.Test.SourceGenerator
             string source = await LoadAsync();
         
             var compilation = CompilationUtil.CreateCompilation(source);
-            var newCompilation = CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> diagnostics,
-                new DataTableSourceGenerator());
+            var newCompilation = CompilationUtil.RunGenerators(compilation, out _, new DataTableSourceGenerator());
         
             var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
         
             Assert.NotNull(newFile);
         
-            var generatedText = newFile.GetText().ToString().Trim();
+            var generatedText = (await newFile.GetTextAsync()).ToString().Trim();
         
             string expectedOutput = await LoadAsync("Target.cs");
         

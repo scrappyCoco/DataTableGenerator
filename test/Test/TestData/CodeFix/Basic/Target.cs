@@ -93,6 +93,8 @@ namespace Example
                 .AddColumn(person => person.LastName)
                 .AddColumn(person => person.CountryCode)
                 .AddColumn(person => person.Logo)
+                .AddColumn(person => person.Contact.Phone)
+                .AddColumn(person => person.Contact.Email)
                 .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
                     .AddColumn(job => job.PersonId)
                     .AddColumn(job => job.CompanyName)

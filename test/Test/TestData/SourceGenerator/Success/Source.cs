@@ -33,6 +33,12 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
     public class Contact
     {
         public string Phone { get; set; }
+        public EmailContact[] Emails { get; set; }
+    }
+
+    public class EmailContact
+    {
+        public Guid PersonId { get; set; }
         public string Email { get; set; }
     }
 
@@ -52,6 +58,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
                 .AddColumn(person => person.FirstName)
                 .AddColumn(person => person.LastName)
                 .AddColumn(person => person.CountryCode, columnName:"COUNTRY")
+                .AddColumn(person => person.Contact.Phone)
                 .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
                     .AddPreExecutionAction((job, person) =>
                     {
@@ -60,10 +67,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
                     .AddColumn(job => job.PersonId)
                     .AddColumn(job => job.CompanyName, "VARCHAR(100)")
                     .AddColumn(job => job.Address, "VARCHAR(200)")
-                ).InlineObject(person => person.Contact, contactBuilder => contactBuilder
-                    .AddColumn(contact => contact.Email)
-                    .AddColumn(contact => contact.Phone)
-                );
+                ).AddSubTable(person => );
         }
     }
 }
