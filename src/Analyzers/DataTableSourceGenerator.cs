@@ -21,7 +21,7 @@ namespace Coding4fun.DataTools.Analyzers
         
         private readonly string _tableBuilderName = typeof(TableBuilder<int>).GetNameWithoutGeneric();
         private NamingConvention _namingConvention = NamingConvention.ScreamingSnakeCase;
-        private SyntaxNode? _nodeContext = null;
+        private SyntaxNode? _nodeContext;
 
         /// <inheritdoc />
         public void Initialize(GeneratorInitializationContext context)
@@ -121,7 +121,7 @@ namespace Coding4fun.DataTools.Analyzers
                             Throw(DataTableMessages.GetUnableToGetTableTypeInfo(), genericType);
                         }
 
-                        ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol);
+                        ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol, semanticModel);
                         
                         string[] usingDirectives = rootNode.DescendantNodes()
                             .OfType<UsingDirectiveSyntax>()
@@ -196,7 +196,7 @@ namespace Coding4fun.DataTools.Analyzers
         private string GetSqlTableName(string entityName) => "#" + ChangeSqlCase(entityName);
 
         private ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression,
-            ITypeSymbol genericType)
+            ITypeSymbol genericType, SemanticModel semanticModel)
         {
             string? propertyName = null;
             string? columnName = null;
@@ -221,6 +221,11 @@ namespace Coding4fun.DataTools.Analyzers
                         SetContext(simpleLambdaExpression.ExpressionBody, DataTableMessages.GetUnableToGetExpressionBody);
                         expressionBody = simpleLambdaExpression.ExpressionBody!.ToString();
                         propertyName = columnName = simpleLambdaExpression.ExpressionBody.GetLastToken().ToString();
+                        var memberAccessExpressionSyntax = simpleLambdaExpression.ExpressionBody.DescendantNodesAndSelf()
+                            .OfType<MemberAccessExpressionSyntax>()
+                            .FirstOrDefault();
+                        
+                        TypeInfo typeInfo = semanticModel.GetTypeInfo(memberAccessExpressionSyntax);
                     }
                     else
                     {
@@ -436,14 +441,9 @@ namespace Coding4fun.DataTools.Analyzers
         
         private void SetContext(SyntaxNode node) => _nodeContext = node;
 
-        private void ParseInlineObject(InvocationExpressionSyntax invocationExpressionSyntax)
-        {
-            
-        }
-
         private void ParseInvocationExpressions(IEnumerable<InvocationExpressionSyntax> invocationExpressions,
             TableDescription tableDescription,
-            ITypeSymbol genericType)
+            ITypeSymbol genericType, SemanticModel semanticModel)
         {
             foreach (var invocationExpression in invocationExpressions)
             {
@@ -489,12 +489,8 @@ namespace Coding4fun.DataTools.Analyzers
 
                 if (methodName == nameof(TableBuilder<int>.AddColumn))
                 {
-                    ColumnDescription columnDescription = ParseAddColumn(invocationExpression, genericType);
+                    ColumnDescription columnDescription = ParseAddColumn(invocationExpression, genericType, semanticModel);
                     tableDescription.Columns.Add(columnDescription);
-                }
-                if (methodName == nameof(TableBuilder<int>.InlineObject))
-                {
-                    ParseInlineObject(invocationExpression);
                 }
                 else if (methodName == nameof(TableBuilder<int>.AddSubTable))
                 {
@@ -515,7 +511,7 @@ namespace Coding4fun.DataTools.Analyzers
                     if (subTableDescription.GenericType == null) Throw(DataTableMessages.GetUnableToGetGenericTypeOfSubTable());
                     
                     ParseInvocationExpressions(subTableInvocationExpressions, subTableDescription,
-                        subTableDescription.GenericType!);
+                        subTableDescription.GenericType!, semanticModel);
                 }
             }
         }

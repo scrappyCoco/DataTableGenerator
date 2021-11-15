@@ -17,10 +17,10 @@ namespace Coding4fun.DataTools.Test.SourceGenerator
         [Test]
         public async Task Success()
         {
-            string source = await LoadAsync();
+            string source = await LoadAsync("Test.cs");
         
             var compilation = CompilationUtil.CreateCompilation(source);
-            var newCompilation = CompilationUtil.RunGenerators(compilation, out _, new DataTableSourceGenerator());
+            var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
         
             var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
