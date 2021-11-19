@@ -7,12 +7,10 @@ namespace Coding4fun.DataTools.Analyzers.Template
 {
     public class CodeTemplate
     {
-        internal CodeTemplate(string? name, CodeTemplate? parent, CodeTemplate[]? children = null)
+        internal CodeTemplate(string? name)
         {
             Name = name;
-            Parent = parent;
-            Children = children ?? Array.Empty<CodeTemplate>();
-            foreach (CodeTemplate child in Children) child.Parent = this;
+            Children = Array.Empty<CodeTemplate>();
         }
 
         internal CodeTemplate(CodeTemplate? parent, string text)

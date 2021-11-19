@@ -27,13 +27,14 @@ namespace Coding4fun.DataTools.Test.Infrastructure
         protected TestBase()
         {
             // Assumes that test assembly name is equals to the root namespace.
-            string assemblyFullName = GetType().Assembly.GetName().Name;
-            string testNamespace = GetType().Namespace;
+            string assemblyFullName = GetType().Assembly.GetName().Name!;
+            string testNamespace = GetType().Namespace!;
             List<string> pathComponents = new List<string> { TestData };
             pathComponents.AddRange(testNamespace
                 .Replace(assemblyFullName, "")
                 .Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries)
             );
+            pathComponents.Add(GetType().Name.Replace("Tests", ""));
             _pathToTestData = Path.Combine(pathComponents.ToArray());
         }
 

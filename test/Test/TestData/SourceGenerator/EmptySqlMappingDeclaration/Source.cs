@@ -3,11 +3,6 @@ namespace Example
     public class SqlMappingDeclarationAttribute : System.Attribute
     {
     }
-    
-    public class TableBuilder<T>
-    {
-    
-    }
 
     public partial class PersonSqlMapping
     {
@@ -15,6 +10,13 @@ namespace Example
         private void Initialize()
         {
             
+        }
+    }
+
+    class Program
+    {
+        static void Main()
+        {
         }
     }
 }

@@ -35,13 +35,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
                 var table = (TableDescription)contextObjects.Last();
                 return table.SubTables.Cast<object>().ToArray();
             }
-            
-            if (template.Name == "sqlColumnName")
-            {
-                var table = (ColumnDescription)contextObjects.Last();
-                return new object?[] { table.SqlColumnName };
-            }
-            
+
             if (template.Name == "sharpType")
             {
                 var table = (ColumnDescription)contextObjects.Last();

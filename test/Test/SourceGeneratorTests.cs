@@ -5,9 +5,9 @@ using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
 using NUnit.Framework;
 
-namespace Coding4fun.DataTools.Test.SourceGenerator
+namespace Coding4fun.DataTools.Test
 {
-    public class Tests : SourceGeneratorTest<DataTableSourceGenerator>
+    public class SourceGeneratorTests : SourceGeneratorTest<DataTableSourceGenerator>
     {
         [SetUp]
         public void Setup()
@@ -42,14 +42,6 @@ namespace Coding4fun.DataTools.Test.SourceGenerator
         public async Task EmptyTableBuilder() =>
             await AssertDiagnosticAsync(Messages.GetSqlMappingIsEmpty());
         
-        [Test]
-        public async Task NotResolvedType() =>
-            await AssertDiagnosticAsync(Messages.GetUnableToGetTableTypeInfo());
-
-        [Test]
-        public async Task NotResolvedProperty() =>
-            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("Name", "Person"));
-
         [Test]
         public async Task SimpleLambdaExpression() =>
             await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());

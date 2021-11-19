@@ -48,7 +48,7 @@ namespace Example
         public string CountryCode { get; set; }
         public Job[] Jobs { get; set; }
         public byte[] Logo { get; set; }
-    
+        public IEnumerable<byte> AnotherLogo { get; set; }
         public string[] Skills { get; set; }
 
         // Enumerable of basic types should be mapped to complex types with defined relations.

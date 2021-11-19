@@ -20,4 +20,11 @@ namespace Example
             new TableBuilder<Person>();
         }
     }
+    
+    class Program
+    {
+        static void Main()
+        {
+        }
+    }
 }

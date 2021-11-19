@@ -31,7 +31,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
             LinkedList<CodeTemplate> children = new ();
             
             string blockName = xmlReader.Name;
-            CodeTemplate template = new CodeTemplate(blockName, null, Array.Empty<CodeTemplate>());
+            CodeTemplate template = new CodeTemplate(blockName);
             if (xmlReader.IsEmptyElement) return template;
 
             for (bool goForward = true; goForward && (goForward = xmlReader.Read());)

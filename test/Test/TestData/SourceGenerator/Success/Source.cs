@@ -20,6 +20,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         public string CountryCode { get; set; }
         public Job[] Jobs { get; set; }
         public Contact Contact { get; set; }
+        public byte[] Photo { get; set; }
     }
 
     public class Job
@@ -59,6 +60,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
                 .AddColumn((Person person) => person.LastName)
                 .AddColumn((Person person) => person.CountryCode, columnName:"COUNTRY")
                 .AddColumn((Person person) => person.Contact.Phone)
+                .AddColumn((Person person) => person.Photo)
                 .AddSubTable((Person person) => person.Jobs, jobBuilder => jobBuilder
                     .AddPreExecutionAction((Job job, Person person) =>
                     {

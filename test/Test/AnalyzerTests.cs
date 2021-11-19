@@ -3,9 +3,9 @@ using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
 using NUnit.Framework;
 
-namespace Coding4fun.DataTools.Test.Analyzer
+namespace Coding4fun.DataTools.Test
 {
-    public class Tests: TestBase
+    public class AnalyzerTests: TestBase
     {
         [Test]
         public async Task BasicTableBuilder()

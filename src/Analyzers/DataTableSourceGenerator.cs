@@ -39,12 +39,6 @@ namespace Coding4fun.DataTools.Analyzers
             
             foreach (SyntaxTree syntaxTree in context.Compilation.SyntaxTrees)
             {
-                if (syntaxTree.Options.Errors.Any() ||
-                    syntaxTree.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
-                {
-                    return;
-                }
-
                 try
                 {
                     SyntaxNode rootNode = syntaxTree.GetRoot();
@@ -272,7 +266,7 @@ namespace Coding4fun.DataTools.Analyzers
                 Throw(Messages.GetUnableToResolveProperty(propertyName, genericType.Name));   
             }
             columnType ??= MapSharpType2Sql(propertySymbol);
-            string sharpType = propertySymbol.Type.Name;
+            string sharpType = propertySymbol.Type.ToString();
 
             columnName = ChangeSqlCase(columnName);
 

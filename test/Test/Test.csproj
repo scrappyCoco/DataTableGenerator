@@ -33,25 +33,13 @@
 	  <Content Include="TestData\CodeFix\Basic\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
-	  <Content Include="TestData\CodeFix\Basic\Target.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Content Include="TestData\SourceGenerator\EmptySqlMappingDeclaration\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\DataTableBuilderWithoutGeneric\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\EmptyTableBuilder\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\NotResolvedType\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\NotResolvedType\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\WithoutNamespace\Source.cs" />
 	  <Compile Remove="TestData\SourceGenerator\NotResolvedProperty\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\NotResolvedProperty\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\ColumnWithoutLambdaBody\Source.cs" />
 	  <Compile Remove="TestData\SourceGenerator\SyntaxError\Source.cs" />
 	  <Content Include="TestData\SourceGenerator\SyntaxError\Source.cs">
@@ -63,10 +51,6 @@
 	  </Content>
 	  <Compile Remove="TestData\Analyzer\BasicTableBuilder\Source.cs" />
 	  <Content Include="TestData\Analyzer\BasicTableBuilder\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Compile Remove="TestData\SourceGenerator\EmptyTableBuilder\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\EmptyTableBuilder\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Compile Remove="TestData\CodeFix\Basic\Target.cs" />
@@ -100,6 +84,10 @@
 	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\WithoutMemberAccessExpression\Source.cs" />
 	  <Content Include="TestData\SourceGenerator\WithoutMemberAccessExpression\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+    <Compile Remove="TestData\SourceGenerator\EmptyTableBuilder\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\EmptyTableBuilder\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

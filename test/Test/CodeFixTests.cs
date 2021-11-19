@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
 using Microsoft.CodeAnalysis;
@@ -7,9 +6,9 @@ using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 using Message = System.Collections.Generic.KeyValuePair<string, string>;
 
-namespace Coding4fun.DataTools.Test.CodeFix
+namespace Coding4fun.DataTools.Test
 {
-    public class Tests : TestBase
+    public class CodeFixTests : TestBase
     {
         [Test]
         public async Task Basic()

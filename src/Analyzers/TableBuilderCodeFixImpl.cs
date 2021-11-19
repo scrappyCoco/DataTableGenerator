@@ -129,7 +129,7 @@ namespace Coding4fun.DataTools.Analyzers
             if (IsScalarType(type)) return ObjectKind.Scalar;
             if (type is IArrayTypeSymbol arrayType)
             {
-                if ("byte".EqualsIgnoreCase(arrayType.ElementType.Name))
+                if ("byte".EqualsIgnoreCase(arrayType.ElementType.ToString()))
                     return ObjectKind.Scalar;
                 
                 if (IsScalarType(arrayType.ElementType)) return ObjectKind.Ignore;
@@ -137,13 +137,12 @@ namespace Coding4fun.DataTools.Analyzers
                 return ObjectKind.Enumerable;
             }
 
-            if (type.AllInterfaces.Any(i =>
-                    i.Name == "IEnumerable" && i.ContainingNamespace.ToString() == "System.Collections")
+            if (type.AllInterfaces.Any(i => i.ToString() == "System.Collections.IEnumerable")
                 && type is INamedTypeSymbol namedType)
             {
                 ITypeSymbol genericTypeParameter = namedType.TypeArguments.First();
                 enumerableType = genericTypeParameter;
-                if ("byte".EqualsIgnoreCase(genericTypeParameter.Name)) return ObjectKind.Scalar;
+                if ("byte".EqualsIgnoreCase(genericTypeParameter.ToString())) return ObjectKind.Scalar;
                 if (IsScalarType(genericTypeParameter)) return ObjectKind.Ignore;
                 return ObjectKind.Enumerable;
             }
