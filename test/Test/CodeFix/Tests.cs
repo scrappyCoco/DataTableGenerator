@@ -25,8 +25,8 @@ namespace Coding4fun.DataTools.Test.CodeFix
         {
             string source = await LoadAsync();
             string target = await LoadAsync("Target.cs");
-            Message analyzerMessage = new(TableBuilderAnalyzer.DiagnosticId, "It should have some method calls");
-            Message fixMessage = DataTableMessages.GetCyclicDependenciesAreNotSupported("Example.Contact");
+            Message analyzerMessage = new Message(TableBuilderAnalyzer.DiagnosticId, "It should have some method calls");
+            Message fixMessage = Messages.GetCyclicDependenciesAreNotSupported("Example.Contact");
 
             DiagnosticResult[] expectedDiagnostics = {
                 //new DiagnosticResult(fixMessage.Key, DiagnosticSeverity.Warning).WithMessage(fixMessage.Value),

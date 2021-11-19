@@ -56,7 +56,7 @@ namespace Coding4fun.DataTools.Analyzers
                 string typeFullName = t.ToString();
                 if (_usedTypes.Contains(typeFullName))
                 {
-                    throw new SourceGeneratorException(DataTableMessages.GetCyclicDependenciesAreNotSupported(typeFullName));
+                    throw new SourceGeneratorException(Messages.GetCyclicDependenciesAreNotSupported(typeFullName));
                 }
                 _usedTypes.Add(typeFullName);
             }

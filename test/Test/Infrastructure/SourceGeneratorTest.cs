@@ -32,7 +32,7 @@ namespace Coding4fun.DataTools.Test.Infrastructure
                 new TSourceGenerator());
             ImmutableArray<Diagnostic> compilationDiagnostics = compilation.GetDiagnostics();
             
-            if (compilationDiagnostics.Any())
+            if (expectedDiagnostics == null && compilationDiagnostics.Any())
             {
                 // Syntax error.
                 Assert.That(compilationDiagnostics.All(d => d.Descriptor.Id.StartsWith("CS")), "Syntax errors were expected.");

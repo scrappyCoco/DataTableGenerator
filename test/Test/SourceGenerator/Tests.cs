@@ -17,7 +17,7 @@ namespace Coding4fun.DataTools.Test.SourceGenerator
         [Test]
         public async Task Success()
         {
-            string source = await LoadAsync("Test.cs");
+            string source = await LoadAsync();
         
             var compilation = CompilationUtil.CreateCompilation(source);
             var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
@@ -31,35 +31,38 @@ namespace Coding4fun.DataTools.Test.SourceGenerator
         
             string expectedOutput = await LoadAsync("Target.cs");
         
-            Assert.AreEqual(expectedOutput, generatedText);
+            AssertSourceCode(expectedOutput, generatedText);
         }
 
         [Test]
         public async Task EmptySqlMappingDeclaration() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetUnableToGetTableDefinition());
+            await AssertDiagnosticAsync(Messages.GetUnableToGetTableDefinition());
 
         [Test]
         public async Task EmptyTableBuilder() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetSqlMappingIsEmpty());
+            await AssertDiagnosticAsync(Messages.GetSqlMappingIsEmpty());
         
         [Test]
         public async Task NotResolvedType() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetUnableToGetTableTypeInfo());
-        
-        [Test]
-        public async Task WithoutNamespace() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetUnableToFindNamespace());
-        
+            await AssertDiagnosticAsync(Messages.GetUnableToGetTableTypeInfo());
+
         [Test]
         public async Task NotResolvedProperty() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetUnableToResolveProperty("Name", "Person"));
+            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("Name", "Person"));
+
+        [Test]
+        public async Task SimpleLambdaExpression() =>
+            await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
         
         [Test]
-        public async Task ColumnWithoutLambdaBody() =>
-            await AssertDiagnosticAsync(DataTableMessages.GetUnableToGetExpressionBody());
+        public async Task LambdaExpressionWithoutType() =>
+            await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
+        
+        [Test]
+        public async Task WithoutMemberAccessExpression() =>
+            await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
         
         [Test]
         public async Task SyntaxError() => await AssertDiagnosticAsync();
-
-    }
+    }                                                                                                   
 }

@@ -26,11 +26,17 @@ namespace Coding4fun.DataTools.Analyzers
         /// <inheritdoc />
         public void Initialize(GeneratorInitializationContext context)
         {
+        
         }
 
         /// <inheritdoc />
         public void Execute(GeneratorExecutionContext context)
         {
+            if (context.Compilation.GetDiagnostics().Any(d => d.Severity == DiagnosticSeverity.Error))
+            {
+                return;
+            }
+            
             foreach (SyntaxTree syntaxTree in context.Compilation.SyntaxTrees)
             {
                 if (syntaxTree.Options.Errors.Any() ||
@@ -76,7 +82,7 @@ namespace Coding4fun.DataTools.Analyzers
                             .OfType<GenericNameSyntax>()
                             .FirstOrDefault(genericName => genericName.Identifier.Text == _tableBuilderName);
 
-                        SetContext(genericName, DataTableMessages.GetUnableToGetTableDefinition);
+                        SetContext(genericName, Messages.GetUnableToGetTableDefinition);
 
                         // new DataTableBuilder<Person>()...
                         //                     ^      ^
@@ -111,14 +117,14 @@ namespace Coding4fun.DataTools.Analyzers
 
                         if (invocationExpressions.Length == 0)
                         {
-                            Throw(DataTableMessages.GetSqlMappingIsEmpty());
+                            Throw(Messages.GetSqlMappingIsEmpty());
                         }
 
                         SemanticModel semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
                         ITypeSymbol? genericTypeSymbol = semanticModel.GetTypeInfo(genericType).Type;
                         if (genericTypeSymbol is null or IErrorTypeSymbol)
                         {
-                            Throw(DataTableMessages.GetUnableToGetTableTypeInfo(), genericType);
+                            Throw(Messages.GetUnableToGetTableTypeInfo(), genericType);
                         }
 
                         ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol, semanticModel);
@@ -134,14 +140,13 @@ namespace Coding4fun.DataTools.Analyzers
                         ClassDeclarationSyntax classDeclaration =
                             genericType.Ancestors().OfType<ClassDeclarationSyntax>().First()!;
                         
+                        // TODO: C# 10
                         string sqlMappingClassName = classDeclaration.Identifier.Text;
                         NamespaceDeclarationSyntax? namespaceDeclaration = genericName.Ancestors()
                             .OfType<NamespaceDeclarationSyntax>()
                             .FirstOrDefault();
 
-                        SetContext(namespaceDeclaration, DataTableMessages.GetUnableToFindNamespace);
-                        
-                        string @namespace = namespaceDeclaration.Name.GetText().ToString().Trim();
+                        string @namespace = namespaceDeclaration!.Name.GetText().ToString().Trim();
                         
                         List<string> usingNamespaces = new();
                         usingNamespaces.AddRange(usingDirectives);
@@ -203,6 +208,7 @@ namespace Coding4fun.DataTools.Analyzers
             string? columnType = null;
             string? varName = null;
             string? expressionBody = null;
+            IPropertySymbol? propertySymbol = null;
 
             //
             // ...AddColumn(person => person.CountryCode, "CHAR(2)", "COUNTRY_CODE")
@@ -212,33 +218,38 @@ namespace Coding4fun.DataTools.Analyzers
                 ArgumentSyntax argument = invocationExpression.ArgumentList.Arguments[argNumber];
                 string? parameterName = argument.NameColon?.Name.Identifier.Text;
 
+                // Unfortunately type name must be presented explicitly before parameter name in lambda expression.
+                // Without it SemanticModel model unable to resolve type.
                 if (argNumber == 0)
                 {
-                    // person => person.CountryCode
-                    if (argument.Expression is SimpleLambdaExpressionSyntax simpleLambdaExpression)
+                    // Person person => person.CountryCode
+                    if (argument.Expression is SimpleLambdaExpressionSyntax)
                     {
-                        varName = simpleLambdaExpression.Parameter.ToString();
-                        SetContext(simpleLambdaExpression.ExpressionBody, DataTableMessages.GetUnableToGetExpressionBody);
-                        expressionBody = simpleLambdaExpression.ExpressionBody!.ToString();
-                        propertyName = columnName = simpleLambdaExpression.ExpressionBody.GetLastToken().ToString();
-                        var memberAccessExpressionSyntax = simpleLambdaExpression.ExpressionBody.DescendantNodesAndSelf()
-                            .OfType<MemberAccessExpressionSyntax>()
-                            .FirstOrDefault();
-                        
-                        TypeInfo typeInfo = semanticModel.GetTypeInfo(memberAccessExpressionSyntax);
+                        Throw(Messages.GetLambdaWithoutType());
                     }
+                    // (Person person) => person.CountryCode
                     else
                     {
-                        // (person) => person.CountryCode
                         var parenthesizedLambdaExpression =
                             argument.Expression as ParenthesizedLambdaExpressionSyntax;
-
-                        SetContext(parenthesizedLambdaExpression?.ExpressionBody, DataTableMessages.GetUnableToGetExpressionBody);
                         
-                        varName = parenthesizedLambdaExpression.ParameterList.Parameters.First().Identifier.Text;
+                        ParameterSyntax parameter = parenthesizedLambdaExpression.ParameterList.Parameters.First();
+                        if (parameter.Type == null)
+                        {
+                            Throw(Messages.GetLambdaWithoutType());
+                        }
+                        varName = parameter.Identifier.Text;
                         expressionBody = parenthesizedLambdaExpression.ExpressionBody!.ToString();
                         propertyName = columnName =
                             parenthesizedLambdaExpression.ExpressionBody.GetLastToken().ToString();
+                        
+                        MemberAccessExpressionSyntax? memberAccessExpressionSyntax = parenthesizedLambdaExpression.ExpressionBody.DescendantNodesAndSelf()
+                            .OfType<MemberAccessExpressionSyntax>()
+                            .FirstOrDefault();
+                        
+                        SetContext(memberAccessExpressionSyntax, Messages.GetMemberAccessExpression);
+                        
+                        propertySymbol = semanticModel.GetSymbolInfo(memberAccessExpressionSyntax).Symbol as IPropertySymbol;
                     }
                 }
                 else if (parameterName == "sqlType" || parameterName == null && argNumber == 1)
@@ -253,20 +264,15 @@ namespace Coding4fun.DataTools.Analyzers
 
             if (expressionBody == null || varName == null || columnName == null || propertyName == null)
             {
-                Throw(DataTableMessages.GetUnableToParseInvocationExpression(), invocationExpression);
+                Throw(Messages.GetUnableToParseInvocationExpression(), invocationExpression);
             }
 
-            IPropertySymbol? propertySymbol = null;
-            try
+            if (propertySymbol == null)
             {
-                propertySymbol = (IPropertySymbol)genericType.GetMembers(propertyName)[0];
-            }
-            catch
-            {
-                Throw(DataTableMessages.GetUnableToResolveProperty(propertyName, genericType.Name));
+                Throw(Messages.GetUnableToResolveProperty(propertyName, genericType.Name));   
             }
             columnType ??= MapSharpType2Sql(propertySymbol);
-            string? sharpType = propertySymbol.Type.ToString();
+            string sharpType = propertySymbol.Type.Name;
 
             columnName = ChangeSqlCase(columnName);
 
@@ -284,7 +290,7 @@ namespace Coding4fun.DataTools.Analyzers
             {
                 if (!"byte".Equals(arrayTypeSymbol.ElementType.Name, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    Throw(DataTableMessages.GetInvalidType());
+                    Throw(Messages.GetInvalidType());
                 }
 
                 return "VARBINARY(MAX)";
@@ -293,10 +299,12 @@ namespace Coding4fun.DataTools.Analyzers
             if ("string".Equals(propertySymbol.Type.Name, StringComparison.InvariantCultureIgnoreCase))
             {
                 AttributeData[] attributes = propertySymbol.GetAttributes().ToArray();
-                AttributeData? maxLengthAttribute =
-                    attributes.FirstOrDefault(a => a.AttributeClass?.Name == "MaxLength");
+                
+                AttributeData? maxLengthAttribute = 
+                    attributes.FirstOrDefault(a => a.AttributeClass?.ToString() == "System.ComponentModel.DataAnnotations.MaxLengthAttribute");
+                
                 AttributeData? minLengthAttribute =
-                    attributes.FirstOrDefault(a => a.AttributeClass?.Name == "MinLength");
+                    attributes.FirstOrDefault(a => a.AttributeClass?.ToString() == "System.ComponentModel.DataAnnotations.MinLengthAttribute");
 
                 if (maxLengthAttribute != null)
                 {
@@ -342,7 +350,7 @@ namespace Coding4fun.DataTools.Analyzers
 
             if (attributeText == null)
             {
-                Throw(DataTableMessages.GetUnableToParseIntValueFromAttribute(), attributeNode);
+                Throw(Messages.GetUnableToParseIntValueFromAttribute(), attributeNode);
             }
 
             return int.Parse(attributeText);
@@ -369,13 +377,13 @@ namespace Coding4fun.DataTools.Analyzers
                 ArgumentSyntax argument = invocationExpression.ArgumentList.Arguments[argNumber];
                 if (argNumber == 0)
                 {
-                    var lambdaExpressionSyntax = argument.Expression as SimpleLambdaExpressionSyntax;
+                    var lambdaExpressionSyntax = argument.Expression as LambdaExpressionSyntax;
                     ExpressionSyntax? expressionBody = lambdaExpressionSyntax?.ExpressionBody;
                     expressionBodyText = expressionBody?.ToString();
 
                     if (expressionBody == null)
                     {
-                        Throw(DataTableMessages.GetUnableToGetBodyOfLambdaExpression(), argument);
+                        Throw(Messages.GetUnableToGetBodyOfLambdaExpression(), argument);
                     }
 
                     // if generic type is implicit: .AddSubTable(person => person.Jobs, ...)
@@ -398,7 +406,7 @@ namespace Coding4fun.DataTools.Analyzers
                     }
                     else
                     {
-                        Throw(DataTableMessages.GetUnableToGetTypeOfEnumerable());
+                        Throw(Messages.GetUnableToGetTypeOfEnumerable());
                         throw new InvalidOperationException();
                     }
                     
@@ -410,7 +418,7 @@ namespace Coding4fun.DataTools.Analyzers
 
             if (genericNameText == null || subTableGenericType == null)
             {
-                Throw(DataTableMessages.GetUnableToGetGenericName(), invocationExpression);
+                Throw(Messages.GetUnableToGetGenericName(), invocationExpression);
             }
 
             string sqlTableName = GetSqlTableName(genericNameText);
@@ -464,7 +472,7 @@ namespace Coding4fun.DataTools.Analyzers
                     
                     if (lambdaExpression == null)
                     {
-                        Throw(DataTableMessages.GetUnableToGetExpression(),
+                        Throw(Messages.GetUnableToGetExpression(),
                             invocationExpression.ArgumentList);
                     }
                     
@@ -508,7 +516,7 @@ namespace Coding4fun.DataTools.Analyzers
                         .Cast<InvocationExpressionSyntax>()
                         .Reverse();
 
-                    if (subTableDescription.GenericType == null) Throw(DataTableMessages.GetUnableToGetGenericTypeOfSubTable());
+                    if (subTableDescription.GenericType == null) Throw(Messages.GetUnableToGetGenericTypeOfSubTable());
                     
                     ParseInvocationExpressions(subTableInvocationExpressions, subTableDescription,
                         subTableDescription.GenericType!, semanticModel);

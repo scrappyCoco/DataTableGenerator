@@ -3,7 +3,7 @@ using Message = System.Collections.Generic.KeyValuePair<string, string>;
 
 namespace Coding4fun.DataTools.Analyzers
 {
-    public static class DataTableMessages
+    public static class Messages
     {
         private static readonly string TableBuilderName = typeof(TableBuilder<int>).GetNameWithoutGeneric();
 
@@ -12,10 +12,7 @@ namespace Coding4fun.DataTools.Analyzers
         
         public static Message GetUnableToGetTableTypeInfo() =>
             new("C4FDT0003", "Unable to get type info.");
-        
-        public static Message GetUnableToFindNamespace() =>
-            new("C4FDT0004", "Unable to find namespace.");
-        
+
         public static Message GetUnableToGetExpressionBody() =>
             new("C4FDT0005", "Unable to get expression body.");
 
@@ -51,5 +48,10 @@ namespace Coding4fun.DataTools.Analyzers
         
         public static Message GetCyclicDependenciesAreNotSupported(string typeFullName) =>
             new("C4FDT0016", $"Cyclic dependencies are not supported: {typeFullName}.");
+        
+        public static Message GetLambdaWithoutType() =>
+            new("C4FDT0017", "Lambda expression without explicit type is not supported.");
+        
+        public static Message GetMemberAccessExpression() => new("C4FDT0018", "Unable to get member access expression im lambda body.");
     }
 }

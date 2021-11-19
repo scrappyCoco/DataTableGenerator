@@ -17,14 +17,15 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         public PersonSqlMapping()
         {
             PersonDataTable.Columns.Add("id", typeof(Guid));
-            PersonDataTable.Columns.Add("age", typeof(short));
-            PersonDataTable.Columns.Add("first_name", typeof(string));
-            PersonDataTable.Columns.Add("last_name", typeof(string));
-            PersonDataTable.Columns.Add("country", typeof(string));
+            PersonDataTable.Columns.Add("age", typeof(Int16));
+            PersonDataTable.Columns.Add("first_name", typeof(String));
+            PersonDataTable.Columns.Add("last_name", typeof(String));
+            PersonDataTable.Columns.Add("country", typeof(String));
+            PersonDataTable.Columns.Add("phone", typeof(String));
 
             JobDataTable.Columns.Add("person_id", typeof(Guid));
-            JobDataTable.Columns.Add("company_name", typeof(string));
-            JobDataTable.Columns.Add("address", typeof(string));
+            JobDataTable.Columns.Add("company_name", typeof(String));
+            JobDataTable.Columns.Add("address", typeof(String));
         }
   
         public string GetSqlTableDefinition() => @"
@@ -34,7 +35,8 @@ CREATE TABLE #MY_PERSON
   age SMALLINT,
   first_name NVARCHAR(50),
   last_name NVARCHAR(50),
-  country NCHAR(2)
+  country NCHAR(2),
+  phone NVARCHAR(MAX)
 );
 CREATE TABLE #job
 (
@@ -79,7 +81,8 @@ CREATE TABLE #job
                 person.Age,
                 person.FirstName,
                 person.LastName,
-                person.CountryCode
+                person.CountryCode,
+                person.Contact.Phone
             );
         }
 

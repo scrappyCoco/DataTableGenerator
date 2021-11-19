@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
-
 		<IsPackable>false</IsPackable>
-
 		<AssemblyName>Coding4fun.DataTools.Test</AssemblyName>
-
 		<RootNamespace>Coding4fun.DataTools.Test</RootNamespace>
-
 		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -22,6 +19,7 @@
 		<PackageReference Include="NUnit" Version="3.12.0" />
 		<PackageReference Include="NUnit3TestAdapter" Version="3.16.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
 	</ItemGroup>
 
@@ -50,17 +48,11 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\WithoutNamespace\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\WithoutNamespace\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\NotResolvedProperty\Source.cs" />
 	  <Content Include="TestData\SourceGenerator\NotResolvedProperty\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\ColumnWithoutLambdaBody\Source.cs" />
-	  <Content Include="TestData\SourceGenerator\ColumnWithoutLambdaBody\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\SyntaxError\Source.cs" />
 	  <Content Include="TestData\SourceGenerator\SyntaxError\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -98,7 +90,16 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	  <Compile Remove="TestData\SourceGenerator\Success\Test.cs" />
-	  <Content Include="TestData\SourceGenerator\Success\Test.cs">
+	  <Compile Remove="TestData\SourceGenerator\SimpleLambdaExpression\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\SimpleLambdaExpression\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\LambdaExpressionWithoutType\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\LambdaExpressionWithoutType\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\WithoutMemberAccessExpression\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\WithoutMemberAccessExpression\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
@@ -108,12 +109,6 @@
 	  <Compile Remove="TestData\CodeFix\Target.cs" />
 	  <Compile Remove="TestData\SourceGenerator\Source.cs" />
 	  <Compile Remove="TestData\SourceGenerator\Target.cs" />
-	  <Content Include="TestData\SourceGenerator\Success\Source.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="TestData\SourceGenerator\Success\Target.cs">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>

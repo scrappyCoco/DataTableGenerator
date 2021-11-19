@@ -48,26 +48,34 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         private void Initialize()
         {
             new TableBuilder<Person>(NamingConvention.SnakeCase)
-                .AddPreExecutionAction(person =>
+                .AddPreExecutionAction((Person person) =>
                 {
                     Console.WriteLine(person.LastName + " " + person.FirstName);
                 })
                 .SetName("#MY_PERSON")
-                .AddColumn(person => person.Id)
-                .AddColumn(person => person.Age)
-                .AddColumn(person => person.FirstName)
-                .AddColumn(person => person.LastName)
-                .AddColumn(person => person.CountryCode, columnName:"COUNTRY")
-                .AddColumn(person => person.Contact.Phone)
-                .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
-                    .AddPreExecutionAction((job, person) =>
+                .AddColumn((Person person) => person.Id)
+                .AddColumn((Person person) => person.Age)
+                .AddColumn((Person person) => person.FirstName)
+                .AddColumn((Person person) => person.LastName)
+                .AddColumn((Person person) => person.CountryCode, columnName:"COUNTRY")
+                .AddColumn((Person person) => person.Contact.Phone)
+                .AddSubTable((Person person) => person.Jobs, jobBuilder => jobBuilder
+                    .AddPreExecutionAction((Job job, Person person) =>
                     {
                         job.PersonId = person.Id;
                     })
-                    .AddColumn(job => job.PersonId)
-                    .AddColumn(job => job.CompanyName, "VARCHAR(100)")
-                    .AddColumn(job => job.Address, "VARCHAR(200)")
-                ).AddSubTable(person => );
+                    .AddColumn((Job job) => job.PersonId)
+                    .AddColumn((Job job) => job.CompanyName, "VARCHAR(100)")
+                    .AddColumn((Job job) => job.Address, "VARCHAR(200)")
+                );
+        }
+    }
+
+    static class Program
+    {
+        static void Main()
+        {
+            new PersonSqlMapping();
         }
     }
 }
