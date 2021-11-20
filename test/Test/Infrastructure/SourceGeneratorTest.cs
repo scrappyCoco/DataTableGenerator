@@ -28,26 +28,29 @@ namespace Coding4fun.DataTools.Test.Infrastructure
 
             string source = await LoadAsync("Source.cs", methodName!);
             Compilation compilation = CompilationUtil.CreateCompilation(source);
-            CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> diagnostics,
-                new TSourceGenerator());
-            ImmutableArray<Diagnostic> compilationDiagnostics = compilation.GetDiagnostics();
+            Diagnostic[] errors = compilation.GetDiagnostics()
+                .Where(d => d.Severity == DiagnosticSeverity.Error && d.Descriptor.Id.StartsWith("CS"))
+                .ToArray();
             
-            if (expectedDiagnostics == null && compilationDiagnostics.Any())
+            if (errors.Any())
             {
                 // Syntax error.
-                Assert.That(compilationDiagnostics.All(d => d.Descriptor.Id.StartsWith("CS")), "Syntax errors were expected.");
+                Assert.Fail($"Syntax error: {errors[0]}");
             }
-            else if (expectedDiagnostics != null)
+            
+            CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> diagnostics,
+                new TSourceGenerator());
+            
+            if (expectedDiagnostics != null)
             {
-                Assert.AreEqual(1, diagnostics.Length);
+                Assert.AreEqual(1, diagnostics.Length, "Invalid count of diagnostics.");
                 Assert.AreEqual(expectedDiagnostics.Value.Message, diagnostics[0].GetMessage());
                 Assert.AreEqual(expectedDiagnostics.Value.Severity, diagnostics[0].Severity);
                 Assert.AreEqual(expectedDiagnostics.Value.Id, diagnostics[0].Descriptor.Id);
             }
-            else
-            {
-                throw new InvalidOperationException();
-            }
+
+            errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+            Assert.Zero(errors.Length, $"Some errors contains in generated code: {errors.First()}");
         }
     }
 }

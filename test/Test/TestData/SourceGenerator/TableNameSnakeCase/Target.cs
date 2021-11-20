@@ -19,7 +19,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         }
   
         public string GetSqlTableDefinition() => @"
-CREATE TABLE #somePerson
+CREATE TABLE #some_person
 (
   id UNIQUEIDENTIFIER
 );
@@ -37,7 +37,7 @@ CREATE TABLE #somePerson
         {
             using (SqlBulkCopy somePersonSqlBulkCopy = new SqlBulkCopy(targetConnection))
             {
-                somePersonSqlBulkCopy.DestinationTableName = "#somePerson";
+                somePersonSqlBulkCopy.DestinationTableName = "#some_person";
                 await somePersonSqlBulkCopy.WriteToServerAsync(SomePersonDataTable);
             }
         }

@@ -1,7 +1,9 @@
-﻿using Coding4fun.DataTools.Analyzers;
-using Coding4fun.DataTools.Analyzers.StringUtil;
-using System;
+﻿using Coding4fun.DataTools.Analyzers.StringUtil;
+using Coding4fun.DataTools.Analyzers;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -13,6 +15,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
     {
         public DataTable PersonDataTable { get; } = new DataTable();
         public DataTable JobDataTable { get; } = new DataTable();
+        public DataTable SkillDataTable { get; } = new DataTable();
 
         public PersonSqlMapping()
         {
@@ -27,6 +30,9 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
             JobDataTable.Columns.Add("person_id", typeof(System.Guid));
             JobDataTable.Columns.Add("company_name", typeof(string));
             JobDataTable.Columns.Add("address", typeof(string));
+
+            SkillDataTable.Columns.Add("person_id", typeof(System.Guid));
+            SkillDataTable.Columns.Add("tag", typeof(string));
         }
   
         public string GetSqlTableDefinition() => @"
@@ -46,6 +52,11 @@ CREATE TABLE #job
   company_name VARCHAR(100),
   address VARCHAR(200)
 );
+CREATE TABLE #skill
+(
+  person_id UNIQUEIDENTIFIER,
+  tag VARCHAR(100)
+);
 ";
 
         public void FillDataTables(IEnumerable<Person> items)
@@ -58,6 +69,10 @@ CREATE TABLE #job
                 {
                     job.PersonId = person.Id;
                     AddJob(job);
+                }
+                foreach (var skill in person.SkillValues)
+                {
+                    AddSkill(skill);
                 }
             }
         }
@@ -73,6 +88,11 @@ CREATE TABLE #job
             {
                 jobSqlBulkCopy.DestinationTableName = "#job";
                 await jobSqlBulkCopy.WriteToServerAsync(JobDataTable);
+            }
+            using (SqlBulkCopy skillSqlBulkCopy = new SqlBulkCopy(targetConnection))
+            {
+                skillSqlBulkCopy.DestinationTableName = "#skill";
+                await skillSqlBulkCopy.WriteToServerAsync(SkillDataTable);
             }
         }
 
@@ -95,6 +115,14 @@ CREATE TABLE #job
                 job.PersonId,
                 job.CompanyName,
                 job.Address
+            );
+        }
+
+        public void AddSkill(Skill skill)
+        {
+            SkillDataTable.Rows.Add(
+                skill.PersonId,
+                skill.Tag
             );
         }
     }

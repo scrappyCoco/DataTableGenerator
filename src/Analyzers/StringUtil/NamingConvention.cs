@@ -19,11 +19,6 @@ namespace Coding4fun.DataTools.Analyzers.StringUtil
         CamelCase,
 
         /// <summary>
-        /// kebab-case.
-        /// </summary>
-        KebabCase,
-
-        /// <summary>
         /// snake_case.
         /// </summary>
         SnakeCase,

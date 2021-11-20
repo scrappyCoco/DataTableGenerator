@@ -1,9 +1,11 @@
 ﻿#nullable disable
 
-using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Analyzers.StringUtil;
-using System;
+using Coding4fun.DataTools.Analyzers;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System;
 
 namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
@@ -21,6 +23,8 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         public Job[] Jobs { get; set; }
         public Contact Contact { get; set; }
         public byte[] Photo { get; set; }
+        public string[] Skills { get; set; }
+        public IEnumerable<Skill> SkillValues => Skills.Select(skill => new Skill(Id, skill));
     }
 
     public class Job
@@ -41,6 +45,18 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
     {
         public Guid PersonId { get; set; }
         public string Email { get; set; }
+    }
+    
+    public class Skill
+    {
+        public Skill(Guid personId, string tag)
+        {
+            PersonId = personId;
+            Tag = tag;
+        }
+
+        public Guid PersonId { get; set; }
+        public string Tag { get; set; }
     }
 
     public partial class PersonSqlMapping
@@ -69,6 +85,9 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
                     .AddColumn((Job job) => job.PersonId)
                     .AddColumn((Job job) => job.CompanyName, "VARCHAR(100)")
                     .AddColumn((Job job) => job.Address, "VARCHAR(200)")
+                ).AddSubTable((Person person) => person.SkillValues, skillBuilder => skillBuilder
+                    .AddColumn((Skill skill) => skill.PersonId)
+                    .AddColumn((Skill skill) => skill.Tag, "VARCHAR(100)")
                 );
         }
     }

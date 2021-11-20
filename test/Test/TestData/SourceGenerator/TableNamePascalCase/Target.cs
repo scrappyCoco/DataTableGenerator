@@ -15,13 +15,13 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 
         public PersonSqlMapping()
         {
-            SomePersonDataTable.Columns.Add("id", typeof(System.Guid));
+            SomePersonDataTable.Columns.Add("Id", typeof(System.Guid));
         }
   
         public string GetSqlTableDefinition() => @"
-CREATE TABLE #somePerson
+CREATE TABLE #SomePerson
 (
-  id UNIQUEIDENTIFIER
+  Id UNIQUEIDENTIFIER
 );
 ";
 
@@ -37,7 +37,7 @@ CREATE TABLE #somePerson
         {
             using (SqlBulkCopy somePersonSqlBulkCopy = new SqlBulkCopy(targetConnection))
             {
-                somePersonSqlBulkCopy.DestinationTableName = "#somePerson";
+                somePersonSqlBulkCopy.DestinationTableName = "#SomePerson";
                 await somePersonSqlBulkCopy.WriteToServerAsync(SomePersonDataTable);
             }
         }

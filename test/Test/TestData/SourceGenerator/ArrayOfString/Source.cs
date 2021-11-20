@@ -1,4 +1,4 @@
-#nullable disable
+﻿#nullable disable
 
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Analyzers.StringUtil;
@@ -7,9 +7,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
-    public class SomePerson
+    public class Person
     {
-        public Guid Id { get; set; }
+        public string[] Phones { get; set; }
     }
 
     public partial class PersonSqlMapping
@@ -17,8 +17,8 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<SomePerson>(NamingConvention.CamelCase)
-                .AddColumn((SomePerson somePerson) => somePerson.Id);
+            new TableBuilder<Person>()
+                .AddColumn((Person person) => person.Phones);
         }
     }
 

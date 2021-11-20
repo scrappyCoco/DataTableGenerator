@@ -6,8 +6,10 @@ using Coding4fun.DataTools.Analyzers.Extension;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using Coding4fun.DataTools.Analyzers.Template.DataTable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
+using CSharpExtensions = Microsoft.CodeAnalysis.CSharp.CSharpExtensions;
 using NamingConvention = Coding4fun.DataTools.Analyzers.StringUtil.NamingConvention;
 
 namespace Coding4fun.DataTools.Analyzers
@@ -114,7 +116,7 @@ namespace Coding4fun.DataTools.Analyzers
                         }
 
                         SemanticModel semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-                        ITypeSymbol genericTypeSymbol = semanticModel.GetTypeInfo(rootType).Type!;
+                        ITypeSymbol genericTypeSymbol = ModelExtensions.GetTypeInfo(semanticModel, rootType).Type!;
 
                         ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol, semanticModel);
                         
@@ -178,7 +180,6 @@ namespace Coding4fun.DataTools.Analyzers
             {
                 NamingConvention.CamelCase               => entityName.ChangeCase(CaseRules.ToCamelCase)!,
                 NamingConvention.PascalCase              => entityName.ChangeCase(CaseRules.ToTitleCase)!,
-                NamingConvention.KebabCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "-")!,
                 NamingConvention.SnakeCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
                 NamingConvention.ScreamingSnakeCase or _ => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!
             };
@@ -194,7 +195,6 @@ namespace Coding4fun.DataTools.Analyzers
             string? propertyName = null;
             string? columnName = null;
             string? columnType = null;
-            string? varName = null;
             string? expressionBody = null;
             IPropertySymbol? propertySymbol = null;
 
@@ -226,18 +226,20 @@ namespace Coding4fun.DataTools.Analyzers
                         {
                             Throw(Messages.GetLambdaWithoutType());
                         }
-                        varName = parameter.Identifier.Text;
                         expressionBody = parenthesizedLambdaExpression.ExpressionBody!.ToString();
-                        propertyName = columnName =
-                            parenthesizedLambdaExpression.ExpressionBody.GetLastToken().ToString();
-                        
+
                         MemberAccessExpressionSyntax? memberAccessExpressionSyntax = parenthesizedLambdaExpression.ExpressionBody.DescendantNodesAndSelf()
                             .OfType<MemberAccessExpressionSyntax>()
                             .FirstOrDefault();
                         
                         SetContext(memberAccessExpressionSyntax, Messages.GetMemberAccessExpression);
                         
-                        propertySymbol = semanticModel.GetSymbolInfo(memberAccessExpressionSyntax).Symbol as IPropertySymbol;
+                        propertyName = columnName = parenthesizedLambdaExpression.ExpressionBody
+                            .DescendantTokens()
+                            .LastOrDefault(t => t.Kind() == SyntaxKind.IdentifierToken)
+                            .ToString();
+                        
+                        propertySymbol = ModelExtensions.GetSymbolInfo(semanticModel, memberAccessExpressionSyntax).Symbol as IPropertySymbol;
                     }
                 }
                 else if (parameterName == "sqlType" || parameterName == null && argNumber == 1)
@@ -248,11 +250,6 @@ namespace Coding4fun.DataTools.Analyzers
                 {
                     columnName = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
                 }
-            }
-
-            if (expressionBody == null || varName == null || columnName == null || propertyName == null)
-            {
-                Throw(Messages.GetUnableToParseInvocationExpression(), invocationExpression);
             }
 
             if (propertySymbol == null)
@@ -276,7 +273,7 @@ namespace Coding4fun.DataTools.Analyzers
         {
             if (propertySymbol.Type is IArrayTypeSymbol arrayTypeSymbol)
             {
-                if (!"byte".Equals(arrayTypeSymbol.ElementType.Name, StringComparison.InvariantCultureIgnoreCase))
+                if (!"byte".EqualsIgnoreCase(arrayTypeSymbol.ElementType.ToString()))
                 {
                     Throw(Messages.GetInvalidType());
                 }
@@ -312,13 +309,10 @@ namespace Coding4fun.DataTools.Analyzers
             {
                 "guid"           => "UNIQUEIDENTIFIER",
                 "byte"           => "BINARY",
-                "short"          => "SMALLINT",
                 "int16"          => "SMALLINT",
-                "int"            => "INTEGER",
                 "int32"          => "INTEGER",
-                "long"           => "BIGINT",
                 "int64"          => "BIGINT",
-                "bool"           => "BIT",
+                "boolean"        => "BIT",
                 "datetime"       => "DATETIME",
                 "datetimeoffset" => "DATETIMEOFFSET",
                 "timespan"       => "TIME",
@@ -332,20 +326,15 @@ namespace Coding4fun.DataTools.Analyzers
         private int ParseIntAttribute(AttributeData attributeData)
         {
             SyntaxNode attributeNode = attributeData.ApplicationSyntaxReference!.GetSyntax();
-            string? attributeText = attributeNode.Cast<AttributeSyntax>()
+            string attributeText = attributeNode.Cast<AttributeSyntax>()
                 .ArgumentList?.Arguments.First().Expression.Cast<LiteralExpressionSyntax>()
-                .Token.Text;
-
-            if (attributeText == null)
-            {
-                Throw(Messages.GetUnableToParseIntValueFromAttribute(), attributeNode);
-            }
+                .Token.Text!;
 
             return int.Parse(attributeText);
         }
 
         private TableDescription ParseAddSubTable(InvocationExpressionSyntax invocationExpression,
-            ITypeSymbol genericType)
+            ITypeSymbol genericType, SemanticModel semanticModel)
         {
             string? expressionBodyText = null;
 
@@ -365,37 +354,40 @@ namespace Coding4fun.DataTools.Analyzers
                 ArgumentSyntax argument = invocationExpression.ArgumentList.Arguments[argNumber];
                 if (argNumber == 0)
                 {
-                    var lambdaExpressionSyntax = argument.Expression as LambdaExpressionSyntax;
-                    ExpressionSyntax? expressionBody = lambdaExpressionSyntax?.ExpressionBody;
-                    expressionBodyText = expressionBody?.ToString();
-
-                    if (expressionBody == null)
-                    {
-                        Throw(Messages.GetUnableToGetBodyOfLambdaExpression(), argument);
-                    }
+                    ParenthesizedLambdaExpressionSyntax? lambdaExpressionSyntax = argument.Expression as ParenthesizedLambdaExpressionSyntax;
+                    SetContext(lambdaExpressionSyntax, Messages.GetLambdaWithoutType);
+                    ExpressionSyntax expressionBody = lambdaExpressionSyntax.ExpressionBody!;
+                    expressionBodyText = expressionBody.ToString();
 
                     // if generic type is implicit: .AddSubTable(person => person.Jobs, ...)
                     // then we must get it from the type information.
                     MemberAccessExpressionSyntax? enumerableMemberAccessExpression = expressionBody
                         .DescendantNodesAndSelf()
                         .OfType<MemberAccessExpressionSyntax>()
-                        .Last();
+                        .LastOrDefault();
 
-                    string enumerableName = enumerableMemberAccessExpression.GetLastToken().Text;
-                    IPropertySymbol propertySymbol = (IPropertySymbol)genericType.GetMembers(enumerableName)[0];
-                    ITypeSymbol enumerableType;
-                    if (propertySymbol.Type is INamedTypeSymbol namedTypeSymbol)
+                    SetContext(enumerableMemberAccessExpression, Messages.GetMemberAccessExpression);
+
+                    IPropertySymbol? enumerableTypeInfo = semanticModel
+                        .GetSymbolInfo(enumerableMemberAccessExpression).Symbol as IPropertySymbol;
+
+                    if (enumerableTypeInfo == null)
+                    {
+                        Throw(Messages.GetInvalidType(), lambdaExpressionSyntax);
+                    }
+                    
+                    ITypeSymbol? enumerableType = null;
+                    if (enumerableTypeInfo.Type is INamedTypeSymbol namedTypeSymbol)
                     {
                         enumerableType = namedTypeSymbol.TypeArguments[0];
                     }
-                    else if (propertySymbol.Type is IArrayTypeSymbol arrayTypeSymbol)
+                    else if (enumerableTypeInfo.Type is IArrayTypeSymbol arrayTypeSymbol)
                     {
                         enumerableType = (INamedTypeSymbol)arrayTypeSymbol.ElementType;
                     }
                     else
                     {
                         Throw(Messages.GetUnableToGetTypeOfEnumerable());
-                        throw new InvalidOperationException();
                     }
                     
                     subTableGenericType = enumerableType;
@@ -490,7 +482,7 @@ namespace Coding4fun.DataTools.Analyzers
                 }
                 else if (methodName == nameof(TableBuilder<int>.AddSubTable))
                 {
-                    TableDescription subTableDescription = ParseAddSubTable(invocationExpression, genericType);
+                    TableDescription subTableDescription = ParseAddSubTable(invocationExpression, genericType, semanticModel);
 
                     tableDescription.SubTables.Add(subTableDescription);
                     subTableDescription.ParentTable = tableDescription;

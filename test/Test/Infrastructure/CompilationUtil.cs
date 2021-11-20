@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -18,6 +19,7 @@ namespace Coding4fun.DataTools.Test.Infrastructure
         {
             Assembly netStandardAssembly = AppDomain.CurrentDomain.GetAssemblies().Single(a => a.GetName().Name == "netstandard");
             Assembly runtimeAssembly = AppDomain.CurrentDomain.GetAssemblies().First(a => "System.Runtime".Equals(a.GetName().Name));
+            Assembly linqAssembly = AppDomain.CurrentDomain.GetAssemblies().First(a => "System.Linq".Equals(a.GetName().Name));
 
             return CSharpCompilation.Create("compilation",
                 new[] { CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.CSharp9)) },
@@ -25,6 +27,7 @@ namespace Coding4fun.DataTools.Test.Infrastructure
                 {
                     MetadataReference.CreateFromFile(netStandardAssembly.Location),
                     MetadataReference.CreateFromFile(runtimeAssembly.Location),
+                    MetadataReference.CreateFromFile(linqAssembly.Location),
                     MetadataReference.CreateFromFile(typeof(DataTable).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
                     MetadataReference.CreateFromFile(typeof(Attribute).Assembly.Location),

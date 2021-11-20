@@ -1,8 +1,11 @@
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Coding4fun.DataTools.Test
@@ -14,14 +17,22 @@ namespace Coding4fun.DataTools.Test
         {
         }
 
-        [Test]
-        public async Task Success()
+        private async Task TestSuccessAsync([CallerMemberName] string? methodName = null)
         {
-            string source = await LoadAsync();
+            string source = await LoadAsync("Source.cs", methodName);
         
-            var compilation = CompilationUtil.CreateCompilation(source);
+            Compilation compilation = CompilationUtil.CreateCompilation(source);
+            Diagnostic[] compilationErrors = compilation.GetDiagnostics()
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+                .ToArray();
+            
+            if (compilationErrors.Any())
+            {
+                Assert.Fail($"Errors count: {compilationErrors.Length}, first error: {compilationErrors.First()}");
+            }
+            
             var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
-        
+
             var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
         
@@ -29,30 +40,28 @@ namespace Coding4fun.DataTools.Test
         
             var generatedText = (await newFile.GetTextAsync()).ToString().Trim();
         
-            string expectedOutput = await LoadAsync("Target.cs");
+            string expectedOutput = await LoadAsync("Target.cs", methodName);
         
             AssertSourceCode(expectedOutput, generatedText);
         }
         
         [Test]
-        public async Task TableNameCamelCase()
-        {
-            string source = await LoadAsync();
+        public async Task Success() => await TestSuccessAsync();
         
-            var compilation = CompilationUtil.CreateCompilation(source);
-            var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
+        [Test]
+        public async Task TableNameCamelCase() => await TestSuccessAsync();
         
-            var newFile = newCompilation.SyntaxTrees
-                .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
+        [Test]
+        public async Task TableNamePascalCase() => await TestSuccessAsync();
         
-            Assert.NotNull(newFile);
+        [Test]
+        public async Task TableNameScreamingSnakeCase() => await TestSuccessAsync();
         
-            var generatedText = (await newFile.GetTextAsync()).ToString().Trim();
+        [Test]
+        public async Task TableNameSnakeCase() => await TestSuccessAsync();
         
-            string expectedOutput = await LoadAsync("Target.cs");
-        
-            AssertSourceCode(expectedOutput, generatedText);
-        }
+        [Test]
+        public async Task AllSimpleTypes() => await TestSuccessAsync();
 
         [Test]
         public async Task EmptySqlMappingDeclaration() =>
@@ -71,10 +80,24 @@ namespace Coding4fun.DataTools.Test
             await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
         
         [Test]
-        public async Task WithoutMemberAccessExpression() =>
+        public async Task AddColumnWithoutMemberAccessExpression() =>
             await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
         
         [Test]
+        public async Task AddSubTableWithoutMemberAccessExpression() =>
+            await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
+        
+        [Test]
+        public async Task MethodCallInsteadOfProperty() =>
+            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetFirstName", "Person"));
+        
+        [Test]
+        public async Task ArrayOfString() => await AssertDiagnosticAsync(Messages.GetInvalidType());
+        
+        [Test]
+        public async Task InvalidSubTable() => await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
+        
+        [Test]
         public async Task SyntaxError() => await AssertDiagnosticAsync();
-    }                                                                                                   
+    }
 }
