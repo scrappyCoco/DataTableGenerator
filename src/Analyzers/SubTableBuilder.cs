@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using JetBrains.Annotations;
 
 namespace Coding4fun.DataTools.Analyzers
 {
     [PublicAPI]
+    [ExcludeFromCodeCoverage]
     public class SubTableBuilder<TItem, TParentItem>
     {
         public SubTableBuilder<TItem, TParentItem> AddColumn(

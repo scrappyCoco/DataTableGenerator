@@ -80,8 +80,8 @@ namespace Coding4fun.DataTools.Analyzers
 
                         // new DataTableBuilder<Person>()...
                         //                     ^      ^
-                        TypeSyntax genericType = genericName.TypeArgumentList.Arguments.First();
-                        SetContext(genericType);
+                        TypeSyntax rootType = genericName.TypeArgumentList.Arguments.First();
+                        SetContext(rootType);
 
                         // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
                         //                              ^                                 ^
@@ -95,9 +95,8 @@ namespace Coding4fun.DataTools.Analyzers
                         _namingConvention = namingConventionValue.ParseEnum<NamingConvention>();
 
                         //_currentNode = genericName;
-                        string sqlTableName = GetSqlTableName(genericName.ToString());
-                        TableDescription tableDescription =
-                            new(genericType.ToString(), sqlTableName);
+                        string sqlTableName = GetSqlTableName(rootType.ToString());
+                        TableDescription tableDescription = new(rootType.ToString(), sqlTableName);
 
                         // ..
                         //   .AddColumn(...)
@@ -115,11 +114,7 @@ namespace Coding4fun.DataTools.Analyzers
                         }
 
                         SemanticModel semanticModel = context.Compilation.GetSemanticModel(syntaxTree);
-                        ITypeSymbol? genericTypeSymbol = semanticModel.GetTypeInfo(genericType).Type;
-                        if (genericTypeSymbol is null or IErrorTypeSymbol)
-                        {
-                            Throw(Messages.GetUnableToGetTableTypeInfo(), genericType);
-                        }
+                        ITypeSymbol genericTypeSymbol = semanticModel.GetTypeInfo(rootType).Type!;
 
                         ParseInvocationExpressions(invocationExpressions, tableDescription, genericTypeSymbol, semanticModel);
                         
@@ -132,7 +127,7 @@ namespace Coding4fun.DataTools.Analyzers
                         //                      ^              ^
                         
                         ClassDeclarationSyntax classDeclaration =
-                            genericType.Ancestors().OfType<ClassDeclarationSyntax>().First()!;
+                            rootType.Ancestors().OfType<ClassDeclarationSyntax>().First()!;
                         
                         // TODO: C# 10
                         string sqlMappingClassName = classDeclaration.Identifier.Text;
@@ -181,12 +176,11 @@ namespace Coding4fun.DataTools.Analyzers
         {
             string sqlTableName = _namingConvention switch
             {
-                NamingConvention.CamelCase => entityName.ChangeCase(CaseRules.ToCamelCase)!,
-                NamingConvention.PascalCase => entityName.ChangeCase(CaseRules.ToTitleCase)!,
-                NamingConvention.KebabCase => entityName.ChangeCase(CaseRules.ToLowerCase, "-")!,
-                NamingConvention.SnakeCase => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
-                NamingConvention.ScreamingSnakeCase => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!,
-                _ => throw new ArgumentOutOfRangeException($"Unable to map {_namingConvention}.")
+                NamingConvention.CamelCase               => entityName.ChangeCase(CaseRules.ToCamelCase)!,
+                NamingConvention.PascalCase              => entityName.ChangeCase(CaseRules.ToTitleCase)!,
+                NamingConvention.KebabCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "-")!,
+                NamingConvention.SnakeCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
+                NamingConvention.ScreamingSnakeCase or _ => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!
             };
 
             return sqlTableName;

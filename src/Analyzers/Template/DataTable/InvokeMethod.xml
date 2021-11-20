@@ -2,8 +2,9 @@
 <!-- @formatter:off
      --><class><!--
      --><offset />foreach (var <varName /> in <items />)
-<!-- --><offset />{
-<!-- --><offset />    <preExecutionActions />
+<!-- --><offset />{<hasPreExecutionActions>
+<!-- --><offset />    <preExecutionActions /><!--
+                --></hasPreExecutionActions>
 <!-- --><offset />    Add<entityName />(<varName />);
 <!--               --><subTables><invokeMethod /></subTables><!--
      --><offset />}

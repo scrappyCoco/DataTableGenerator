@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +21,12 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
                 return new object?[] { table.EnumerableName ?? "items" };
             }
 
+            if (template.Name == "hasPreExecutionActions")
+            {
+                var table = (TableDescription)contextObjects.Last();
+                return table.PreExecutionActions.Any() ? new object?[] { null } : Array.Empty<object?>();
+            }
+            
             if (template.Name == "preExecutionActions")
             {
                 var table = (TableDescription)contextObjects.Last();

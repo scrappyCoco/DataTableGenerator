@@ -33,6 +33,26 @@ namespace Coding4fun.DataTools.Test
         
             AssertSourceCode(expectedOutput, generatedText);
         }
+        
+        [Test]
+        public async Task TableNameCamelCase()
+        {
+            string source = await LoadAsync();
+        
+            var compilation = CompilationUtil.CreateCompilation(source);
+            var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
+        
+            var newFile = newCompilation.SyntaxTrees
+                .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
+        
+            Assert.NotNull(newFile);
+        
+            var generatedText = (await newFile.GetTextAsync()).ToString().Trim();
+        
+            string expectedOutput = await LoadAsync("Target.cs");
+        
+            AssertSourceCode(expectedOutput, generatedText);
+        }
 
         [Test]
         public async Task EmptySqlMappingDeclaration() =>

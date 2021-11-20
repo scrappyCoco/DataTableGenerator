@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Coding4fun.DataTools.Analyzers.Extension
 {
     public static class StringExtension
     {
         public static TEnum ParseEnum<TEnum>(this string? value) => (TEnum)Enum.Parse(typeof(TEnum), value ?? throw new ArgumentNullException(nameof(value)));
+        [ExcludeFromCodeCoverage]
         public static bool EqualsIgnoreCase(this string? first, string? second)
         {
             if (first == null && second == null) return true;

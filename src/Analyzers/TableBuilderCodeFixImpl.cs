@@ -14,7 +14,7 @@ namespace Coding4fun.DataTools.Analyzers
     public class TableBuilderCodeFixImpl
     {
         private readonly HashSet<string> _usedTypes = new();
-        private readonly Dictionary<IPropertySymbol, LinkedList<string>> _objectPaths = new();
+        private readonly Dictionary<IPropertySymbol, List<string>> _objectPaths = new();
 
         public async Task<Document> AddSqlMappingAsync(Document document,
             ObjectCreationExpressionSyntax objectCreationExpression,
@@ -73,7 +73,7 @@ namespace Coding4fun.DataTools.Analyzers
             for (int propertyNumber = 0; propertyNumber < propertySymbols.Count; propertyNumber++)
             {
                 IPropertySymbol property = propertySymbols[propertyNumber];
-                _objectPaths.TryGetValue(property, out LinkedList<string>? pathComponents);
+                _objectPaths.TryGetValue(property, out List<string>? pathComponents);
 
                 string GetPropertyName()
                 {
@@ -104,16 +104,10 @@ namespace Coding4fun.DataTools.Analyzers
                     
                     foreach (IPropertySymbol objectProperty in objectProperties)
                     {
-                        LinkedList<string> cPathComponents = new();
-                        if (pathComponents != null)
-                        {
-                            foreach (string pathComponent in pathComponents)
-                            {
-                                cPathComponents.AddLast(pathComponent);
-                            }
-                        }
-                        cPathComponents.AddLast(property.Name);
-                        _objectPaths.Add(objectProperty, cPathComponents);
+                        List<string> currentPathComponents = new();
+                        if (pathComponents != null) currentPathComponents.AddRange(pathComponents);
+                        currentPathComponents.Add(property.Name);
+                        _objectPaths.Add(objectProperty, currentPathComponents);
                     }
                     
                     propertySymbols.AddRange(objectProperties);

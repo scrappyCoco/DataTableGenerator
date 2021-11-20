@@ -90,6 +90,14 @@
 	  <Content Include="TestData\SourceGenerator\EmptyTableBuilder\Source.cs">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\TableNameCamelCase\Source.cs" />
+	  <Content Include="TestData\SourceGenerator\TableNameCamelCase\Source.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Compile Remove="TestData\SourceGenerator\TableNameCamelCase\Target.cs" />
+	  <Content Include="TestData\SourceGenerator\TableNameCamelCase\Target.cs">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -102,6 +110,10 @@
 	<ItemGroup>
 	  <Folder Include="TestData\Analyzer\BasicTableBuilder" />
 	  <Folder Include="TestData\Analyzer\EmptyList" />
+	  <Folder Include="TestData\SourceGenerator\TableNameScreamingSnakeCase" />
+	  <Folder Include="TestData\SourceGenerator\TableNameKebabCase" />
+	  <Folder Include="TestData\SourceGenerator\TableNamePascalCase" />
+	  <Folder Include="TestData\SourceGenerator\TableNameSnakeCase" />
 	</ItemGroup>
 
 </Project>

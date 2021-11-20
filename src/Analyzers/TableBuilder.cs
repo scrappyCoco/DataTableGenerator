@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using JetBrains.Annotations;
@@ -7,6 +8,7 @@ using JetBrains.Annotations;
 namespace Coding4fun.DataTools.Analyzers
 {
     [PublicAPI]
+    [ExcludeFromCodeCoverage]
     public class TableBuilder<TItem>
     {
         public const string Name = nameof(TableBuilder<TItem>);
@@ -17,7 +19,7 @@ namespace Coding4fun.DataTools.Analyzers
         public TableBuilder<TItem> AddColumn(
             Expression<Func<TItem, object>> valueGetter,
             string? sqlType = null,
-            string? columnName = null) =>  this;
+            string? columnName = null) => this;
 
         public TableBuilder<TItem> AddPreExecutionAction(Action<TItem> itemAction) => this;
 

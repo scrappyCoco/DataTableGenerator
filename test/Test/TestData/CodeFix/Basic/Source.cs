@@ -50,6 +50,7 @@ namespace Example
         public byte[] Logo { get; set; }
         public IEnumerable<byte> AnotherLogo { get; set; }
         public string[] Skills { get; set; }
+        public List<string> IgnoredList { get; set; }
 
         // Enumerable of basic types should be mapped to complex types with defined relations.
         public IEnumerable<Skill> SkillValues => Skills.Select(skill => new Skill(Id, skill));
@@ -80,6 +81,12 @@ namespace Example
     {
         public string Phone { get; set; }
         public string Email { get; set; }
+        public Address Address { get; set; }
+    }
+
+    public class Address
+    {
+        public string FullAddress { get; set; }
     }
 
     class Program

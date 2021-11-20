@@ -38,9 +38,9 @@ namespace Coding4fun.DataTools.Test.Infrastructure
             _pathToTestData = Path.Combine(pathComponents.ToArray());
         }
 
-        protected Task<string> LoadAsync(string fileName = "Source.cs", [CallerMemberName] string methodName = null)
+        protected Task<string> LoadAsync(string fileName = "Source.cs", [CallerMemberName] string? methodName = null)
         {
-            string pathToFile = Path.Combine(_pathToTestData, methodName, fileName);
+            string pathToFile = Path.Combine(_pathToTestData, methodName!, fileName);
             string code = File.ReadAllText(pathToFile);
             return Task.FromResult(code.Trim().Replace("\r", ""));
         }
