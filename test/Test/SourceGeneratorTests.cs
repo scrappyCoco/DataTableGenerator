@@ -76,6 +76,10 @@ namespace Coding4fun.DataTools.Test
             await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
         
         [Test]
+        public async Task SimpleLambdaExpressionSubTable() =>
+            await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
+
+        [Test]
         public async Task LambdaExpressionWithoutType() =>
             await AssertDiagnosticAsync(Messages.GetLambdaWithoutType());
         
@@ -90,6 +94,10 @@ namespace Coding4fun.DataTools.Test
         [Test]
         public async Task MethodCallInsteadOfProperty() =>
             await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetFirstName", "Person"));
+        
+        [Test]
+        public async Task MethodCallInsteadOfPropertySubTable() =>
+            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetJobs", "Person"));
         
         [Test]
         public async Task ArrayOfString() => await AssertDiagnosticAsync(Messages.GetInvalidType());

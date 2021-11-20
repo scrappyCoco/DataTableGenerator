@@ -17,40 +17,47 @@ namespace Coding4fun.DataTools.Test.Infrastructure
             [CallerMemberName] string? methodName = null
         )
         {
-            DiagnosticResult? expectedDiagnostics = null;
-            if (expectedMessage != null)
-            {
-                expectedDiagnostics =
-                    new DiagnosticResult(expectedMessage.Value.Key, DiagnosticSeverity.Error)
-                        .WithMessage(expectedMessage.Value.Value);
-            }
-            
-
             string source = await LoadAsync("Source.cs", methodName!);
             Compilation compilation = CompilationUtil.CreateCompilation(source);
-            Diagnostic[] errors = compilation.GetDiagnostics()
+            Diagnostic[] compilationErrors = compilation.GetDiagnostics()
                 .Where(d => d.Severity == DiagnosticSeverity.Error && d.Descriptor.Id.StartsWith("CS"))
                 .ToArray();
-            
-            if (errors.Any())
+
+            if (expectedMessage != null)
             {
                 // Syntax error.
-                Assert.Fail($"Syntax error: {errors[0]}");
+                if (compilationErrors.Any())
+                {
+                    Assert.Fail($"Syntax error: {compilationErrors[0]}");
+                }
+            }
+            else
+            {
+                if (!compilationErrors.Any())
+                {
+                    Assert.Fail($"Syntax error: {compilationErrors[0]}");
+                }
             }
             
-            CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> diagnostics,
+            CompilationUtil.RunGenerators(compilation, out ImmutableArray<Diagnostic> generatorDiagnostics,
                 new TSourceGenerator());
             
-            if (expectedDiagnostics != null)
+            if (expectedMessage != null)
             {
-                Assert.AreEqual(1, diagnostics.Length, "Invalid count of diagnostics.");
-                Assert.AreEqual(expectedDiagnostics.Value.Message, diagnostics[0].GetMessage());
-                Assert.AreEqual(expectedDiagnostics.Value.Severity, diagnostics[0].Severity);
-                Assert.AreEqual(expectedDiagnostics.Value.Id, diagnostics[0].Descriptor.Id);
+                DiagnosticResult expectedDiagnostics =
+                    new DiagnosticResult(expectedMessage.Value.Key, DiagnosticSeverity.Error)
+                        .WithMessage(expectedMessage.Value.Value);
+                
+                Assert.AreEqual(1, generatorDiagnostics.Length, "Invalid count of diagnostics.");
+                Assert.AreEqual(expectedDiagnostics.Message, generatorDiagnostics[0].GetMessage());
+                Assert.AreEqual(expectedDiagnostics.Severity, generatorDiagnostics[0].Severity);
+                Assert.AreEqual(expectedDiagnostics.Id, generatorDiagnostics[0].Descriptor.Id);
             }
-
-            errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-            Assert.Zero(errors.Length, $"Some errors contains in generated code: {errors.First()}");
+            else
+            {
+                Diagnostic[] generatorErrors = generatorDiagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+                Assert.Zero(generatorErrors.Length, $"Some errors contains in generated code: {generatorErrors.FirstOrDefault()}");                
+            }
         }
     }
 }

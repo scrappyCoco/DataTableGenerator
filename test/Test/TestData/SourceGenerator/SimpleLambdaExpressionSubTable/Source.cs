@@ -1,38 +1,39 @@
-﻿using Coding4fun.DataTools.Analyzers.StringUtil;
+﻿#nullable disable
+
 using Coding4fun.DataTools.Analyzers;
+using Coding4fun.DataTools.Analyzers.StringUtil;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System;
 
 namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
     public class Person
     {
         public string FirstName { get; set; }
+        public List<Job> Jobs { get; set; }
     }
 
     public class Job
     {
-        public Guid PersonId { get; set; }
+        public string Name { get; set; }
     }
-
 
     public partial class PersonSqlMapping
     {
-        [SqlMappingDeclaration]
+        [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<Person>().AddSubTable<Job>((Person person) => new Job[] { }, jobBuilder => jobBuilder
-                .AddColumn((Job job) => job.PersonId)
-            );
+            new TableBuilder<Person>(NamingConvention.SnakeCase)
+                .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder.AddColumn((Job job) => job.Name));
         }
     }
 
-    class Program
+    static class Program
     {
         static void Main()
         {
+            new PersonSqlMapping();
         }
     }
 }
