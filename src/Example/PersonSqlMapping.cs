@@ -32,18 +32,21 @@ namespace Coding4fun.DataTools.Example
                 .SetName("#MY_PERSON")
                 // person.Id has Guid type and column name will be ID in table #PERSON.
                 // Type will be UNIQUEIDENTIFIER.
-                .AddColumn(person => person.Id)
-                .AddColumn(person => person.Age)
+                .AddColumn((Person person) => person.Id)
+                .AddColumn((Person person) => person.Age)
                 // For string values it's desirable to set sql type,
                 // because by default it will be NVARCHAR(MAX).
-                .AddColumn(person => person.FirstName, "VARCHAR(50)")
-                .AddColumn(person => person.LastName, "VARCHAR(50)")
+                .AddColumn((Person person) => person.FirstName, "VARCHAR(50)")
+                .AddColumn((Person person) => person.LastName, "VARCHAR(50)")
                 // person.CountryCode has 2 two attributes: [MinLength(2)], [MaxLength(2)].
                 // In this case SQL type will be NCHAR(2).
                 // If you want to set CHAR(2), you should add second argument explicitly.
-                .AddColumn(person => person.CountryCode, columnName: "COUNTRY")
+                .AddColumn((Person person) => person.CountryCode, columnName: "COUNTRY")
                 // Logo is array of byte and it will have VARBINARY(MAX).
-                .AddColumn(person => person.Logo)
+                .AddColumn((Person person) => person.Logo)
+                // Incline plain objects from another classes.
+                .AddColumn((Person person) => person.Contact.Email)
+                .AddColumn((Person person) => person.Contact.Phone)
                 // Adding detail table #JOB for master table #PERSON.
                 .AddSubTable(person => person.Jobs, jobBuilder => jobBuilder
                     // You should add relation identifiers between person and job yourself.
@@ -54,9 +57,6 @@ namespace Coding4fun.DataTools.Example
                 ).AddSubTable<Skill>(person => person.SkillValues, skillBuilder => skillBuilder
                     .AddColumn(skill => skill.PersonId)
                     .AddColumn(skill => skill.Tag, "VARCHAR(100)")
-                ).InlineObject(person => person.Contact, contactBuilder => contactBuilder
-                    .AddColumn(contact => contact.Email)
-                    .AddColumn(contact => contact.Phone)
                 );
         }
     }

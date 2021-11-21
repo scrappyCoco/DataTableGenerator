@@ -6,11 +6,11 @@ namespace Example
 
     public partial class PersonSqlMapping
     {
-        [SqlMappingDeclaration]  
+        /*[__ERROR__*/[SqlMappingDeclaration]  
         private void Initialize()
         {
             
-        }
+        }/*__ERROR__]*/
     }
 
     class Program

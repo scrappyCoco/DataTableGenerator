@@ -17,7 +17,7 @@ namespace Example
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<Person>();
+            /*[__ERROR__*/new TableBuilder<Person>()/*__ERROR__]*/;
         }
     }
     

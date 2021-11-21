@@ -20,7 +20,7 @@ public partial class PersonSqlMapping
     [SqlMappingDeclaration]  
     private void Initialize()
     {
-        new TableBuilder<Person>().AddColumn((Person person) => "There must be member access expression: person.FirstName");
+        new TableBuilder<Person>().AddColumn((Person person) => /*[__ERROR__*/"There must be member access expression: person.FirstName"/*__ERROR__]*/);
     }
 }
 

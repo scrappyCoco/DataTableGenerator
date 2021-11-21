@@ -10,21 +10,21 @@ namespace Coding4fun.DataTools.Example
     {
         private static async Task Main()
         {
-            Person[] persons = JsonSerializer.Deserialize<Person[]>(await File.ReadAllTextAsync("Persons.json"));
-
-            PersonSqlMapping personSqlMapping = new PersonSqlMapping();
-            personSqlMapping.FillDataTables(persons);
-            
-            Console.WriteLine(personSqlMapping.GetSqlTableDefinition());
-
-            await using SqlConnection targetConnection = new SqlConnection("server=localhost;Integrated Security=True;");
-            await using SqlCommand createTempTablesCommand = new SqlCommand(personSqlMapping.GetSqlTableDefinition(), targetConnection);
-            await targetConnection.OpenAsync();
-            await createTempTablesCommand.ExecuteNonQueryAsync();
-            await personSqlMapping.BulkCopyAsync(targetConnection);
-            
-            // TODO: do something with that tables.
-            await targetConnection.CloseAsync();
+            // Person[] persons = JsonSerializer.Deserialize<Person[]>(await File.ReadAllTextAsync("Persons.json"));
+            //
+            // PersonSqlMapping personSqlMapping = new PersonSqlMapping();
+            // personSqlMapping.FillDataTables(persons);
+            //
+            // Console.WriteLine(personSqlMapping.GetSqlTableDefinition());
+            //
+            // await using SqlConnection targetConnection = new SqlConnection("server=localhost;Integrated Security=True;");
+            // await using SqlCommand createTempTablesCommand = new SqlCommand(personSqlMapping.GetSqlTableDefinition(), targetConnection);
+            // await targetConnection.OpenAsync();
+            // await createTempTablesCommand.ExecuteNonQueryAsync();
+            // await personSqlMapping.BulkCopyAsync(targetConnection);
+            //
+            // // TODO: do something with that tables.
+            // await targetConnection.CloseAsync();
         }
     }
 }

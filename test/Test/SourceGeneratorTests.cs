@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -85,25 +84,25 @@ namespace Coding4fun.DataTools.Test
         
         [Test]
         public async Task AddColumnWithoutMemberAccessExpression() =>
-            await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
+            await AssertDiagnosticAsync(Messages.Get19());
         
         [Test]
         public async Task AddSubTableWithoutMemberAccessExpression() =>
-            await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
+            await AssertDiagnosticAsync(Messages.Get20());
         
         [Test]
         public async Task MethodCallInsteadOfProperty() =>
-            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetFirstName"));
+            await AssertDiagnosticAsync(Messages.Get19());
         
         [Test]
         public async Task MethodCallInsteadOfPropertySubTable() =>
-            await AssertDiagnosticAsync(Messages.GetInvalidType());
+            await AssertDiagnosticAsync(Messages.Get20());
         
         [Test]
         public async Task ArrayOfString() => await AssertDiagnosticAsync(Messages.GetInvalidType());
         
         [Test]
-        public async Task InvalidSubTable() => await AssertDiagnosticAsync(Messages.GetMemberAccessExpression());
+        public async Task InvalidSubTable() => await AssertDiagnosticAsync(Messages.Get20());
         
         [Test]
         public async Task SyntaxError() => await AssertDiagnosticAsync();

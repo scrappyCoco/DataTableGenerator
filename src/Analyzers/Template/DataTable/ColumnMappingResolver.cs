@@ -5,10 +5,6 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
 {
     internal class ColumnMappingResolver: ResolverBase
     {
-        private readonly string _sqlMappingName;
-
-        internal ColumnMappingResolver(string sqlMappingName) => _sqlMappingName = sqlMappingName;
-
         /// <inheritdoc />
         public override object?[] Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
         {

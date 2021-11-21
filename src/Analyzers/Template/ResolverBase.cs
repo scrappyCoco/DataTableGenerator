@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.CodeAnalysis;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {

@@ -19,7 +19,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         private void Initialize()
         {
             new TableBuilder<Person>(NamingConvention.SnakeCase)
-                .AddColumn((Person person) => person.GetFirstName());
+                .AddColumn((Person person) =>/*[__ERROR__*/person.GetFirstName()/*__ERROR__]*/);
         }
     }
 

@@ -11,20 +11,18 @@ namespace Coding4fun.DataTools.Analyzers
             new("C4FDT0002", $"Unable to find definition of {TableBuilderName}<TItem>.");
         
         public static Message GetInvalidType() =>
-            new("C4FDT0007", "Invalid type.");
+            new("C4FDT0007", "Only array of byte is available in AddColumn method.");
         
         public static Message GetSqlMappingIsEmpty() =>
             new("C4FDT0014", "Sql mapping is empty.");
-        
-        public static Message GetUnableToResolveProperty(string propertyName) =>
-            new("C4FDT0015", $"Unable to resolve {propertyName}.");
         
         public static Message GetCyclicDependenciesAreNotSupported(string typeFullName) =>
             new("C4FDT0016", $"Cyclic dependencies are not supported: {typeFullName}.");
         
         public static Message GetLambdaWithoutType() =>
-            new("C4FDT0017", "Lambda expression without explicit type is not supported.");
+            new("C4FDT0017", "Lambda expression without explicit type is not supported. Example: AddColumn((Person person) => person.Age). ");
         
-        public static Message GetMemberAccessExpression() => new("C4FDT0018", "Unable to get member access expression im lambda body.");
+        public static Message Get19() => new("C4FDT0019", "Access to property is required in lambda expression body. Example: AddColumn((Person person) => person.Age)");
+        public static Message Get20() => new("C4FDT0020", "Access to property is required in lambda expression body. Example: AddSubTable((Person person) => person.Jobs, ...)");
     }
 }

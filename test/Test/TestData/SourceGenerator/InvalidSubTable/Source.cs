@@ -21,12 +21,12 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 
     public partial class PersonSqlMapping
     {
-        [SqlMappingDeclaration]  
+        [SqlMappingDeclaration]
         private void Initialize()
         {
             new TableBuilder<Person>(NamingConvention.SnakeCase)
                 .AddColumn((Person person) => person.Id)
-                .AddSubTable((Person person) => new Job[] { }, jobBuilder => jobBuilder
+                .AddSubTable((Person person) =>/*[__ERROR__*/new Job[] { }/*__ERROR__]*/, jobBuilder => jobBuilder
                     .AddColumn((Job job) => job.PersonId)
                 );
         }

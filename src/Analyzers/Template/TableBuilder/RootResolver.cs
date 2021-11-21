@@ -15,7 +15,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.TableBuilder
             _linePrefix = linePrefix;
         }
 
-        public override object?[]? Resolve(CodeTemplate template, IEnumerable<object> context)
+        public override object?[] Resolve(CodeTemplate template, IEnumerable<object> context)
         {
             return template.Name switch
             {

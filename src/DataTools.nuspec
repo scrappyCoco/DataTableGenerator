@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>Coding4fun.DataTools</id>
-		<version>1.0.60</version>
+		<version>1.0.65</version>
 		<authors>Korshunov Artem</authors>
 		<owners>Korshunov Artem</owners>
 		<projectUrl>https://github.com/scrappyCoco/DataTools</projectUrl>

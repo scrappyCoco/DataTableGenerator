@@ -9,7 +9,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.TableBuilder
 
         public BodyResolver(string linePrefix) => _linePrefix = linePrefix;
 
-        public override object?[]? Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
+        public override object?[] Resolve(CodeTemplate template, IEnumerable<object> contextObjects)
         {
             if (template.Name == "columns")
             {

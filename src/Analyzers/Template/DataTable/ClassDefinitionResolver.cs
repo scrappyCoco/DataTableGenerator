@@ -74,7 +74,7 @@ namespace Coding4fun.DataTools.Analyzers.Template.DataTable
             
             if (currentTemplate.Name == "columnMapping")
             {
-                newResolver = new ColumnMappingResolver(_sqlMappingClassName);
+                newResolver = new ColumnMappingResolver();
                 return true;
             }
 

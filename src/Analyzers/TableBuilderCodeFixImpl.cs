@@ -14,7 +14,9 @@ namespace Coding4fun.DataTools.Analyzers
     public class TableBuilderCodeFixImpl
     {
         private readonly HashSet<string> _usedTypes = new();
-        private readonly Dictionary<IPropertySymbol, List<string>> _objectPaths = new();
+        #pragma warning disable RS1024
+        private readonly Dictionary<IPropertySymbol, List<string>> _objectPaths = new ();
+        #pragma warning restore RS1024
 
         public async Task<Document> AddSqlMappingAsync(Document document,
             ObjectCreationExpressionSyntax objectCreationExpression,

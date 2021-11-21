@@ -18,7 +18,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         private void Initialize()
         {
             new TableBuilder<Person>()
-                .AddColumn((Person person) => person.Phones);
+                .AddColumn((Person person) =>/*[__ERROR__*/person.Phones/*__ERROR__]*/);
         }
     }
 

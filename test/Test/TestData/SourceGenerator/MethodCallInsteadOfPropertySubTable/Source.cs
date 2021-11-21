@@ -24,8 +24,8 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<Person>(NamingConvention.SnakeCase)
-                .AddSubTable((Person person) => person.GetJobs(), jobBuilder =>
+            new TableBuilder<Person>()
+                .AddSubTable((Person person) =>/*[__ERROR__*/person.GetJobs()/*__ERROR__]*/, jobBuilder =>
                     jobBuilder.AddColumn((Job job) => job.Name)
                 );
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using JetBrains.Annotations;
-using Microsoft.CodeAnalysis;
 using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
 
 namespace Coding4fun.DataTools.Analyzers

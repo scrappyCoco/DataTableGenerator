@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Coding4fun.DataTools.Analyzers" Version="1.0.60" />
+		<PackageReference Include="Coding4fun.DataTools.Analyzers" Version="1.0.65" />
 		<PackageReference Include="JetBrains.Annotations" Version="2021.3.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
