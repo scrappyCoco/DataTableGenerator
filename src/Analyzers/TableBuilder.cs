@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using JetBrains.Annotations;
 
@@ -17,7 +16,7 @@ namespace Coding4fun.DataTools.Analyzers
         }
 
         public TableBuilder<TItem> AddColumn(
-            Expression<Func<TItem, object>> valueGetter,
+            Func<TItem, object> valueGetter,
             string? sqlType = null,
             string? columnName = null) => this;
 
@@ -26,7 +25,7 @@ namespace Coding4fun.DataTools.Analyzers
         public TableBuilder<TItem> SetName(string sqlTableName) => this;
 
         public TableBuilder<TItem> AddSubTable<TSubItem>(
-            Expression<Func<TItem, IEnumerable<TSubItem>>> enumerableGetter,
+            Func<TItem, IEnumerable<TSubItem>> enumerableGetter,
             Action<SubTableBuilder<TSubItem, TItem>> subTableConsumer) => this;
     }
 }

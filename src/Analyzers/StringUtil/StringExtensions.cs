@@ -41,7 +41,6 @@ namespace Coding4fun.DataTools.Analyzers.StringUtil
                 ++wordLength;
 
                 if (wordLength == 1) continue;
-                if (previousCharKind == CharKind.Other) continue;
                 if (previousCharKind == currentCharKind) continue;
                 if (previousCharKind == CharKind.Upper && currentCharKind == CharKind.Lower)
                 {
@@ -109,5 +108,4 @@ namespace Coding4fun.DataTools.Analyzers.StringUtil
             : char.IsDigit(ch) ? CharKind.Digit
             : CharKind.Other;
     }
-
 }

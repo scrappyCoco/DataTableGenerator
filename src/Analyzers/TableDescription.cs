@@ -22,7 +22,6 @@ namespace Coding4fun.DataTools.Analyzers
             SubTables = new List<TableDescription>();
         }
         
-        public ITypeSymbol? GenericType { get; set; }
         public string EntityName { get; internal set; }
         public string? ClassName { get; }
         public string? SqlTableName { get; internal set; }

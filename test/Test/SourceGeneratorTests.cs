@@ -93,11 +93,11 @@ namespace Coding4fun.DataTools.Test
         
         [Test]
         public async Task MethodCallInsteadOfProperty() =>
-            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetFirstName", "Person"));
+            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetFirstName"));
         
         [Test]
         public async Task MethodCallInsteadOfPropertySubTable() =>
-            await AssertDiagnosticAsync(Messages.GetUnableToResolveProperty("GetJobs", "Person"));
+            await AssertDiagnosticAsync(Messages.GetInvalidType());
         
         [Test]
         public async Task ArrayOfString() => await AssertDiagnosticAsync(Messages.GetInvalidType());

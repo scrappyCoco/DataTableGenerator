@@ -27,17 +27,6 @@ namespace Coding4fun.DataTools.Analyzers.StringUtil
             }
         }
 
-        public static void ToCapitalizedCase(ReadOnlySpan<char> word, int wordNumber, Action<char> consumer)
-        {
-            for (int chNumber = 0; chNumber < word.Length; chNumber++)
-            {
-                char ch = word[chNumber];
-                consumer.Invoke(wordNumber == 0 && chNumber == 0
-                    ? char.ToUpperInvariant(ch)
-                    : char.ToLowerInvariant(ch));
-            }
-        }
-
         public static void ToCamelCase(ReadOnlySpan<char> word, int wordNumber, Action<char> consumer)
         {
             for (int chNumber = 0; chNumber < word.Length; chNumber++)
