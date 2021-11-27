@@ -29,11 +29,11 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
         public void BuildCode(StringBuilder sharpSb, ResolverBase resolver)
         {
-            LinkedList<object> contextObjects = new ();
+            LinkedList<EnumerableItem> contextObjects = new ();
             BuildCode(sharpSb, resolver, contextObjects);
         }
 
-        private void BuildCode(StringBuilder sharpSb, ResolverBase resolver, LinkedList<object> contextObjects)
+        private void BuildCode(StringBuilder sharpSb, ResolverBase resolver, LinkedList<EnumerableItem> contextObjects)
         {
             if (Text != null)
             {
@@ -41,10 +41,9 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 return;
             }
 
-            if (resolver.TryReplaceTemplate(this, out ResolverBase? newResolver, contextObjects))
+            if (resolver.TryReplaceTemplate(this, out CodeTemplate? newCodeTemplate, contextObjects))
             {
-                CodeTemplate newTemplate = newResolver!.GetTemplate();
-                newTemplate.BuildCode(sharpSb, newResolver, contextObjects);
+                newCodeTemplate.BuildCode(sharpSb, resolver, contextObjects);
                 return;
             }
 
@@ -57,13 +56,15 @@ namespace Coding4fun.DataTools.Analyzers.Template
             }
             else
             {
-                foreach (object? rObject in resolvedObjects)
+                for (int position = 0; position < resolvedObjects.Length; position++)
                 {
-                    if (rObject != null) contextObjects.AddLast(rObject);
+                    object? rObject = resolvedObjects[position];
+                    if (rObject != null) contextObjects.AddLast(new EnumerableItem(rObject, position, resolvedObjects.Length));
                     foreach (CodeTemplate? childTemplate in Children)
                     {
                         childTemplate.BuildCode(sharpSb, resolver, contextObjects);
                     }
+
                     if (rObject != null) contextObjects.RemoveLast();
                 }
             }
@@ -71,7 +72,6 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
         /// <inheritdoc />
         [ExcludeFromCodeCoverage]
-        public override string ToString() => $"{Name ?? Text}";
+        public override string ToString() => Text ?? $"<{Name} />";
     }
-
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><Root><!--
+     -->CREATE TABLE <SqlTableName />
+<!-- -->(<!--
+     --><Columns>
+<!-- -->  <SqlColumnName /> <SqlType /><Comma /><!--
+     --></Columns>
+<!-- -->);
+<!-- --><SubTables><SqlTableDefinition /></SubTables><!--
+     --></Root>

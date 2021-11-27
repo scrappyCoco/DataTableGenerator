@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers.Extension;
-using Coding4fun.DataTools.Analyzers.Template.TableBuilder;
+using Coding4fun.DataTools.Analyzers.Template;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -37,7 +37,7 @@ namespace Coding4fun.DataTools.Analyzers
                 SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
                 whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
                 TableDescription tableDescription = ParseTable(genericTypeInfo.Type!);
-                string code = RootResolver.GenerateDataBuilder(tableDescription, whitespaceTrivia.ToString());
+                string code = DataTableResolver.BuildCode(tableDescription)
                 newStatement = SyntaxFactory.ParseStatement(code);
             }
             catch (Exception e)

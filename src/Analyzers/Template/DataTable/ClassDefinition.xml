@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
-     --><root><!--
-     --><usingNamespaces>
-<!-- -->using <usingNamespace />;<!-- 
-     --></usingNamespaces>
+     --><Root><!--
+     --><UsingNamespaces>
+<!-- -->using <UsedNamespace />;<!-- 
+     --></UsingNamespaces>
 <!-- -->
-<!-- -->namespace <namespace />
+<!-- -->namespace <Namespace />
 <!-- -->{
-<!-- -->    public partial class <sqlMappingClassName />
+<!-- -->    public partial class <SqlMappingClassName />
 <!-- -->    {
-<!--          --><class><dataTableDefinition /></class><!--
+<!--          --><RootClass><DataTableDefinition /></RootClass><!--
      -->
-<!-- -->        public <sqlMappingClassName />()
+<!-- -->        public <SqlMappingClassName />()
 <!-- -->        {<!--
-                --><class><columnMapping /></class><!--
+                --><RootClass><ColumnMapping /></RootClass><!--
      -->        }
   
 <!-- -->        public string GetSqlTableDefinition() => @"
-<!-- --><class><sqlTableDefinition /></class>";
+<!-- --><RootClass><SqlTableDefinition /></RootClass>";
 <!-- -->
-<!-- -->        public void FillDataTables(IEnumerable&lt;<className />&gt; items)
-<!-- -->        {<!--
-             --><class>
-<!--             --><invokeMethod /><!--
-             --></class><!--    
+<!-- -->        public void FillDataTables(IEnumerable&lt;<ClassName />&gt; items)
+<!-- -->        {<!--w  
+             --><RootClass>
+<!--             --><InvokeMethod /><!--
+             --></RootClass><!--    
      -->        }
 <!-- -->
 <!-- -->        public async Task BulkCopyAsync(SqlConnection targetConnection)
 <!-- -->        {
-<!--            --><class><bulkCopy /></class>
+<!--            --><RootClass><BulkCopy /></RootClass>
 <!-- -->        }
 <!--        
-             --><class>
-<!--             --><methodDefinition /><!--
-             --></class><!--    
+             --><RootClass>
+<!--             --><MethodDefinition /><!--
+             --></RootClass><!--    
      -->    }
 <!-- -->}
-<!-- --></root>
+<!-- --></Root>

@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Coding4fun.DataTools.Analyzers.Extension;
 using Coding4fun.DataTools.Analyzers.StringUtil;
-using Coding4fun.DataTools.Analyzers.Template.DataTable;
+using Coding4fun.DataTools.Analyzers.Template;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -144,7 +144,7 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Threading.Tasks"
                         });
                         
-                        string sharpCode = ClassDefinitionResolver.GenerateDataTable(tableDescription, usingNamespaces, @namespace, sqlMappingClassName);
+                        string sharpCode = DataTableResolver.BuildCode(tableDescription, usingNamespaces, @namespace, sqlMappingClassName);
             
                         context.AddSource($"{sqlMappingClassName}.Generated.cs", sharpCode);
                     }
@@ -186,7 +186,6 @@ namespace Coding4fun.DataTools.Analyzers
 
         private ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
         {
-            string? propertyName = null;
             string? columnName = null;
             string? columnType = null;
             string? expressionBody = null;
@@ -227,7 +226,7 @@ namespace Coding4fun.DataTools.Analyzers
 
                         lambdaBody = parenthesizedLambdaExpression.ExpressionBody;
                         
-                        propertyName = columnName = parenthesizedLambdaExpression.ExpressionBody
+                        columnName = parenthesizedLambdaExpression.ExpressionBody
                             .DescendantTokens()
                             .LastOrDefault(t => t.Kind() == SyntaxKind.IdentifierToken)
                             .ToString();

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
-     --><root><!--
-     --><columns>
-<!-- -->            <dataTableName/>.Columns.Add("<sqlColumnName />", typeof(<sharpType />));<!--
-     --></columns>
-<!-- --><subTables><columnMapping /></subTables><!--
-     --></root>
+     --><Root><!--
+     --><Columns>
+<!-- -->            <DataTableName/>.Columns.Add("<SqlColumnName />", typeof(<SharpType />));<!--
+     --></Columns>
+<!-- --><SubTables><ColumnMapping /></SubTables><!--
+     --></Root>

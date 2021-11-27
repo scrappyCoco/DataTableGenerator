@@ -40,12 +40,10 @@
 	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
 	  <EmbeddedResource Include="Template\DataTable\ClassDefinition.xml" />
 	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
-	  <EmbeddedResource Include="Template\DataTable\Definition.xml" />
+	  <EmbeddedResource Include="Template\DataTable\DataTableDefinition.xml" />
 	  <EmbeddedResource Include="Template\DataTable\InvokeMethod.xml" />
 	  <EmbeddedResource Include="Template\DataTable\MethodDefinition.xml" />
-	  <EmbeddedResource Include="Template\DataTable\SqlDefinition.xml" />
-	  <EmbeddedResource Include="Template\Resource\DataTable.stg" />
-	  <EmbeddedResource Include="Template\Resource\TableBuilder.stg" />
+	  <EmbeddedResource Include="Template\DataTable\SqlTableDefinition.xml" />
 	  <EmbeddedResource Include="Template\TableBuilder\Body.xml" />
 	  <EmbeddedResource Include="Template\TableBuilder\Root.xml" />
 	  <None Remove="Template\DataTable\BulkCopy.xml" />

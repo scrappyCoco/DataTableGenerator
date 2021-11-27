@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<!-- @formatter:off
-     --><root><!--
-     -->        public DataTable <dataTableName /> { get; } = new DataTable();
-<!-- --><subTables><dataTableDefinition /></subTables><!--
-     --></root>

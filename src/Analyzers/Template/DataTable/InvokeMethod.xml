@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
-     --><class><!--
-     --><offset />foreach (var <varName /> in <items />)
-<!-- --><offset />{<hasPreExecutionActions>
-<!-- --><offset />    <preExecutionActions /><!--
-                --></hasPreExecutionActions>
-<!-- --><offset />    Add<entityName />(<varName />);
-<!--               --><subTables><invokeMethod /></subTables><!--
-     --><offset />}
-<!-- --></class>
+     --><Root><!--
+     --><Offset />foreach (var <VarName /> in <EnumerableName />)
+<!-- --><Offset />{<HasPreExecutionActions>
+<!-- --><Offset />    <PreExecutionActions /><!--
+                --></HasPreExecutionActions>
+<!-- --><Offset />    Add<EntityName />(<VarName />);
+<!--               --><SubTables><InvokeMethod /></SubTables><!--
+     --><Offset />}
+<!-- --></Root>

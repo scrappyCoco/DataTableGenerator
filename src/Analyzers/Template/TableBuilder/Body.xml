@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
-     --><table><!--
-     --><columns>
-<!-- --><space />.AddColumn(<varName /> =&gt; <varName />.<valueBody />)<!--
-     --></columns><!--
-     --><subTables>
-<!-- --><space />.AddSubTable(<parentTableVarName /> =&gt; <parentTableVarName />.<enumerableName />, <!--
-     --><childTableVarName />Builder =&gt; <childTableVarName />Builder<body />
-<!-- --><space />)</subTables><!--
-     --></table>
+     --><Root><!--
+     --><Columns>
+<!-- --><Space />.AddColumn(<VarName /> =&gt; <VarName />.<ValueBody />)<!--
+     --></Columns><!--
+     --><SubTables>
+<!-- --><Space />.AddSubTable(<ParentTableVarName /> =&gt; <ParentTableVarName />.<EnumerableName />, <!--
+     --><VarName />Builder =&gt; <VarName />Builder<Body />
+<!-- --><Space />)</SubTables><!--
+     --></Root>
