@@ -37,7 +37,7 @@ namespace Coding4fun.DataTools.Analyzers
                 SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
                 whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
                 TableDescription tableDescription = ParseTable(genericTypeInfo.Type!);
-                string code = DataTableResolver.BuildCode(tableDescription)
+                string code = "";//new DataTableResolver().BuildCode()
                 newStatement = SyntaxFactory.ParseStatement(code);
             }
             catch (Exception e)

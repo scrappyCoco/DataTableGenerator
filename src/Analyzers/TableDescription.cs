@@ -8,7 +8,7 @@ using CaseRules = Coding4fun.DataTools.Analyzers.StringUtil.CaseRules;
 namespace Coding4fun.DataTools.Analyzers
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    internal class TableDescription
+    public class TableDescription
     {
         public TableDescription(string className, string? sqlTableName = null)
         {

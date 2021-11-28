@@ -32,6 +32,15 @@ namespace Coding4fun.DataTools.Test
             
             var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
 
+            compilationErrors = diagnostics
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+                .ToArray();
+            
+            if (compilationErrors.Any())
+            {
+                Assert.Fail($"Errors count: {compilationErrors.Length}, first error: {compilationErrors.First()}");
+            }
+            
             var newFile = newCompilation.SyntaxTrees
                 .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
         

@@ -143,8 +143,26 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Data.SqlClient",
                             "System.Threading.Tasks"
                         });
+
+                        DataTableResolver dataTableResolver = new (tableDescription);
                         
-                        string sharpCode = DataTableResolver.BuildCode(tableDescription, usingNamespaces, @namespace, sqlMappingClassName);
+                        dataTableResolver.CustomResolvers.Add("Namespace",
+                            _ => @namespace.ToArrayOfObject());
+                        
+                        dataTableResolver.CustomResolvers.Add("UsingNamespaces",
+                            _ => usingNamespaces.Cast<object?>().ToArray());
+                        
+                        dataTableResolver.CustomResolvers.Add("UsedNamespace",
+                            resolverContext => resolverContext.GetLast());
+                        
+                        dataTableResolver.CustomResolvers.Add("SqlMappingClassName",
+                            _ => classDeclaration.Identifier.ToString().ToArrayOfObject());
+                        
+                        /* UsingNamespaces, Namespace SqlMappingClassName
+                         * , @namespace, sqlMappingClassName, usingNamespaces
+                         */
+                        string sharpCode = dataTableResolver
+                            .GenerateCode();
             
                         context.AddSource($"{sqlMappingClassName}.Generated.cs", sharpCode);
                     }

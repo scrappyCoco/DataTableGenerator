@@ -38,7 +38,7 @@
 
 	<ItemGroup>
 	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
-	  <EmbeddedResource Include="Template\DataTable\ClassDefinition.xml" />
+	  <EmbeddedResource Include="Template\DataTable\Main.xml" />
 	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
 	  <EmbeddedResource Include="Template\DataTable\DataTableDefinition.xml" />
 	  <EmbeddedResource Include="Template\DataTable\InvokeMethod.xml" />

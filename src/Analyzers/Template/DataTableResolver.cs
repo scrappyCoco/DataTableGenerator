@@ -2,102 +2,54 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using Coding4fun.DataTools.Analyzers.Extension;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {
-    internal class DataTableResolver : ResolverBase
+    public class DataTableResolver : ResolverBase
     {
         private readonly object?[] _rootTableDescriptions;
-        private readonly object?[] _ns;
-        private readonly object?[] _sqlMappingClassName;
-        private readonly object[] _usingNamespaces;
-        private readonly object?[] _singleNullObjects;
-        private readonly object?[] _emptyObjects;
-        private readonly object?[] _commaObjects;
 
-        private DataTableResolver(TableDescription tableDescription,
-            string @namespace,
-            string sqlMappingClassName,
-            string usingNamespaces): base("Coding4fun.DataTools.Analyzers.Template.DataTable")
+        public DataTableResolver(TableDescription tableDescription): base("Coding4fun.DataTools.Analyzers.Template.DataTable")
         {
             _rootTableDescriptions = new object?[] { tableDescription };
-            _ns = new object?[] { @namespace };
-            _sqlMappingClassName = new object?[] { sqlMappingClassName };
-            _singleNullObjects = new object?[] { null };
-            _commaObjects = new object?[] { "," };
-            _emptyObjects = new object?[] { };
-            _usingNamespaces = usingNamespaces.Cast<object>().ToArray();
         }
 
+        public Dictionary<string, Func<ResolverContext, object?[]>> CustomResolvers { get; } = new();
+
         /// <inheritdoc />
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public override object?[] Resolve(CodeTemplate template, IEnumerable<EnumerableItem> contextObjects)
+        public override object?[] Resolve(CodeTemplate template, ResolverContext context)
         {
-            object?[] GetValue<T>(Func<T, object?> valueGetter)
+            if (CustomResolvers.TryGetValue(template.Name!, out Func<ResolverContext, object?[]>? customerResolver))
             {
-                T requiredObject = contextObjects.Reverse()
-                    .Select(t => t.Value)
-                    .OfType<T>()
-                    .First()!;
-                
-                return requiredObject.Let(it => (valueGetter.Invoke(it) ?? it).ToArrayOfObject());
-            }
-
-            object?[] GetBool<T>(Func<T, bool> predicate) => contextObjects.Last()
-                .Value
-                .Cast<T>()
-                .Let(it => predicate.Invoke(it) ? _singleNullObjects : _emptyObjects);
-
-            object?[] GetArray<TSource, TTarget>(Func<TSource, IEnumerable<TTarget>> enumerableGetter) => contextObjects
-                .Last()
-                .Value
-                .Cast<TSource>()
-                .Let(it => enumerableGetter.Invoke(it).Cast<object?>().ToArray());
-
-            object?[] GetTableOffset()
-            {
-                 int offsetLength = (contextObjects
-                     .Count(t => t.Value is TableDescription) + 2) * 4;
-                 
-                 return new object?[] { new string(' ', offsetLength) };
-            }
-
-            object?[] GetComma()
-            {
-                EnumerableItem lastItem = contextObjects.Last();
-                return lastItem.Position + 1 == lastItem.Length ? _singleNullObjects : _commaObjects;
+                return customerResolver.Invoke(context);
             }
 
             // @formatter:off
             return template.Name switch
             {
-                nameof(TableDescription.VarName)                     => GetValue<TableDescription>(t => t.VarName),
-                nameof(TableDescription.EntityName)                  => GetValue<TableDescription>(t => t.EntityName),
-                nameof(TableDescription.ClassName)                   => contextObjects.Any()
-                                                                        ? GetValue<TableDescription>(t => t.ClassName)
+                nameof(TableDescription.VarName)                     => context.GetValue<TableDescription>(t => t.VarName),
+                nameof(TableDescription.EntityName)                  => context.GetValue<TableDescription>(t => t.EntityName),
+                nameof(TableDescription.ClassName)                   => context.Objects.Any()
+                                                                        ? context.GetValue<TableDescription>(t => t.ClassName)
                                                                         : _rootTableDescriptions.First().Cast<TableDescription>().ClassName.ToArrayOfObject(),
-                nameof(TableDescription.EnumerableName)              => GetValue<TableDescription>(t => t.EnumerableName ?? "items"),
-                nameof(TableDescription.DataTableName)               => GetValue<TableDescription>(t => t.DataTableName),
-                nameof(TableDescription.SqlTableName)                => GetValue<TableDescription>(t => t.SqlTableName),
-                nameof(TableDescription.SubTables)                   => GetArray<TableDescription, TableDescription>(t => t.SubTables),
-                nameof(TableDescription.Columns)                     => GetArray<TableDescription, ColumnDescription>(t => t.Columns),
-                "ParentTableVarName"                                 => GetValue<TableDescription>(t => t.ParentTable.SqlTableName),
-                "Has" + nameof(TableDescription.PreExecutionActions) => GetBool<TableDescription>(t => t.PreExecutionActions.Any()),
-                nameof(TableDescription.PreExecutionActions)         => GetArray<TableDescription, string>(t => t.PreExecutionActions),
-                nameof(ColumnDescription.SharpType)                  => GetValue<ColumnDescription>(c => c.SharpType),
-                nameof(ColumnDescription.SqlType)                    => GetValue<ColumnDescription>(c => c.SqlType),
-                nameof(ColumnDescription.ValueBody)                  => GetValue<ColumnDescription>(c => c.ValueBody),
-                nameof(ColumnDescription.SqlColumnName)              => GetValue<ColumnDescription>(c => c.SqlColumnName),
-                "Offset"                                             => GetTableOffset(),
+                nameof(TableDescription.EnumerableName)              => context.GetValue<TableDescription>(t => t.EnumerableName ?? "items"),
+                nameof(TableDescription.DataTableName)               => context.GetValue<TableDescription>(t => t.DataTableName),
+                nameof(TableDescription.SqlTableName)                => context.GetValue<TableDescription>(t => t.SqlTableName),
+                nameof(TableDescription.SubTables)                   => context.GetArray<TableDescription, TableDescription>(t => t.SubTables),
+                nameof(TableDescription.Columns)                     => context.GetArray<TableDescription, ColumnDescription>(t => t.Columns),
+                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => t.ParentTable.SqlTableName),
+                "Has" + nameof(TableDescription.PreExecutionActions) => context.GetBool<TableDescription>(t => t.PreExecutionActions.Any()),
+                nameof(TableDescription.PreExecutionActions)         => context.GetArray<TableDescription, string>(t => t.PreExecutionActions),
+                nameof(ColumnDescription.SharpType)                  => context.GetValue<ColumnDescription>(c => c.SharpType),
+                nameof(ColumnDescription.SqlType)                    => context.GetValue<ColumnDescription>(c => c.SqlType),
+                nameof(ColumnDescription.ValueBody)                  => context.GetValue<ColumnDescription>(c => c.ValueBody),
+                nameof(ColumnDescription.SqlColumnName)              => context.GetValue<ColumnDescription>(c => c.SqlColumnName),
+                "Offset"                                             => context.GetTableOffset(),
                 "RootClass"                                          => _rootTableDescriptions,
-                "UsingNamespaces"                                    => _usingNamespaces,
-                "UsedNamespace"                                      => GetValue<string>(t => t),
-                "Namespace"                                          => _ns,
-                "SqlMappingClassName"                                => _sqlMappingClassName,
-                "Root"                                               => _singleNullObjects,
-                "Comma"                                              => GetComma(),
+                "UsedNamespace"                                      => context.GetValue<string>(t => t),
+                "Root"                                               => context.SingleNullObjects,
+                "Comma"                                              => context.GetComma(),
                 _                                                    => throw new InvalidOperationException(template.Name)
             };
             // @formatter:on
@@ -105,7 +57,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
         /// <inheritdoc />
         public override bool TryReplaceTemplate(CodeTemplate currentTemplate,
-            [NotNullWhen(true)] out CodeTemplate? newCodeTemplate, LinkedList<EnumerableItem> contextObjects)
+            [NotNullWhen(true)] out CodeTemplate? newCodeTemplate)
         {
             if (AvailableTemplateResources.Contains(currentTemplate.Name!))
             {
@@ -115,15 +67,6 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
             newCodeTemplate = null;
             return false;
-        }
-
-        public static string BuildCode(TableDescription tableDescription)
-        {
-            DataTableResolver dataTableResolver = new (tableDescription, TODO, TODO, TODO);
-            CodeTemplate rootTemplate = dataTableResolver.ReadTemplate("ClassDefinition");
-            StringBuilder codeBuilder = new();
-            rootTemplate.BuildCode(codeBuilder, dataTableResolver);
-            return codeBuilder.ToString();
         }
     }
 }

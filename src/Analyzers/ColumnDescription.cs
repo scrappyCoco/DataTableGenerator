@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Coding4fun.DataTools.Analyzers
 {
     [DebuggerDisplay("{ToString()}")]
-    internal class ColumnDescription
+    public class ColumnDescription
     {
         public ColumnDescription(string valueBody, string? sqlColumnName = null, string? sqlType = null)
         {

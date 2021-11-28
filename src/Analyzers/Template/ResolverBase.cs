@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {
@@ -46,17 +45,16 @@ namespace Coding4fun.DataTools.Analyzers.Template
             return template;
         }
 
-        public abstract object?[]? Resolve(CodeTemplate template, IEnumerable<EnumerableItem> contextObjects);
+        public abstract object?[]? Resolve(CodeTemplate template, ResolverContext context);
 
         public abstract bool TryReplaceTemplate(
             CodeTemplate currentTemplate,
-            [NotNullWhen(true)] out CodeTemplate? newCodeTemplate,
-            LinkedList<EnumerableItem> contextObjects);
+            [NotNullWhen(true)] out CodeTemplate? newCodeTemplate);
 
         public string GenerateCode()
         {
             StringBuilder sharpCodeBuilder = new();
-            CodeTemplate rootTemplate = ReadTemplate("Root");
+            CodeTemplate rootTemplate = ReadTemplate("Main");
             rootTemplate.BuildCode(sharpCodeBuilder, this);
             return sharpCodeBuilder.ToString();
         }

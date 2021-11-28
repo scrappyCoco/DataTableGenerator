@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -29,11 +28,11 @@ namespace Coding4fun.DataTools.Analyzers.Template
 
         public void BuildCode(StringBuilder sharpSb, ResolverBase resolver)
         {
-            LinkedList<EnumerableItem> contextObjects = new ();
-            BuildCode(sharpSb, resolver, contextObjects);
+            ResolverContext context = new ();
+            BuildCode(sharpSb, resolver, context);
         }
 
-        private void BuildCode(StringBuilder sharpSb, ResolverBase resolver, LinkedList<EnumerableItem> contextObjects)
+        private void BuildCode(StringBuilder sharpSb, ResolverBase resolver, ResolverContext context)
         {
             if (Text != null)
             {
@@ -41,13 +40,13 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 return;
             }
 
-            if (resolver.TryReplaceTemplate(this, out CodeTemplate? newCodeTemplate, contextObjects))
+            if (resolver.TryReplaceTemplate(this, out CodeTemplate? newCodeTemplate))
             {
-                newCodeTemplate.BuildCode(sharpSb, resolver, contextObjects);
+                newCodeTemplate.BuildCode(sharpSb, resolver, context);
                 return;
             }
 
-            object?[]? resolvedObjects = resolver.Resolve(this, contextObjects);
+            object?[]? resolvedObjects = resolver.Resolve(this, context);
             if ((resolvedObjects?.Length ?? 0) == 0) return;
 
             if (resolvedObjects!.Length == 1 && Children.Length == 0 && resolvedObjects[0] != null)
@@ -59,13 +58,13 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 for (int position = 0; position < resolvedObjects.Length; position++)
                 {
                     object? rObject = resolvedObjects[position];
-                    if (rObject != null) contextObjects.AddLast(new EnumerableItem(rObject, position, resolvedObjects.Length));
+                    if (rObject != null) context.Add(new EnumerableItem(rObject, position, resolvedObjects.Length));
                     foreach (CodeTemplate? childTemplate in Children)
                     {
-                        childTemplate.BuildCode(sharpSb, resolver, contextObjects);
+                        childTemplate.BuildCode(sharpSb, resolver, context);
                     }
 
-                    if (rObject != null) contextObjects.RemoveLast();
+                    if (rObject != null) context.RemoveLast();
                 }
             }
         }
