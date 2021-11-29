@@ -37,7 +37,10 @@ namespace Coding4fun.DataTools.Analyzers
                 SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
                 whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
                 TableDescription tableDescription = ParseTable(genericTypeInfo.Type!);
-                string code = "";//new DataTableResolver().BuildCode()
+                DataTableResolver dataTableResolver = new DataTableResolver(tableDescription, Templates.TableBuilder);
+                dataTableResolver.CustomResolvers.Add("Space", context => ((whitespaceTrivia.ToString() ?? "") + new  string(' ',
+                    (context.Objects.Count - 1) * 4)).ToArrayOfObject());
+                string code = dataTableResolver.GenerateCode();
                 newStatement = SyntaxFactory.ParseStatement(code);
             }
             catch (Exception e)

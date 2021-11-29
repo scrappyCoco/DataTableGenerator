@@ -34,14 +34,14 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 throw new InvalidOperationException($"Unable to get resource {templateName}.");
             }
             string templatePath = _pathToResource + "." + templateName + ".xml";
-            if (Cache.TryGetValue(templateName, out CodeTemplate codeTemplate)) return codeTemplate;
+            if (Cache.TryGetValue(templatePath, out CodeTemplate codeTemplate)) return codeTemplate;
 
             using Stream templatesStream = typeof(ResolverBase)
                 .Assembly
                 .GetManifestResourceStream(templatePath)!;
 
             CodeTemplate template = new XmlTemplateParser().ParseXml(templatesStream);
-            Cache.Add(templateName, template);
+            Cache.Add(templatePath, template);
             return template;
         }
 

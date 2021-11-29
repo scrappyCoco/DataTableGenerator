@@ -45,7 +45,7 @@
 	  <EmbeddedResource Include="Template\DataTable\MethodDefinition.xml" />
 	  <EmbeddedResource Include="Template\DataTable\SqlTableDefinition.xml" />
 	  <EmbeddedResource Include="Template\TableBuilder\Body.xml" />
-	  <EmbeddedResource Include="Template\TableBuilder\Root.xml" />
+	  <EmbeddedResource Include="Template\TableBuilder\Main.xml" />
 	  <None Remove="Template\DataTable\BulkCopy.xml" />
 	  <None Remove="Template\DataTable\ColumnMapping.xml" />
 	  <None Remove="Template\Resource\DataTableClassDefinition.xml" />

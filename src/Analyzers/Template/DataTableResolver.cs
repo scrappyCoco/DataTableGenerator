@@ -10,7 +10,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
     {
         private readonly object?[] _rootTableDescriptions;
 
-        public DataTableResolver(TableDescription tableDescription): base("Coding4fun.DataTools.Analyzers.Template.DataTable")
+        public DataTableResolver(TableDescription tableDescription, string resourcePath): base(resourcePath)
         {
             _rootTableDescriptions = new object?[] { tableDescription };
         }
@@ -38,7 +38,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 nameof(TableDescription.SqlTableName)                => context.GetValue<TableDescription>(t => t.SqlTableName),
                 nameof(TableDescription.SubTables)                   => context.GetArray<TableDescription, TableDescription>(t => t.SubTables),
                 nameof(TableDescription.Columns)                     => context.GetArray<TableDescription, ColumnDescription>(t => t.Columns),
-                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => t.ParentTable.SqlTableName),
+                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => t.ParentTable.VarName),
                 "Has" + nameof(TableDescription.PreExecutionActions) => context.GetBool<TableDescription>(t => t.PreExecutionActions.Any()),
                 nameof(TableDescription.PreExecutionActions)         => context.GetArray<TableDescription, string>(t => t.PreExecutionActions),
                 nameof(ColumnDescription.SharpType)                  => context.GetValue<ColumnDescription>(c => c.SharpType),
@@ -50,7 +50,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 "UsedNamespace"                                      => context.GetValue<string>(t => t),
                 "Root"                                               => context.SingleNullObjects,
                 "Comma"                                              => context.GetComma(),
-                _                                                    => throw new InvalidOperationException(template.Name)
+                _                                                    => throw new InvalidOperationException($"Unable to resolve <{template.Name} />")
             };
             // @formatter:on
         }

@@ -20,7 +20,6 @@ namespace Coding4fun.DataTools.Analyzers
         private const string ErrorTitle = "Unable to generate source for DataTable";
         private const string ErrorCategory = "Code";
         
-        private readonly string _tableBuilderName = typeof(TableBuilder<int>).GetNameWithoutGeneric();
         private NamingConvention _namingConvention = NamingConvention.ScreamingSnakeCase;
         private SyntaxNode? _nodeContext;
 
@@ -144,7 +143,7 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Threading.Tasks"
                         });
 
-                        DataTableResolver dataTableResolver = new (tableDescription);
+                        DataTableResolver dataTableResolver = new (tableDescription, Templates.DataTable);
                         
                         dataTableResolver.CustomResolvers.Add("Namespace",
                             _ => @namespace.ToArrayOfObject());
@@ -158,11 +157,7 @@ namespace Coding4fun.DataTools.Analyzers
                         dataTableResolver.CustomResolvers.Add("SqlMappingClassName",
                             _ => classDeclaration.Identifier.ToString().ToArrayOfObject());
                         
-                        /* UsingNamespaces, Namespace SqlMappingClassName
-                         * , @namespace, sqlMappingClassName, usingNamespaces
-                         */
-                        string sharpCode = dataTableResolver
-                            .GenerateCode();
+                        string sharpCode = dataTableResolver.GenerateCode();
             
                         context.AddSource($"{sqlMappingClassName}.Generated.cs", sharpCode);
                     }
