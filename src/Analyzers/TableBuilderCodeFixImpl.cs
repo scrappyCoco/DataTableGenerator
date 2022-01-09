@@ -37,9 +37,11 @@ namespace Coding4fun.DataTools.Analyzers
                 SyntaxTriviaList leadingTrivia = oldStatement.GetLeadingTrivia();
                 whitespaceTrivia = leadingTrivia.LastOrDefault(trivia => trivia.Kind() == SyntaxKind.WhitespaceTrivia);
                 TableDescription tableDescription = ParseTable(genericTypeInfo.Type!);
-                DataTableResolver dataTableResolver = new DataTableResolver(tableDescription, Templates.TableBuilder);
-                dataTableResolver.CustomResolvers.Add("Space", context => ((whitespaceTrivia.ToString() ?? "") + new  string(' ',
+                DataTableResolver dataTableResolver = new DataTableResolver(tableDescription, Templates.TableBuilder, cancellationToken);
+                
+                dataTableResolver.CustomResolvers.Add("Space", context => ((whitespaceTrivia.ToString() ?? "") + new string(' ',
                     (context.Objects.Count - 1) * 4)).ToArrayOfObject());
+
                 string code = dataTableResolver.GenerateCode();
                 newStatement = SyntaxFactory.ParseStatement(code);
             }
@@ -89,7 +91,8 @@ namespace Coding4fun.DataTools.Analyzers
                 ObjectKind objectKind = GetObjectKind(property.Type, out ITypeSymbol? enumerableType);
                 if (objectKind == ObjectKind.Scalar)
                 {
-                    tableDescription.Columns.Add(new ColumnDescription(GetPropertyName()));
+                    string propertyName = GetPropertyName();
+                    tableDescription.Columns.Add(new ColumnDescription(propertyName));
                 }
                 else if (objectKind == ObjectKind.Enumerable)
                 {

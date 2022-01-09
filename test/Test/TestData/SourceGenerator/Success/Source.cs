@@ -64,7 +64,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<Person>(NamingConvention.SnakeCase)
+            new TableBuilder<Person>(namingConvention: NamingConvention.SnakeCase)
                 .AddPreExecutionAction((Person person) =>
                 {
                     Console.WriteLine(person.LastName + " " + person.FirstName);

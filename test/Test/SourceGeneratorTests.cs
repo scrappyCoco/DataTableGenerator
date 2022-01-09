@@ -31,7 +31,7 @@ namespace Coding4fun.DataTools.Test
             }
             
             var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
-
+            
             compilationErrors = diagnostics
                 .Where(d => d.Severity == DiagnosticSeverity.Error)
                 .ToArray();

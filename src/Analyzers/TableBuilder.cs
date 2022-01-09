@@ -11,7 +11,9 @@ namespace Coding4fun.DataTools.Analyzers
     public class TableBuilder<TItem>
     {
         public const string Name = nameof(TableBuilder<TItem>);
-        public TableBuilder(NamingConvention namingConvention = NamingConvention.ScreamingSnakeCase)
+        public TableBuilder(
+            string templateGroup = Templates.DataTable,
+            NamingConvention namingConvention = NamingConvention.ScreamingSnakeCase)
         {
         }
 

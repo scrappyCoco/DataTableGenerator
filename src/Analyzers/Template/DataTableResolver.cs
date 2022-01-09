@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using Coding4fun.DataTools.Analyzers.Extension;
+using Microsoft.CodeAnalysis;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {
@@ -10,7 +12,11 @@ namespace Coding4fun.DataTools.Analyzers.Template
     {
         private readonly object?[] _rootTableDescriptions;
 
-        public DataTableResolver(TableDescription tableDescription, string resourcePath): base(resourcePath)
+        public DataTableResolver(
+            TableDescription tableDescription,
+            string resourcePath,
+            CancellationToken cancellationToken,
+            IEnumerable<AdditionalText>? additionalTexts = null) : base(resourcePath, cancellationToken, additionalTexts)
         {
             _rootTableDescriptions = new object?[] { tableDescription };
         }
@@ -38,7 +44,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 nameof(TableDescription.SqlTableName)                => context.GetValue<TableDescription>(t => t.SqlTableName),
                 nameof(TableDescription.SubTables)                   => context.GetArray<TableDescription, TableDescription>(t => t.SubTables),
                 nameof(TableDescription.Columns)                     => context.GetArray<TableDescription, ColumnDescription>(t => t.Columns),
-                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => t.ParentTable.VarName),
+                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => (t.ParentTable ?? throw new NullReferenceException($"{nameof(t.ParentTable)} is null.")).VarName),
                 "Has" + nameof(TableDescription.PreExecutionActions) => context.GetBool<TableDescription>(t => t.PreExecutionActions.Any()),
                 nameof(TableDescription.PreExecutionActions)         => context.GetArray<TableDescription, string>(t => t.PreExecutionActions),
                 nameof(ColumnDescription.SharpType)                  => context.GetValue<ColumnDescription>(c => c.SharpType),
@@ -47,7 +53,6 @@ namespace Coding4fun.DataTools.Analyzers.Template
                 nameof(ColumnDescription.SqlColumnName)              => context.GetValue<ColumnDescription>(c => c.SqlColumnName),
                 "Offset"                                             => context.GetTableOffset(),
                 "RootClass"                                          => _rootTableDescriptions,
-                "UsedNamespace"                                      => context.GetValue<string>(t => t),
                 "Root"                                               => context.SingleNullObjects,
                 "Comma"                                              => context.GetComma(),
                 _                                                    => throw new InvalidOperationException($"Unable to resolve <{template.Name} />")
@@ -59,12 +64,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
         public override bool TryReplaceTemplate(CodeTemplate currentTemplate,
             [NotNullWhen(true)] out CodeTemplate? newCodeTemplate)
         {
-            if (AvailableTemplateResources.Contains(currentTemplate.Name!))
-            {
-                newCodeTemplate = ReadTemplate(currentTemplate.Name!);
-                return true;
-            }
-
+            if (CodeTemplates.TryGetValue(currentTemplate.Name!, out newCodeTemplate)) return true;
             newCodeTemplate = null;
             return false;
         }

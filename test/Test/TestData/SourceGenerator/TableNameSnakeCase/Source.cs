@@ -17,7 +17,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<SomePerson>(NamingConvention.SnakeCase)
+            new TableBuilder<SomePerson>(namingConvention: NamingConvention.SnakeCase)
                 .AddColumn((SomePerson somePerson) => somePerson.Id);
         }
     }

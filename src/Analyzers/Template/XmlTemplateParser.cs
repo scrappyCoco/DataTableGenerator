@@ -13,7 +13,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
             return ParseXml(streamReader);
         }
 
-        private CodeTemplate ParseXml(TextReader streamReader)
+        public CodeTemplate ParseXml(TextReader streamReader)
         {
             using var xmlReader = XmlReader.Create(streamReader);
 

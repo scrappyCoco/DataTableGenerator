@@ -41,6 +41,7 @@ namespace Coding4fun.DataTools.Analyzers
             {
                 try
                 {
+                    if (context.CancellationToken.IsCancellationRequested) break;
                     SyntaxNode rootNode = syntaxTree.GetRoot();
                     MethodDeclarationSyntax[] methodDeclarations = rootNode
                         .DescendantNodes()
@@ -49,6 +50,7 @@ namespace Coding4fun.DataTools.Analyzers
 
                     foreach (MethodDeclarationSyntax methodDeclaration in methodDeclarations)
                     {
+                        if (context.CancellationToken.IsCancellationRequested) break;
                         // [SqlMappingDeclaration]
                         //  ^                   ^
                         // private void Initialize()
@@ -84,12 +86,35 @@ namespace Coding4fun.DataTools.Analyzers
 
                         // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
                         //                              ^                                 ^
-                        string? namingConventionValue = genericName.Ancestors()
-                                                            .OfType<ObjectCreationExpressionSyntax>()
-                                                            .First()
-                                                            .ArgumentList?.Arguments.FirstOrDefault()?.GetLastToken()
-                                                            .Text
-                                                        ?? NamingConvention.ScreamingSnakeCase.ToString();
+                        string namingConventionValue = NamingConvention.ScreamingSnakeCase.ToString();
+                        string templateNamespace = Templates.DataTable;
+
+                        ArgumentSyntax[]? constructorArguments = genericName.Ancestors()
+                            .OfType<ObjectCreationExpressionSyntax>()
+                            .First()
+                            .ArgumentList?.Arguments.ToArray();
+
+                        if (constructorArguments != null)
+                        {
+                            for (int argNumber = 0; argNumber < constructorArguments.Length; argNumber++)
+                            {
+                                ArgumentSyntax constructorArgument = constructorArguments[argNumber];
+                                string? argName = constructorArgument.NameColon?.Name.ToString();
+                                if ("templateGroup" == argName || argName == null && argNumber == 0)
+                                {
+                                    if (constructorArgument.Expression.Kind() == SyntaxKind.StringLiteralExpression
+                                        && constructorArgument.Expression is LiteralExpressionSyntax literalExpression)
+                                    {
+                                        templateNamespace = literalExpression.Token.Value?.ToString() ?? Templates.Unresolved;
+                                    }
+                                }
+                                else if ("namingConvention" == argName || argName == null && argNumber == 1)
+                                {
+                                    namingConventionValue = constructorArgument.Expression.GetLastToken().Text;
+                                }
+                            }
+                        }
+                        
 
                         _namingConvention = namingConventionValue.ParseEnum<NamingConvention>();
 
@@ -143,12 +168,16 @@ namespace Coding4fun.DataTools.Analyzers
                             "System.Threading.Tasks"
                         });
 
-                        DataTableResolver dataTableResolver = new (tableDescription, Templates.DataTable);
+                        DataTableResolver dataTableResolver = new (
+                            tableDescription, 
+                            templateNamespace,
+                            context.CancellationToken,
+                            context.AdditionalFiles);
                         
                         dataTableResolver.CustomResolvers.Add("Namespace",
                             _ => @namespace.ToArrayOfObject());
                         
-                        dataTableResolver.CustomResolvers.Add("UsingNamespaces",
+                        dataTableResolver.CustomResolvers.Add("UsedNamespaces",
                             _ => usingNamespaces.Cast<object?>().ToArray());
                         
                         dataTableResolver.CustomResolvers.Add("UsedNamespace",

@@ -1,48 +1,23 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text;
+using System.Threading;
+using Microsoft.CodeAnalysis;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {
     public abstract class ResolverBase
     {
-        private readonly string _pathToResource;
-        protected readonly ImmutableHashSet<string> AvailableTemplateResources;
-        private static readonly Dictionary<string, CodeTemplate> Cache = new();
+        protected readonly Dictionary<string, CodeTemplate> CodeTemplates;
 
-        protected ResolverBase(string pathToResource)
+        protected ResolverBase(
+            string pathToResource,
+            CancellationToken cancellationToken,
+            IEnumerable<AdditionalText>? additionalTexts)
         {
-            _pathToResource = pathToResource;
-            
-            AvailableTemplateResources = typeof(ResolverBase)
-                .Assembly.GetManifestResourceNames()
-                .Where(path => path.StartsWith(pathToResource))
-                .Select(path => path
-                    .Replace(pathToResource + ".", "")
-                    .Replace(".xml", ""))
-                .ToImmutableHashSet();
-        }
-
-        protected CodeTemplate ReadTemplate(string templateName)
-        {
-            if (!AvailableTemplateResources.Contains(templateName))
-            {
-                throw new InvalidOperationException($"Unable to get resource {templateName}.");
-            }
-            string templatePath = _pathToResource + "." + templateName + ".xml";
-            if (Cache.TryGetValue(templatePath, out CodeTemplate codeTemplate)) return codeTemplate;
-
-            using Stream templatesStream = typeof(ResolverBase)
-                .Assembly
-                .GetManifestResourceStream(templatePath)!;
-
-            CodeTemplate template = new XmlTemplateParser().ParseXml(templatesStream);
-            Cache.Add(templatePath, template);
-            return template;
+            CodeTemplates = Templates.Read(pathToResource, cancellationToken, additionalTexts);
         }
 
         public abstract object?[]? Resolve(CodeTemplate template, ResolverContext context);
@@ -54,8 +29,8 @@ namespace Coding4fun.DataTools.Analyzers.Template
         public string GenerateCode()
         {
             StringBuilder sharpCodeBuilder = new();
-            CodeTemplate rootTemplate = ReadTemplate("Main");
-            rootTemplate.BuildCode(sharpCodeBuilder, this);
+            CodeTemplate mainTemplate = CodeTemplates[Templates.MainTemplate];
+            mainTemplate.BuildCode(sharpCodeBuilder, this);
             return sharpCodeBuilder.ToString();
         }
     }

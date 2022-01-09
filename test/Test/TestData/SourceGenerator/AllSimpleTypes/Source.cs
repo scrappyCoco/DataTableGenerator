@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-using Coding4fun.DataTools.Analyzers;
+﻿using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Analyzers.StringUtil;
 using System;
 using System.ComponentModel.DataAnnotations;
