@@ -61,7 +61,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
         public object?[] GetComma()
         {
             EnumerableItem lastItem = Objects.Last();
-            return lastItem.Position + 1 == lastItem.Length ? SingleNullObjects : _commaObjects;
+            return lastItem.IsLast ? SingleNullObjects : _commaObjects;
         }
 
         public object?[] GetLast() => Objects.Last().Value.ToArrayOfObject();

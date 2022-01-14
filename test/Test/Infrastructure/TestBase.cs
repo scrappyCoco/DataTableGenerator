@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Testing;
-using NUnit.Framework;
 
 namespace Coding4fun.DataTools.Test.Infrastructure
 {
@@ -42,14 +38,22 @@ namespace Coding4fun.DataTools.Test.Infrastructure
         {
             string pathToFile = Path.Combine(_pathToTestData, methodName!, fileName);
             string code = File.ReadAllText(pathToFile);
-            return Task.FromResult(code.Trim().Replace("\r", ""));
+            return Task.FromResult(code.Replace("\r", ""));
         }
 
-        protected void AssertSourceCode(string expected, string actual)
+        protected async Task<(string, string)[]> LoadXmlFiles([CallerMemberName] string? methodName = null)
         {
-            expected = _newLineRegex.Replace(expected, "\n");
-            actual = _newLineRegex.Replace(actual, "\n");
-            Assert.AreEqual(expected, actual);
+            List<(string, string)> files = new List<(string, string)>();
+            string pathToDirectory = Path.Combine(_pathToTestData, methodName!);
+            string[] xmlFiles = Directory.GetFiles(pathToDirectory, "*.xml", SearchOption.TopDirectoryOnly);
+            foreach (string xmlFilePath in xmlFiles)
+            {
+                string xmlContent = await File.ReadAllTextAsync(xmlFilePath);
+                string fileName = Path.GetFileName(xmlFilePath);
+                files.Add((fileName, xmlContent));
+            }
+
+            return files.ToArray();
         }
     }
 }

@@ -20,7 +20,7 @@
 <!-- --><RootClass><SqlTableDefinition /></RootClass>";
 <!-- -->
 <!-- -->        public void FillDataTables(IEnumerable&lt;<ClassName />&gt; items)
-<!-- -->        {<!--w  
+<!-- -->        {<!--
              --><RootClass>
 <!--             --><InvokeMethod /><!--
              --></RootClass><!--    

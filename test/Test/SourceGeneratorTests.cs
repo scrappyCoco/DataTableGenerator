@@ -1,15 +1,22 @@
-using System.IO;
+using System;
+using System.Collections.Immutable;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
 namespace Coding4fun.DataTools.Test
 {
-    public class SourceGeneratorTests : SourceGeneratorTest<DataTableSourceGenerator>
+    public class SourceGeneratorTests : Infrastructure.SourceGeneratorTest<DataTableSourceGenerator>
     {
         [SetUp]
         public void Setup()
@@ -18,39 +25,28 @@ namespace Coding4fun.DataTools.Test
 
         private async Task TestSuccessAsync([CallerMemberName] string? methodName = null)
         {
-            string source = await LoadAsync("Source.cs", methodName);
-        
-            Compilation compilation = CompilationUtil.CreateCompilation(source);
-            Diagnostic[] compilationErrors = compilation.GetDiagnostics()
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-                .ToArray();
-            
-            if (compilationErrors.Any())
+            string sourceCode = await LoadAsync("Source.cs", methodName);
+            string targetCode = await LoadAsync("Target.cs", methodName);
+
+            var test = new CSharpSourceGeneratorVerifier<DataTableSourceGenerator>.Test
             {
-                Assert.Fail($"Errors count: {compilationErrors.Length}, first error: {compilationErrors.First()}");
-            }
+                TestState =
+                {
+                    Sources = { sourceCode },
+                    GeneratedSources =
+                    {
+                        (typeof(DataTableSourceGenerator), "PersonSqlMapping.Generated.cs", targetCode)
+                    },
+                    MarkupHandling = MarkupMode.Allow
+                }
+            };
             
-            var newCompilation = CompilationUtil.RunGenerators(compilation, out var diagnostics, new DataTableSourceGenerator());
-            
-            compilationErrors = diagnostics
-                .Where(d => d.Severity == DiagnosticSeverity.Error)
-                .ToArray();
-            
-            if (compilationErrors.Any())
+            foreach (var (fileName, fileContent) in await LoadXmlFiles(methodName))
             {
-                Assert.Fail($"Errors count: {compilationErrors.Length}, first error: {compilationErrors.First()}");
+                test.TestState.AdditionalFiles.Add((fileName, fileContent));
             }
-            
-            var newFile = newCompilation.SyntaxTrees
-                .Single(x => Path.GetFileName(x.FilePath).EndsWith(".Generated.cs"));
-        
-            Assert.NotNull(newFile);
-        
-            var generatedText = (await newFile.GetTextAsync()).ToString().Trim();
-        
-            string expectedOutput = await LoadAsync("Target.cs", methodName);
-        
-            AssertSourceCode(expectedOutput, generatedText);
+
+            await test.RunAsync();
         }
         
         [Test]
@@ -70,6 +66,9 @@ namespace Coding4fun.DataTools.Test
         
         [Test]
         public async Task AllSimpleTypes() => await TestSuccessAsync();
+        
+        [Test]
+        public async Task CustomTemplate() => await TestSuccessAsync();
 
         [Test]
         public async Task EmptySqlMappingDeclaration() =>
