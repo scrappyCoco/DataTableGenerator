@@ -7,6 +7,33 @@
 <!-- -->
 <!-- -->namespace <Namespace />
 <!-- -->{
-<!-- -->    // This is custom template.
+<!-- -->    public class <SqlMappingClassName /> : MsSqlBatchHandler
+<!-- -->    {
+<!--      --><RootClass><DataTableDefinition /></RootClass><!--
+     -->
+<!-- -->
+<!-- -->        public <SqlMappingClassName />(MsSqlConfig config) : base(config, CreateDataTables()) => _logoutDt = DataTables[0];
+
+<!-- -->        /// &lt;inheritdoc /&gt;
+<!-- -->        protected override string TempTableDeclaration => @"<!--
+                --><RootClass><SqlTableDefinition /></RootClass><!--
+                -->";
+
+<!-- -->        /// &lt;inheritdoc /&gt;
+<!-- -->        protected override string ProcedureName => "dbo.Insert<RootClass><EntityName /></RootClass>";
+
+<!-- -->        private static DataTable[] CreateDataTables()
+<!-- -->        {
+<!-- -->            <ColumnMapping />
+<!-- -->            return new[] { <RootClass><DataTableNames /></RootClass> };
+<!-- -->        }
+
+<!-- -->        /// &lt;inheritdoc /&gt;
+<!-- -->        protected override void AddEntityInternal(object entity)
+<!-- -->        {
+<!-- -->            var login = (LoginMessage)entity;
+<!-- -->            _logoutDt.Rows.Add(login.Email, login.Time, login.SessionId);
+<!-- -->        }
+<!-- -->    }
 <!-- -->}
 <!-- --></Root>

@@ -15,7 +15,9 @@ namespace Coding4fun.DataTools.Test
         {
             string source = await LoadAsync();
             string target = await LoadAsync("Target.cs");
-            await CSharpCodeFixVerifier<TableBuilderAnalyzer, TableBuilderCodeFixProvider>.VerifyCodeFixAsync(source,
+            await CSharpCodeFixVerifier<TableBuilderAnalyzer, TableBuilderCodeFixProvider>.VerifyCodeFixAsync(
+                source,
+                new DiagnosticResult[]{},
                 target);
         }
 
