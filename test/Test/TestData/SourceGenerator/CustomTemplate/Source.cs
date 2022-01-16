@@ -4,11 +4,20 @@ using Coding4fun.DataTools.Analyzers.StringUtil;
 using Coding4fun.DataTools.Analyzers;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using System;
 
 namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
+    public class MsSqlConfig { }
+    
+    public abstract class MsSqlBatchHandler
+    {
+        protected MsSqlBatchHandler(MsSqlConfig config, DataTable[] dataTables) { }
+        public DataTable[] DataTables { get; }
+    }
+    
     public class Person
     {
         public Guid Id { get; set; }
@@ -59,8 +68,10 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         public string Tag { get; set; }
     }
 
-    public partial class PersonSqlMapping
+    public partial class PersonSqlMapping : MsSqlBatchHandler
     {
+        public PersonSqlMapping(): base(new MsSqlConfig(), new DataTable[]{}) { }
+        
         [SqlMappingDeclaration]  
         private void Initialize()
         {

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><Root><!--
+     -->            _<DataTableName /> = DataTables.First(t => t.TableName == "<SqlTableName />");
+<!-- --><SubTables><DataTableInit /></SubTables><!--
+     --></Root>

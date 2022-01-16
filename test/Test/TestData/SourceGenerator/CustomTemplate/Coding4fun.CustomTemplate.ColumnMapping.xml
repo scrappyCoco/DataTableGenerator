@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
      --><Root><!--
+     -->            DataTable <DataTableName/> = new DataTable("<SqlTableName />");<!--
      --><Columns>
 <!-- -->            <DataTableName/>.Columns.Add("<SqlColumnName />", typeof(<SharpType />));<!--
      --></Columns>
+
 <!-- --><SubTables><ColumnMapping /></SubTables><!--
      --></Root>

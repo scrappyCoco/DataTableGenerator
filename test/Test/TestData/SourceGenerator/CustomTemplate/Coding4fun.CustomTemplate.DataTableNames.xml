@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- @formatter:off
      --><Root><!--
-     --> _<DataTableName />,
-<!-- --><SubTables><DataTableNames /></SubTables><!--
+     --><DataTableName /><!--
+     --><SubTables>, <DataTableNames /></SubTables><!--
      --></Root>

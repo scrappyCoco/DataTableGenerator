@@ -178,7 +178,7 @@ namespace Coding4fun.DataTools.Analyzers
                             _ => @namespace.ToArrayOfObject());
                         
                         dataTableResolver.CustomResolvers.Add("UsedNamespaces",
-                            _ => usingNamespaces.Cast<object?>().ToArray());
+                            _ => usingNamespaces.Distinct().OrderBy(n => n).Cast<object?>().ToArray());
                         
                         dataTableResolver.CustomResolvers.Add("UsedNamespace",
                             resolverContext => resolverContext.GetLast());

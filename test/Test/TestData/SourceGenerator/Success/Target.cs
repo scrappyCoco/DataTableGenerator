@@ -1,13 +1,12 @@
 ﻿
-using Coding4fun.DataTools.Analyzers.StringUtil;
 using Coding4fun.DataTools.Analyzers;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using Coding4fun.DataTools.Analyzers.StringUtil;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
