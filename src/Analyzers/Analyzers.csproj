@@ -37,24 +37,10 @@
 <!--  </ItemGroup>-->
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Template\DataTable\BulkCopy.xml" />
-	  <EmbeddedResource Include="Template\DataTable\Main.xml" />
-	  <EmbeddedResource Include="Template\DataTable\ColumnMapping.xml" />
-	  <EmbeddedResource Include="Template\DataTable\DataTableDefinition.xml" />
-	  <EmbeddedResource Include="Template\DataTable\InvokeMethod.xml" />
-	  <EmbeddedResource Include="Template\DataTable\MethodDefinition.xml" />
-	  <EmbeddedResource Include="Template\DataTable\SqlTableDefinition.xml" />
-	  <EmbeddedResource Include="Template\TableBuilder\Body.xml" />
-	  <EmbeddedResource Include="Template\TableBuilder\Main.xml" />
-	  <None Remove="Template\DataTable\BulkCopy.xml" />
-	  <None Remove="Template\DataTable\ColumnMapping.xml" />
-	  <None Remove="Template\Resource\DataTableClassDefinition.xml" />
-	  <None Remove="Template\Resource\DataTableDefinition.xml" />
-	  <None Remove="Template\Resource\DataTableInvokeMethod.xml" />
-	  <None Remove="Template\Resource\DataTableMethodDefinition.xml" />
-	  <None Remove="Template\Resource\DataTableSqlDefinition.xml" />
-	  <None Remove="Template\TableBuilderBody.xml" />
-	  <None Remove="Template\TableBuilderRoot.xml" />
+	  <EmbeddedResource Include="Template\DataTable\*.xml" />
+	  <EmbeddedResource Include="Template\TableBuilder\*.xml" />
+	  <None Remove="Template\DataTable\*.xml" />
+	  <None Remove="Template\TableBuilder\*.xml" />
 	</ItemGroup>
   
 	<ItemGroup>

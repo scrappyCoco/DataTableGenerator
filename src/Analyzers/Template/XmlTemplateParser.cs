@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,15 +29,29 @@ namespace Coding4fun.DataTools.Analyzers.Template
         private CodeTemplate ReadBlock(XmlReader xmlReader)
         {
             LinkedList<CodeTemplate> children = new ();
-            
+            Dictionary<string, string> attributes = new(StringComparer.InvariantCultureIgnoreCase);
+
             string blockName = xmlReader.Name;
-            CodeTemplate template = new CodeTemplate(blockName);
+            CodeTemplate template = new CodeTemplate(blockName, attributes);
+            if (xmlReader.HasAttributes)
+            {
+                for (int attributeNumber = 0; attributeNumber < xmlReader.AttributeCount; ++attributeNumber)
+                {
+                    xmlReader.MoveToAttribute(attributeNumber);
+                    attributes.Add(xmlReader.Name, xmlReader.Value);
+                }
+
+                xmlReader.MoveToElement(); 
+            }
             if (xmlReader.IsEmptyElement) return template;
 
             for (bool goForward = true; goForward && (goForward = xmlReader.Read());)
             {
                 switch (xmlReader.NodeType)
                 {
+                    case XmlNodeType.Attribute:
+                        attributes.Add(xmlReader.Name, xmlReader.Value);
+                        break;
                     case XmlNodeType.Text:
                     case XmlNodeType.Whitespace:
                         children.AddLast(new CodeTemplate(template, xmlReader.Value));

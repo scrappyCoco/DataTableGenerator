@@ -4,7 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using Coding4fun.DataTools.Analyzers.Extension;
+using Coding4fun.DataTools.Analyzers.StringUtil;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace Coding4fun.DataTools.Analyzers.Template
 {
@@ -30,27 +32,66 @@ namespace Coding4fun.DataTools.Analyzers.Template
             {
                 return customerResolver.Invoke(context);
             }
+            
+            string caseAttributeName = CodeTemplate.Attribute.Case.ToString();
+            string wordSeparatorAttributeName = CodeTemplate.Attribute.Case.ToString();
+            object? ApplyAttributes(object? obj)
+            {
+                if (obj is not string str) return null;
+                if (template.Attributes.TryGetValue(caseAttributeName, out string stringCaseRuleName))
+                {
+                    string wordSeparator = template.Attributes.TryGetValue(wordSeparatorAttributeName, out wordSeparator)
+                        ? wordSeparator
+                        : "";
+                    
+                    switch (stringCaseRuleName)
+                    {
+                        case nameof(CaseRules.ToCamelCase):
+                            return str.ChangeCase(CaseRules.ToCamelCase, wordSeparator);
+                        case nameof(CaseRules.ToTitleCase):
+                            return str.ChangeCase(CaseRules.ToTitleCase, wordSeparator);
+                        case nameof(CaseRules.ToLowerCase):
+                            return str.ChangeCase(CaseRules.ToLowerCase, wordSeparator);
+                        case nameof(CaseRules.ToUpperCase):
+                            return str.ChangeCase(CaseRules.ToUpperCase, wordSeparator);
+                        default:
+                            throw new InvalidOperationException($"Unable to find handler for attribute {caseAttributeName}: {stringCaseRuleName}.");
+                    }
+                }
+
+                return str;
+            }
 
             // @formatter:off
             return template.Name switch
             {
-                nameof(TableDescription.VarName)                     => context.GetValue<TableDescription>(t => t.VarName),
-                nameof(TableDescription.EntityName)                  => context.GetValue<TableDescription>(t => t.EntityName),
                 nameof(TableDescription.ClassName)                   => context.Objects.Any()
-                                                                        ? context.GetValue<TableDescription>(t => t.ClassName)
+                                                                        ? context.GetValue<TableDescription>(t => ApplyAttributes(t.ClassName))
                                                                         : _rootTableDescriptions.First().Cast<TableDescription>().ClassName.ToArrayOfObject(),
                 nameof(TableDescription.EnumerableName)              => context.GetValue<TableDescription>(t => t.EnumerableName ?? "items"),
-                nameof(TableDescription.DataTableName)               => context.GetValue<TableDescription>(t => t.DataTableName),
-                nameof(TableDescription.SqlTableName)                => context.GetValue<TableDescription>(t => t.SqlTableName),
                 nameof(TableDescription.SubTables)                   => context.GetArray<TableDescription, TableDescription>(t => t.SubTables),
                 nameof(TableDescription.Columns)                     => context.GetArray<TableDescription, ColumnDescription>(t => t.Columns),
-                "ParentTableVarName"                                 => context.GetValue<TableDescription>(t => (t.ParentTable ?? throw new NullReferenceException($"{nameof(t.ParentTable)} is null.")).VarName),
+                "ParentTable" + nameof(TableDescription.ClassName)   => context.GetValue<TableDescription>(t => ApplyAttributes((t.ParentTable ?? throw new NullReferenceException($"{nameof(t.ParentTable)} is null.")).ClassName)),
                 "Has" + nameof(TableDescription.PreExecutionActions) => context.GetBool<TableDescription>(t => t.PreExecutionActions.Any()),
                 nameof(TableDescription.PreExecutionActions)         => context.GetArray<TableDescription, string>(t => t.PreExecutionActions),
                 nameof(ColumnDescription.SharpType)                  => context.GetValue<ColumnDescription>(c => c.SharpType),
                 nameof(ColumnDescription.SqlType)                    => context.GetValue<ColumnDescription>(c => c.SqlType),
                 nameof(ColumnDescription.ValueBody)                  => context.GetValue<ColumnDescription>(c => c.ValueBody),
-                nameof(ColumnDescription.SqlColumnName)              => context.GetValue<ColumnDescription>(c => c.SqlColumnName),
+                "HasAttribute"                                       => context.GetBool<TableDescription>(t =>
+                                                                        {
+                                                                            string templateAttributeName = template.Attributes["name"];
+                                                                            return t.CustomAttributes.ContainsKey(templateAttributeName);
+                                                                        }),
+                "HasNotAttribute"                                    => context.GetBool<TableDescription>(t =>
+                                                                        {
+                                                                            string templateAttributeName = template.Attributes["name"];
+                                                                            return !t.CustomAttributes.ContainsKey(templateAttributeName);
+                                                                        }),
+                "Attribute"                                          => context.GetValue<TableDescription>(t =>
+                                                                        {
+                                                                            string templateAttributeName = template.Attributes["name"];
+                                                                            return t.CustomAttributes[templateAttributeName];
+                                                                        }),
                 "Offset"                                             => context.GetTableOffset(),
                 "RootClass"                                          => _rootTableDescriptions,
                 "Root"                                               => context.SingleNullObjects,

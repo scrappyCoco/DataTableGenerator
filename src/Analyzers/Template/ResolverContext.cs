@@ -8,7 +8,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
     public class ResolverContext
     {
         public object?[] SingleNullObjects { get; }
-        private readonly object?[] _emptyObjects;
+        public readonly object?[] EmptyObjects;
         private readonly object?[] _commaObjects;
         private readonly LinkedList<EnumerableItem> _objects;
 
@@ -17,7 +17,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
             _objects = new LinkedList<EnumerableItem>();
             SingleNullObjects = new object?[] { null };
             _commaObjects = new object?[] { "," };
-            _emptyObjects = new object?[] { };
+            EmptyObjects = new object?[] { };
         }
 
         public IReadOnlyCollection<EnumerableItem> Objects => _objects;
@@ -42,7 +42,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
         public object?[] GetBool<T>(Func<T, bool> predicate) => Objects.Last()
             .Value
             .Cast<T>()
-            .Let(it => predicate.Invoke(it) ? SingleNullObjects : _emptyObjects);
+            .Let(it => predicate.Invoke(it) ? SingleNullObjects : EmptyObjects);
 
         public object?[] GetArray<TSource, TTarget>(Func<TSource, IEnumerable<TTarget>> enumerableGetter) => Objects
             .Last()

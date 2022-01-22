@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -6,10 +7,17 @@ namespace Coding4fun.DataTools.Analyzers.Template
 {
     public class CodeTemplate
     {
-        internal CodeTemplate(string? name)
+        public enum Attribute
+        {
+            Case,
+            WordSeparator
+        }
+        
+        internal CodeTemplate(string? name, Dictionary<string, string> attributes)
         {
             Name = name;
             Children = Array.Empty<CodeTemplate>();
+            Attributes = attributes;
         }
 
         internal CodeTemplate(CodeTemplate? parent, string text)
@@ -17,6 +25,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
             Text = text;
             Parent = parent;
             Children = Array.Empty<CodeTemplate>();
+            Attributes = new Dictionary<string, string>();
         }
 
         public string? Name { get; }
@@ -25,6 +34,7 @@ namespace Coding4fun.DataTools.Analyzers.Template
         public CodeTemplate? Parent { get; set; }
         public CodeTemplate[] Children { get; internal set; }
         private string? Text { get; }
+        public IReadOnlyDictionary<string, string> Attributes { get; }
 
         public void BuildCode(StringBuilder sharpSb, ResolverBase resolver)
         {

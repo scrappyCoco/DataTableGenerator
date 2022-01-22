@@ -119,8 +119,7 @@ namespace Coding4fun.DataTools.Analyzers
                         _namingConvention = namingConventionValue.ParseEnum<NamingConvention>();
 
                         //_currentNode = genericName;
-                        string sqlTableName = GetSqlTableName(rootType.ToString());
-                        TableDescription tableDescription = new(rootType.ToString(), sqlTableName);
+                        TableDescription tableDescription = new(rootType.ToString());
 
                         // ..
                         //   .AddColumn(...)
@@ -211,20 +210,20 @@ namespace Coding4fun.DataTools.Analyzers
             }
         }
 
-        private string ChangeSqlCase(string entityName)
-        {
-            string sqlTableName = _namingConvention switch
-            {
-                NamingConvention.CamelCase               => entityName.ChangeCase(CaseRules.ToCamelCase)!,
-                NamingConvention.PascalCase              => entityName.ChangeCase(CaseRules.ToTitleCase)!,
-                NamingConvention.SnakeCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
-                NamingConvention.ScreamingSnakeCase or _ => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!
-            };
+        // private string ChangeSqlCase(string entityName)
+        // {
+        //     string sqlTableName = _namingConvention switch
+        //     {
+        //         NamingConvention.CamelCase               => entityName.ChangeCase(CaseRules.ToCamelCase)!,
+        //         NamingConvention.PascalCase              => entityName.ChangeCase(CaseRules.ToTitleCase)!,
+        //         NamingConvention.SnakeCase               => entityName.ChangeCase(CaseRules.ToLowerCase, "_")!,
+        //         NamingConvention.ScreamingSnakeCase or _ => entityName.ChangeCase(CaseRules.ToUpperCase, "_")!
+        //     };
+        //
+        //     return sqlTableName;
+        // }
 
-            return sqlTableName;
-        }
-
-        private string GetSqlTableName(string entityName) => "#" + ChangeSqlCase(entityName);
+        // private string GetSqlTableName(string entityName) => "#" + ChangeSqlCase(entityName);
 
         private ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
         {
@@ -291,7 +290,7 @@ namespace Coding4fun.DataTools.Analyzers
             columnType ??= MapSharpType2Sql(propertySymbol!, lambdaBody!);
             string sharpType = propertySymbol.Type.ToString();
 
-            columnName = ChangeSqlCase(columnName!);
+            //columnName = ChangeSqlCase(columnName!);
 
             ColumnDescription columnDescription = new(expressionBody!, columnName, columnType)
             {
@@ -419,9 +418,7 @@ namespace Coding4fun.DataTools.Analyzers
                 }
             }
 
-            string sqlTableName = GetSqlTableName(genericNameText!);
-
-            TableDescription subTableDescription = new(genericNameText!, sqlTableName)
+            TableDescription subTableDescription = new(genericNameText!)
             {
                 EnumerableName = expressionBodyText
             };
