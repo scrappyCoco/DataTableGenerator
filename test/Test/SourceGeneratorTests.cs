@@ -1,16 +1,7 @@
-using System;
-using System.Collections.Immutable;
-using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Coding4fun.DataTools.Analyzers;
 using Coding4fun.DataTools.Test.Infrastructure;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using NUnit.Framework;
 
@@ -23,7 +14,7 @@ namespace Coding4fun.DataTools.Test
         {
         }
 
-        private async Task TestSuccessAsync([CallerMemberName] string? methodName = null)
+        private async Task TestSuccessAsync([CallerMemberName] string methodName = null!)
         {
             string sourceCode = await LoadAsync("Source.cs", methodName);
             string targetCode = await LoadAsync("Target.cs", methodName);
@@ -37,7 +28,11 @@ namespace Coding4fun.DataTools.Test
                     {
                         (typeof(DataTableSourceGenerator), "PersonSqlMapping.Generated.cs", targetCode)
                     },
-                    MarkupHandling = MarkupMode.Allow
+                    MarkupHandling = MarkupMode.Allow,
+                    AdditionalFiles =
+                    {
+                        ("Coding4fun.Test.DataTools", "")
+                    }
                 }
             };
             

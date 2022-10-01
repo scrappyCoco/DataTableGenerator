@@ -12,42 +12,6 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 {
     public partial class PersonSqlMapping
     {
-        public DataTable SomePersonDataTable { get; } = new DataTable();
-
-        public PersonSqlMapping()
-        {
-            SomePersonDataTable.Columns.Add("id", typeof(System.Guid));
-        }
-  
-        public string GetSqlTableDefinition() => @"
-CREATE TABLE #somePerson
-(
-  id UNIQUEIDENTIFIER
-);
-";
-
-        public void FillDataTables(IEnumerable<SomePerson> items)
-        {
-            foreach (var somePerson in items)
-            {
-                AddSomePerson(somePerson);
-            }
-        }
-
-        public async Task BulkCopyAsync(SqlConnection targetConnection)
-        {
-            using (SqlBulkCopy somePersonSqlBulkCopy = new SqlBulkCopy(targetConnection))
-            {
-                somePersonSqlBulkCopy.DestinationTableName = "#somePerson";
-                await somePersonSqlBulkCopy.WriteToServerAsync(SomePersonDataTable);
-            }
-        }
-
-        public void AddSomePerson(SomePerson somePerson)
-        {
-            SomePersonDataTable.Rows.Add(
-                somePerson.Id
-            );
-        }
+        const string RootSqlTableName = "#SOME_PERSON";
     }
 }

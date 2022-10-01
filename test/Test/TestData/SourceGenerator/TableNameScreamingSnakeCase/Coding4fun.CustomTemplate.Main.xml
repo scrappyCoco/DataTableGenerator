@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off
+     --><Root><!--
+     --><UsedNamespaces>
+<!-- -->using <UsedNamespace />;<!-- 
+     --></UsedNamespaces>
+<!-- -->
+<!-- -->namespace <Namespace />
+<!-- -->{
+<!-- -->    public partial class <SqlMappingClassName />
+<!-- -->    {
+<!-- -->        const string RootSqlTableName<RootClass> = "<SqlTableName />";</RootClass>
+<!-- -->    }
+<!-- -->}
+<!-- --></Root>

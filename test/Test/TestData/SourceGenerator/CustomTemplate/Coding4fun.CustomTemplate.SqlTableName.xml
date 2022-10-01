@@ -5,6 +5,6 @@
         --><Attribute name="SqlTableName" /><!--
       --></HasAttribute><!--
       --><HasNotAttribute name="SqlTableName"><!--
-        -->#<ClassName case="ToUpperCase" wordSeparator="_" /><!--
+        -->#<ClassName case="ToLowerCase" wordSeparator="_" /><!--
       --></HasNotAttribute><!--
     --></Root>

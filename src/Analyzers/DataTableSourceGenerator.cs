@@ -20,7 +20,6 @@ namespace Coding4fun.DataTools.Analyzers
         private const string ErrorTitle = "Unable to generate source for DataTable";
         private const string ErrorCategory = "Code";
         
-        private NamingConvention _namingConvention = NamingConvention.ScreamingSnakeCase;
         private SyntaxNode? _nodeContext;
 
         /// <inheritdoc />
@@ -84,9 +83,8 @@ namespace Coding4fun.DataTools.Analyzers
                         TypeSyntax rootType = genericName.TypeArgumentList.Arguments.First();
                         SetContext(rootType);
 
-                        // new DataTableBuilder<Person>(NamingConvention.ScreamingSnakeCase)...
+                        // new DataTableBuilder<Person>(Templates.DataTable)...
                         //                              ^                                 ^
-                        string namingConventionValue = NamingConvention.ScreamingSnakeCase.ToString();
                         string templateNamespace = Templates.DataTable;
 
                         ArgumentSyntax[]? constructorArguments = genericName.Ancestors()
@@ -108,15 +106,9 @@ namespace Coding4fun.DataTools.Analyzers
                                         templateNamespace = literalExpression.Token.Value?.ToString() ?? Templates.Unresolved;
                                     }
                                 }
-                                else if ("namingConvention" == argName || argName == null && argNumber == 1)
-                                {
-                                    namingConventionValue = constructorArgument.Expression.GetLastToken().Text;
-                                }
                             }
                         }
                         
-
-                        _namingConvention = namingConventionValue.ParseEnum<NamingConvention>();
 
                         //_currentNode = genericName;
                         TableDescription tableDescription = new(rootType.ToString());
@@ -228,6 +220,7 @@ namespace Coding4fun.DataTools.Analyzers
         private ColumnDescription ParseAddColumn(InvocationExpressionSyntax invocationExpression, SemanticModel semanticModel)
         {
             string? columnName = null;
+            string? customColumnName = null;
             string? columnType = null;
             string? expressionBody = null;
             IPropertySymbol? propertySymbol = null;
@@ -283,18 +276,17 @@ namespace Coding4fun.DataTools.Analyzers
                 }
                 else if (parameterName == "columnName" || parameterName == null && argNumber == 2)
                 {
-                    columnName = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
+                    customColumnName = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
                 }
             }
             
             columnType ??= MapSharpType2Sql(propertySymbol!, lambdaBody!);
             string sharpType = propertySymbol.Type.ToString();
 
-            //columnName = ChangeSqlCase(columnName!);
-
             ColumnDescription columnDescription = new(expressionBody!, columnName, columnType)
             {
-                SharpType = sharpType
+                SharpType = sharpType,
+                SqlColumnName = customColumnName
             };
 
             return columnDescription;

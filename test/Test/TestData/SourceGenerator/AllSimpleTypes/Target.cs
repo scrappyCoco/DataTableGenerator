@@ -16,41 +16,41 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
 
         public PersonSqlMapping()
         {
-            PersonDataTable.Columns.Add("IT_IS_GUID", typeof(System.Guid));
-            PersonDataTable.Columns.Add("IT_IS_DATE_TIME", typeof(System.DateTime));
-            PersonDataTable.Columns.Add("IT_IS_DATE_TIME_OFFSET", typeof(System.DateTimeOffset));
-            PersonDataTable.Columns.Add("IT_IS_DATE_TIME_SPAN", typeof(System.TimeSpan));
-            PersonDataTable.Columns.Add("IT_IS_BOOL", typeof(bool));
-            PersonDataTable.Columns.Add("IT_IS_BYTE", typeof(byte));
-            PersonDataTable.Columns.Add("IT_IS_SHORT", typeof(short));
-            PersonDataTable.Columns.Add("IT_IS_INT", typeof(int));
-            PersonDataTable.Columns.Add("IT_IS_LONG", typeof(long));
-            PersonDataTable.Columns.Add("IT_IS_DECIMAL", typeof(decimal));
-            PersonDataTable.Columns.Add("IT_IS_DOUBLE", typeof(double));
-            PersonDataTable.Columns.Add("IT_IS_SINGLE", typeof(float));
-            PersonDataTable.Columns.Add("IT_IS_INT_16", typeof(short));
-            PersonDataTable.Columns.Add("IT_IS_INT_32", typeof(int));
-            PersonDataTable.Columns.Add("IT_IS_INT_64", typeof(long));
+            PersonDataTable.Columns.Add("it_is_guid", typeof(System.Guid));
+            PersonDataTable.Columns.Add("it_is_date_time", typeof(System.DateTime));
+            PersonDataTable.Columns.Add("it_is_date_time_offset", typeof(System.DateTimeOffset));
+            PersonDataTable.Columns.Add("it_is_date_time_span", typeof(System.TimeSpan));
+            PersonDataTable.Columns.Add("it_is_bool", typeof(bool));
+            PersonDataTable.Columns.Add("it_is_byte", typeof(byte));
+            PersonDataTable.Columns.Add("it_is_short", typeof(short));
+            PersonDataTable.Columns.Add("it_is_int", typeof(int));
+            PersonDataTable.Columns.Add("it_is_long", typeof(long));
+            PersonDataTable.Columns.Add("it_is_decimal", typeof(decimal));
+            PersonDataTable.Columns.Add("it_is_double", typeof(double));
+            PersonDataTable.Columns.Add("it_is_single", typeof(float));
+            PersonDataTable.Columns.Add("it_is_int_16", typeof(short));
+            PersonDataTable.Columns.Add("it_is_int_32", typeof(int));
+            PersonDataTable.Columns.Add("it_is_int_64", typeof(long));
         }
   
         public string GetSqlTableDefinition() => @"
-CREATE TABLE #PERSON
+CREATE TABLE #person
 (
-  IT_IS_GUID UNIQUEIDENTIFIER,
-  IT_IS_DATE_TIME DATETIME,
-  IT_IS_DATE_TIME_OFFSET DATETIMEOFFSET,
-  IT_IS_DATE_TIME_SPAN TIME,
-  IT_IS_BOOL BIT,
-  IT_IS_BYTE BINARY,
-  IT_IS_SHORT SMALLINT,
-  IT_IS_INT INTEGER,
-  IT_IS_LONG BIGINT,
-  IT_IS_DECIMAL DECIMAL(15,2),
-  IT_IS_DOUBLE FLOAT,
-  IT_IS_SINGLE REAL,
-  IT_IS_INT_16 SMALLINT,
-  IT_IS_INT_32 INTEGER,
-  IT_IS_INT_64 BIGINT
+  it_is_guid UNIQUEIDENTIFIER,
+  it_is_date_time DATETIME,
+  it_is_date_time_offset DATETIMEOFFSET,
+  it_is_date_time_span TIME,
+  it_is_bool BIT,
+  it_is_byte BINARY,
+  it_is_short SMALLINT,
+  it_is_int INTEGER,
+  it_is_long BIGINT,
+  it_is_decimal DECIMAL(15,2),
+  it_is_double FLOAT,
+  it_is_single REAL,
+  it_is_int_16 SMALLINT,
+  it_is_int_32 INTEGER,
+  it_is_int_64 BIGINT
 );
 ";
 
@@ -66,7 +66,7 @@ CREATE TABLE #PERSON
         {
             using (SqlBulkCopy personSqlBulkCopy = new SqlBulkCopy(targetConnection))
             {
-                personSqlBulkCopy.DestinationTableName = "#PERSON";
+                personSqlBulkCopy.DestinationTableName = "#person";
                 await personSqlBulkCopy.WriteToServerAsync(PersonDataTable);
             }
         }

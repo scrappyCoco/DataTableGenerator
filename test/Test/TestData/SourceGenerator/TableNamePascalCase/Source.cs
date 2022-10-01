@@ -17,7 +17,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
         [SqlMappingDeclaration]  
         private void Initialize()
         {
-            new TableBuilder<SomePerson>(namingConvention: NamingConvention.PascalCase)
+            new TableBuilder<SomePerson>("Coding4fun.CustomTemplate")
                 .AddColumn((SomePerson somePerson) => somePerson.Id);
         }
     }

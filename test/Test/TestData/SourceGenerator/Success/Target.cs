@@ -23,7 +23,7 @@ namespace Coding4fun.DataTools.Test.TestData.SourceGenerator
             PersonDataTable.Columns.Add("age", typeof(short));
             PersonDataTable.Columns.Add("first_name", typeof(string));
             PersonDataTable.Columns.Add("last_name", typeof(string));
-            PersonDataTable.Columns.Add("country", typeof(string));
+            PersonDataTable.Columns.Add("COUNTRY", typeof(string));
             PersonDataTable.Columns.Add("phone", typeof(string));
             PersonDataTable.Columns.Add("photo", typeof(byte[]));
 
@@ -42,7 +42,7 @@ CREATE TABLE #MY_PERSON
   age SMALLINT,
   first_name NVARCHAR(50),
   last_name NVARCHAR(50),
-  country NCHAR(2),
+  COUNTRY NCHAR(2),
   phone NVARCHAR(MAX),
   photo VARBINARY(MAX)
 );

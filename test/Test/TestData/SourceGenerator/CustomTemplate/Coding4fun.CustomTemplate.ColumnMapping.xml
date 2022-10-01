@@ -3,7 +3,7 @@
      --><Root><!--
      -->            DataTable <DataTableName/> = new DataTable("<SqlTableName />");<!--
      --><Columns>
-<!-- -->            <DataTableName/>.Columns.Add("<SqlColumnName />", typeof(<SharpType />));<!--
+<!-- -->            <DataTableName/>.Columns.Add("<ColumnName />", typeof(<SharpType />));<!--
      --></Columns>
 
 <!-- --><SubTables><ColumnMapping /></SubTables><!--

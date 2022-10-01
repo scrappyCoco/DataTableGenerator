@@ -14,6 +14,11 @@ namespace Coding4fun.DataTools.Test.Infrastructure
         /// Folder name with test data.
         /// </summary>
         private const string TestData = nameof(TestData);
+
+        /// <summary>
+        /// Suffix of derived class.
+        /// </summary>
+        private const string Tests = nameof(Tests);
         
         /// <summary>
         /// Relative path to test data, depend on namespace of executing test class.
@@ -25,12 +30,16 @@ namespace Coding4fun.DataTools.Test.Infrastructure
             // Assumes that test assembly name is equals to the root namespace.
             string assemblyFullName = GetType().Assembly.GetName().Name!;
             string testNamespace = GetType().Namespace!;
+            
             List<string> pathComponents = new List<string> { TestData };
+            
             pathComponents.AddRange(testNamespace
                 .Replace(assemblyFullName, "")
                 .Split(new[] { "." }, StringSplitOptions.RemoveEmptyEntries)
             );
-            pathComponents.Add(GetType().Name.Replace("Tests", ""));
+            
+            pathComponents.Add(GetType().Name.Replace(Tests, ""));
+            
             _pathToTestData = Path.Combine(pathComponents.ToArray());
         }
 
@@ -41,10 +50,10 @@ namespace Coding4fun.DataTools.Test.Infrastructure
             return Task.FromResult(code.Replace("\r", ""));
         }
 
-        protected async Task<(string, string)[]> LoadXmlFiles([CallerMemberName] string? methodName = null)
+        protected async Task<(string, string)[]> LoadXmlFiles([CallerMemberName] string methodName = null!)
         {
             List<(string, string)> files = new List<(string, string)>();
-            string pathToDirectory = Path.Combine(_pathToTestData, methodName!);
+            string pathToDirectory = Path.Combine(_pathToTestData, methodName);
             string[] xmlFiles = Directory.GetFiles(pathToDirectory, "*.xml", SearchOption.TopDirectoryOnly);
             foreach (string xmlFilePath in xmlFiles)
             {

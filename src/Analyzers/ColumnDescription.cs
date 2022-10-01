@@ -7,26 +7,35 @@ using Coding4fun.DataTools.Analyzers.Extension;
 namespace Coding4fun.DataTools.Analyzers
 {
     [DebuggerDisplay("{ToString()}")]
-    public class ColumnDescription
+    public class ColumnDescription: IAttributeHolder
     {
         internal readonly Dictionary<string, string> CustomAttributes = new (StringComparer.InvariantCultureIgnoreCase);
 
-        public ColumnDescription(string valueBody, string? columnName = null, string? sqlType = null)
+        internal string? SqlColumnName
         {
-            ColumnName = columnName;
+            get => CustomAttributes.GetValueOrNull(nameof(SqlColumnName));
+            set => CustomAttributes.SetValue(nameof(SqlColumnName), value);
+        }
+        
+        public ColumnDescription(string valueBody, string? propertyName = null, string? sqlType = null)
+        {
+            PropertyName = propertyName;
             SqlType = sqlType;
             ValueBody = valueBody;
         }
 
-        public string? ColumnName { get; se; }
+        public string? PropertyName { get; set; }
         public string? SqlType { get; }
         public string ValueBody { get; }
         public string? SharpType { get; set; }
 
         /// <inheritdoc />
         [ExcludeFromCodeCoverage]
-        public override string ToString() => $"{nameof(ColumnName)}={ColumnName}," +
+        public override string ToString() => $"{nameof(PropertyName)}={PropertyName}," +
                                              $"{nameof(SqlType)}={SqlType}," +
                                              $"{nameof(ValueBody)}={ValueBody}";
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, string> Attributes => CustomAttributes;
     }
 }

@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 namespace Coding4fun.DataTools.Analyzers
 {
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
-    public class TableDescription
+    public class TableDescription: IAttributeHolder
     {
         internal readonly Dictionary<string, string> CustomAttributes = new (StringComparer.InvariantCultureIgnoreCase);
 
@@ -36,5 +36,8 @@ namespace Coding4fun.DataTools.Analyzers
         [ExcludeFromCodeCoverage]
         public override string ToString() => $"{nameof(ClassName)}={ClassName}," +
                                              $"{nameof(EnumerableName)}={EnumerableName},";
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, string> Attributes => CustomAttributes;
     }
 }

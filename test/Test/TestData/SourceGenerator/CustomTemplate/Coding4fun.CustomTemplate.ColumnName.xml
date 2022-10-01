@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- @formatter:off-->
+<Root><!--
+--><HasAttribute name="SqlColumnName"><!--
+  --><Attribute name="SqlColumnName" /><!--
+--></HasAttribute><!--
+--><HasNotAttribute name="SqlColumnName"><!--
+  --><PropertyName case="ToLowerCase" wordSeparator="_" /><!--
+--></HasNotAttribute><!--
+--></Root>

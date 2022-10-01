@@ -35,4 +35,9 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="TestData\SourceGenerator\CustomTemplate\Coding4fun.CustomTemplate.ColumnName.xml" />
+    <EmbeddedResource Include="TestData\SourceGenerator\CustomTemplate\Coding4fun.CustomTemplate.Comma.xml" />
+  </ItemGroup>
+
 </Project>
