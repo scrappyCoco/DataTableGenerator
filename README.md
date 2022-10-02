@@ -4,16 +4,16 @@
 
 ## DataTable source generator
 
-Someone who have deal with C# DataTable knows, that it has many lines of code, located in different places. It has some problems.
+Someone who had deal with C# DataTable knows, that it has many lines of code, located in different places. It has some problems.
 
 For example:
 ```c#
-// 1. We must to declare tables. It's not difficult.
+// 1. We must declare tables.
 DataTable personDataTable = new DataTable();
 DataTable jobDataTable = new DataTable();
 DataTable skillDataTable = new DataTable();
 
-// 2. We must to declare columns. Why we must to write types expclicitly? It could be got from Person type`
+// 2. We must declare columns. Why we have to write types expclicitly? It could be gotten from Person type.
 personDataTable.Columns.Add("ID", typeof(Guid));
 personDataTable.Columns.Add("AGE", typeof(short));
 personDataTable.Columns.Add("FIRST_NAME", typeof(string));
@@ -28,7 +28,7 @@ jobDataTable.Columns.Add("ADDRESS", typeof(string));
 skillDataTable.Columns.Add("PERSON_ID", typeof(Guid));
 skillDataTable.Columns.Add("TAG", typeof(string));
 
-// 3. We must to fill DataTables.
+// 3. We must fill DataTables.
 // Same columns are involved.
 // In cases, where columns count is big it's difficult to map columns to it's values,
 // especially if column names are not equals to property names.
@@ -63,7 +63,7 @@ foreach (var person in persons)
     }
 }
 
-// 4. If we want write to temp tables, we must to define it.
+// 4. If we want to write into temp tables, we have to define it.
 // Another one time we specify same columns.
 const string tempTableDefinition = @"
 CREATE TABLE #MY_PERSON
@@ -113,9 +113,9 @@ using (SqlBulkCopy skillSqlBulkCopy = new SqlBulkCopy(targetConnection))
 await targetConnection.CloseAsync();
 ```
 
-Keep in mind, that this model is basic and only for example. In real world we have deal with more complex objects.
+Keep in mind, that this model is basic and only for example. In real world we have to deal with more complex objects.
 
-As you can notice, there a lot boilerplate code. I think, that there could be presented model, that will generate all this code:
+As you can notice, there are a lot of boilerplate code. I think, that there could be presented model, that will generate all this code:
 ```c#
 // Create partial class with mapping.
 // Source generator will produce read-only class PersonSqlMapping.Generated.cs
@@ -130,7 +130,7 @@ public partial class PersonSqlMapping
         //    For our example it's `person`.
         //    If you write for the first column: person => person.Id.
         //    At the second column it should be same: person => person.Age.
-        //    It will be not valid for second and others columns: p => p.Age.
+        //    It will be invalid for second and others columns: p => p.Age.
         
         new TableBuilder<Person>()
             // It's possible to add some action, that will be added before
@@ -313,7 +313,7 @@ Then you could see wavy line, move cursor over it, press the light bulb and pres
 
 ![TableBuilderCodeFix](https://raw.githubusercontent.com/scrappyCoco/DataTools/master/screenshots/TableBuilderCodeFix.png)
 
-Then we must to consume generated code:
+Then we have to consume generated code:
 ```c#
 Person[] persons = JsonSerializer.Deserialize<Person[]>(await File.ReadAllTextAsync("Persons.json"));
 
@@ -332,28 +332,28 @@ await personSqlMapping.BulkCopyAsync(targetConnection);
 await targetConnection.CloseAsync();
 ```
 
-As result we have got very compat data model, where each column described in one place. It's easy to read and refactoring.
+As a result we got very compat data model, where each column described in one place. It's easy to read and refactoring.
 
 ## Custom templates
 
-| Element | Returns type | Description                                                                                                                                                                                                                                                                                                                  | Available in |
-| :--- | :--- |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| :--- |
-| Root | - | Root element for file.                                                                                                                                                                                                                                                                                                       | - |
-| RootClass | Table | Description for the root table \(class\).                                                                                                                                                                                                                                                                                    | - |
-| VarName | string | Name of the entity in camelCase.                                                                                                                                                                                                                                                                                             | Table |
-| EntityName | string | Name of the entity in TitleCase.                                                                                                                                                                                                                                                                                             | Table |
-| ClassName | string | Original name of the entity.                                                                                                                                                                                                                                                                                                 | Table |
-| EnumerableName | string | Name of the property with type inherited from IEnumerable.<br/>For example:<br/><code>.AddSubTable&lt;Job&gt;\(p =&gt; p.Jobs, jobBuilder =&gt; jobBuilder</code><br/>It will be </b>p.Jobs</b>.                                                                                                                             | Table |
-| DataTableName | string | Name of the entity in TitleCase + "DataTable" suffix.                                                                                                                                                                                                                                                                        | Table |
-| SqlTableName | string | Name of SQL table. It depend on NamingConvention in TableBuilder constructor.<br/>Possible values are:<br/>- NamingConvention.PascalCase \(PascalCase\)<br/>- NamingConvention.CamelCase \(camelCase\)<br/>- NamingConvention.SnakeCase \(snake\_case\)<br/>- NamingConvention.ScreamingSnakeCase \(SCREAMING\_SNAKE\_CASE\) | Name of SQL table. It depend on NamingConvention in TableBuilder constructor. |
-| SubTables | Table\[\] | Sub tables that were added by <code>AddSubTable</code> method.                                                                                                                                                                                                                                                               | Table |
-| Columns | Column\[\] | Columns that were added by <code>AddColumn</code> method.                                                                                                                                                                                                                                                                    | Table |
-| ParentTableVarName | string | <b>VarName</b> of the parent table (if it exists).                                                                                                                                                                                                                                                                           | Table |
-| HasPreExecutionActions | BoolElement | If <code>AddPreExecutionAction</code> method was called, then inner block will be rendered.                                                                                                                                                                                                                                  | Table |
-| PreExecutionActions | string\[\] | This is some actions over entity, that would be executed after inserting to add it, use :<code>AddPreExecutionAction</code> method call.                                                                                                                                                                                     | Table |
-| SharpType | string | This dotnet type for current property. It could be: int, Guid, DateTime and so on.                                                                                                                                                                                                                                           | Column |
-| SqlType | string | SQL Server type, that was converted from <b>SharpType</b>.                                                                                                                                                                                                                                                                   | Column |
-| ValueBody | string | Value of lambda expression. For <code>.AddColumn((Person person) => person.Photo)</code> it could be <code>person.Photo</code>.                                                                                                                                                                                              | Column |
-| SqlColumnName | string | Name of MSSQL column.                                                                                                                                                                                                                                                                                                        | Column |
-| Offset | string | (CountOfTable + 2) * 4.                                                                                                                                                                                                                                                                                                      | - |
-| Comma | string | Comma for each element, except last.                                                                                                                                                                                                                                                                                         | Array |
+| Element                | Returns type | Description                                                                                                                                                                                                                                                                                                                  | Available in                                                                  |
+|:-----------------------|:-------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------|
+| Root                   | -            | Root element for file.                                                                                                                                                                                                                                                                                                       | -                                                                             |
+| RootClass              | Table        | Description for the root table \(class\).                                                                                                                                                                                                                                                                                    | -                                                                             |
+| VarName                | string       | Name of the entity in camelCase.                                                                                                                                                                                                                                                                                             | Table                                                                         |
+| EntityName             | string       | Name of the entity in TitleCase.                                                                                                                                                                                                                                                                                             | Table                                                                         |
+| ClassName              | string       | Original name of the entity.                                                                                                                                                                                                                                                                                                 | Table                                                                         |
+| EnumerableName         | string       | Name of the property with type inherited from IEnumerable.<br/>For example:<br/><code>.AddSubTable&lt;Job&gt;\(p =&gt; p.Jobs, jobBuilder =&gt; jobBuilder</code><br/>It will be </b>p.Jobs</b>.                                                                                                                             | Table                                                                         |
+| DataTableName          | string       | Name of the entity in TitleCase + "DataTable" suffix.                                                                                                                                                                                                                                                                        | Table                                                                         |
+| SqlTableName           | string       | Name of SQL table. It depend on NamingConvention in TableBuilder constructor.<br/>Possible values are:<br/>- NamingConvention.PascalCase \(PascalCase\)<br/>- NamingConvention.CamelCase \(camelCase\)<br/>- NamingConvention.SnakeCase \(snake\_case\)<br/>- NamingConvention.ScreamingSnakeCase \(SCREAMING\_SNAKE\_CASE\) | Name of SQL table. It depend on NamingConvention in TableBuilder constructor. |
+| SubTables              | Table\[\]    | Sub tables that were added by <code>AddSubTable</code> method.                                                                                                                                                                                                                                                               | Table                                                                         |
+| Columns                | Column\[\]   | Columns that were added by <code>AddColumn</code> method.                                                                                                                                                                                                                                                                    | Table                                                                         |
+| ParentTableVarName     | string       | <b>VarName</b> of the parent table (if it exists).                                                                                                                                                                                                                                                                           | Table                                                                         |
+| HasPreExecutionActions | BoolElement  | If <code>AddPreExecutionAction</code> method was called, then inner block will be rendered.                                                                                                                                                                                                                                  | Table                                                                         |
+| PreExecutionActions    | string\[\]   | This is some actions over entity, that would be executed after inserting to add it, use :<code>AddPreExecutionAction</code> method call.                                                                                                                                                                                     | Table                                                                         |
+| SharpType              | string       | This dotnet type for current property. It could be: int, Guid, DateTime and so on.                                                                                                                                                                                                                                           | Column                                                                        |
+| SqlType                | string       | SQL Server type, that was converted from <b>SharpType</b>.                                                                                                                                                                                                                                                                   | Column                                                                        |
+| ValueBody              | string       | Value of lambda expression. For <code>.AddColumn((Person person) => person.Photo)</code> it could be <code>person.Photo</code>.                                                                                                                                                                                              | Column                                                                        |
+| SqlColumnName          | string       | Name of MSSQL column.                                                                                                                                                                                                                                                                                                        | Column                                                                        |
+| Offset                 | string       | (CountOfTable + 2) * 4.                                                                                                                                                                                                                                                                                                      | -                                                                             |
+| Comma                  | string       | Comma for each element, except last.                                                                                                                                                                                                                                                                                         | Array                                                                         |
